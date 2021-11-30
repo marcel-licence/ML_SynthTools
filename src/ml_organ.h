@@ -33,9 +33,9 @@
  * @author Marcel Licence
  * @date 26.11.2021
  *
- * @brief 	This shows you all available functions to use the organ library
- * 			The library is still in progress and will be updated in future
- *			You can integrate this lib at the moment in your ESP32 and ESP8266 projects
+ * @brief   This shows you all available functions to use the organ library
+ *          The library is still in progress and will be updated in future
+ *          You can integrate this lib at the moment in your ESP32 and ESP8266 projects
  */
 
 #ifndef SRC_ML_ORGAN_H_
@@ -53,7 +53,8 @@ void Organ_Setup();
 /**
  * when initialized you will get your audio samples from this function
  */
-int16_t Organ_Process();
+int16_t Organ_Process(); /* only supported by ESP32, ESP8266 */
+void Organ_Process_Buf(int32_t *buf, uint8_t len); /* supported only by SAMD21 */
 
 /**
  * this functions are used to feed in the note on/off events
@@ -65,7 +66,7 @@ void Organ_NoteOff(uint8_t ch __attribute__((unused)), uint8_t note);
  * finally you can control some settings with the following functions
  */
 void Organ_PercussionSet(uint8_t setting);
-void Organ_SetLeslCtrl(uint8_t val);
+void Organ_SetLeslCtrl(uint8_t val); /* only supported by ESP32, ESP8266 */
 void Organ_SetDrawbar(uint8_t idx, uint8_t value);
 
 
