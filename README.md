@@ -6,5 +6,7 @@
 </p>
 
 The organ example can be found here: https://github.com/marcel-licence/esp32_esp8266_organ
+Demo using the XIAO: https://youtu.be/2wT8nByoUNw
+Demo using the Teensy4.1: https://youtu.be/H-NDCQnSDV0
 more information available in future
 
