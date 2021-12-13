@@ -38,6 +38,7 @@
  *          You can integrate this lib at the moment in your ESP32 and ESP8266 projects
  */
 
+
 #ifndef SRC_ML_ORGAN_H_
 #define SRC_ML_ORGAN_H_
 
@@ -48,12 +49,12 @@
 /**
  * call this first before using the module to initialize it
  */
-void Organ_Setup();
+void Organ_Setup(Stream *ser);
 
 /**
  * when initialized you will get your audio samples from this function
  */
-int16_t Organ_Process();
+int16_t Organ_Process(void);
 void Organ_Process_Buf(int32_t *buf, uint8_t len); /* not supported by ESP32, ESP8266 */
 
 /**
