@@ -46,10 +46,20 @@
 #include "Arduino.h"
 #include <stdint.h>
 
+
+#define CTRL_PERC_SWITCH    0
+#define CTRL_PERC_SPEED     1
+#define CTRL_PERC_NOTE      2
+#define CTRL_PERC_LOUD      3
+#define CTRL_PERC_POLY      4
+#define CTRL_INTR_FEEDBACK  5
+#define CTRL_ROTARY_ACTIVE  6
+
+
 /**
  * call this first before using the module to initialize it
  */
-void Organ_Setup(Stream *ser);
+void Organ_Setup(Stream *ser, float sample_rate);
 
 /**
  * when initialized you will get your audio samples from this function
