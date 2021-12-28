@@ -82,6 +82,7 @@ public:
      * set parameter for all oscillators
      */
     static void SetParam(uint8_t osc_param, float value);
+    static void SetWaveform(uint8_t *waveform_ptr);
 
 private:
 
