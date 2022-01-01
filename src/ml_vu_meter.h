@@ -29,56 +29,25 @@
  */
 
 /**
- * @file ml_organ.h
+ * @file ml_vu_meter.h
  * @author Marcel Licence
- * @date 26.11.2021
+ * @date 01.01.2021
  *
- * @brief   This shows you all available functions to use the organ library
- *          The library is still in progress and will be updated in future
- *          You can integrate this lib at the moment in your ESP32 and ESP8266 projects
+ * @brief   This is a little helper for a simple vu meter
  */
 
 
-#ifndef SRC_ML_ORGAN_H_
-#define SRC_ML_ORGAN_H_
+#ifndef SRC_ML_VU_METER_H_
+#define SRC_ML_VU_METER_H_
 
 
-#include "Arduino.h"
-#include <stdint.h>
+#include <Arduino.h>
 
 
-#define CTRL_PERC_SWITCH    0
-#define CTRL_PERC_SPEED     1
-#define CTRL_PERC_NOTE      2
-#define CTRL_PERC_LOUD      3
-#define CTRL_PERC_POLY      4
-#define CTRL_INTR_FEEDBACK  5
-#define CTRL_ROTARY_ACTIVE  6
+void VuMeter_Init(void);
+void VuMeter_Process(void);
+void VuMeter_PutSamples(float *left, float *right, uint32_t len);
+float getVuMeterVal(uint8_t idx);
 
 
-/**
- * call this first before using the module to initialize it
- */
-void Organ_Setup(Stream *ser, float sample_rate);
-
-/**
- * when initialized you will get your audio samples from this function
- */
-int16_t Organ_Process(void);
-void Organ_Process_Buf(int32_t *buf, uint8_t len); /* not supported by ESP32, ESP8266 */
-
-/**
- * this functions are used to feed in the note on/off events
- */
-void Organ_NoteOn(uint8_t ch __attribute__((unused)), uint8_t note, uint8_t vel __attribute__((unused)));
-void Organ_NoteOff(uint8_t ch __attribute__((unused)), uint8_t note);
-
-/**
- * finally you can control some settings with the following functions
- */
-void Organ_PercussionSet(uint8_t setting);
-void Organ_SetLeslCtrl(uint8_t val); /* not supported by SAMD21 */
-void Organ_SetDrawbar(uint8_t idx, uint8_t value);
-
-
-#endif /* SRC_ML_ORGAN_H_ */
+#endif /* SRC_ML_VU_METER_H_ */
