@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Dieses Programm ist Freie Software: Sie kÃ¶nnen es unter den Bedingungen
+ * Dieses Programm ist Freie Software: Sie können es unter den Bedingungen
  * der GNU General Public License, wie von der Free Software Foundation,
  * Version 3 der Lizenz oder (nach Ihrer Wahl) jeder neueren
- * verÃ¶ffentlichten Version, weiter verteilen und/oder modifizieren.
+ * veröffentlichten Version, weiter verteilen und/oder modifizieren.
  *
- * Dieses Programm wird in der Hoffnung bereitgestellt, dass es nÃ¼tzlich sein wird, jedoch
- * OHNE JEDE GEWÃ„HR,; sogar ohne die implizite
- * GewÃ¤hr der MARKTFÃ„HIGKEIT oder EIGNUNG FÃœR EINEN BESTIMMTEN ZWECK.
- * Siehe die GNU General Public License fÃ¼r weitere Einzelheiten.
+ * Dieses Programm wird in der Hoffnung bereitgestellt, dass es nützlich sein wird, jedoch
+ * OHNE JEDE GEWÄHR,; sogar ohne die implizite
+ * Gewähr der MARKTFÄHIGKEIT oder EIGNUNG FÜR EINEN BESTIMMTEN ZWECK.
+ * Siehe die GNU General Public License für weitere Einzelheiten.
  *
  * Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  * Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>.
@@ -44,10 +44,14 @@
 #include <Arduino.h>
 
 
-#ifdef SPI_DISP_ENABLED
-#define REV_MUL(a)  (a/2)
+#ifdef REVERB_DIV
+#define REV_MUL(a)  (a / REVERB_DIV)
+#else
+#ifdef REVERB_MUL
+#define REV_MUL(a)  (a * REVERB_MUL)
 #else
 #define REV_MUL(a)  (a)
+#endif
 #endif
 
 #define l_CB0 REV_MUL(3460)
