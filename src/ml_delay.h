@@ -29,22 +29,29 @@
  */
 
 /**
- * @file ml_boards.h
+ * @file ml_delay.h
  * @author Marcel Licence
- * @date 02.01.2021
+ * @date 06.01.2022
  *
- * @brief Board description main include file
+ * @brief This file contains an implementation of a simple reverb effect
  */
 
 
-#ifdef BOARD_ML_V1
-#include "./boards/board_ml_v1.h"
-#elif (defined BOARD_ESP32_AUDIO_KIT_AC101)
-#include "./boards/board_audio_kit_ac101.h"
-#elif (defined BOARD_ESP32_AUDIO_KIT_ES8388)
-#include "./boards/board_audio_kit_es8388.h"
-#elif (defined BOARD_ESP32_DOIT)
-#include "./boards/board_esp32_doit.h"
-#else
-/* no include here */
-#endif
+#ifndef SRC_ML_DELAY_H_
+#define SRC_ML_DELAY_H_
+
+
+#include <Arduino.h>
+
+
+void Delay_Init(int16_t *buffer, uint32_t len);
+void Delay_Reset(void);
+void Delay_Process(float *signal_l, float *signal_r);
+void Delay_Process_Buff(float *signal_l, int buffLen);
+void Delay_SetInputLevel(uint8_t unused, float value);
+void Delay_SetFeedback(uint8_t unused, float value);
+void Delay_SetOutputLevel(uint8_t unused, float value);
+void Delay_SetLength(uint8_t unused, float value);
+
+
+#endif /* SRC_ML_DELAY_H_ */
