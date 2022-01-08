@@ -27,3 +27,16 @@ Demo using the XIAO: https://youtu.be/2wT8nByoUNw
 Demo using the Teensy4.1: https://youtu.be/H-NDCQnSDV0
 
 More information will be available in future
+
+# Modules of this library
+
+The library contains the following modules:
+- arpeggiator <a href="extras/ml_arp.md">more details</a>
+- board pinout definitions <a href="extras/ml_boards.md">more details</a>
+- a simple delay <a href="extras/ml_delay.md">more details</a>
+- a simple reverb [more details](extras/ml_reverb.md)
+- organ sound generator <a href="extras/ml_organ.md">more details</a>
+- saw/square pulse width modulated oscillator <a href="extras/ml_oscillator.md">more details</a>
+- vu meter (helper) <a href="extras/ml_vu_meter.md">more details</a>
+- oled scope <a href="extras/ml_scope.md">more details</a>
+

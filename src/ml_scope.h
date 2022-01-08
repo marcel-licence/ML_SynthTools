@@ -29,31 +29,34 @@
  */
 
 /**
- * @file ml_delay.h
+ * @file h
  * @author Marcel Licence
- * @date 06.01.2022
+ * @date 01.01.2022
  *
- * @brief This file contains an implementation of a simple reverb effect
+ * @brief This file contains an implementation of a little fast scope which
+ * is optimized to create steady images
+ *
+ * In this version it uses the default Wire connection to talk to an OLED display
+ * It is written to be used with up to two 128x64 OLED displays
+ * The left channel will be output on i2c addr 0x3C and the right on i2c addr 0x3D
  */
 
 
-#ifndef SRC_ML_DELAY_H_
-#define SRC_ML_DELAY_H_
+#ifndef SRC_ML_SCOPE_H_
+#define SRC_ML_SCOPE_H_
 
 
 #include <Arduino.h>
 
 
-void Delay_Init(int16_t *buffer, uint32_t len);
-void Delay_Init2(int16_t *left, int16_t *right, uint32_t len);
-void Delay_Reset(void);
-//void Delay_Process(float *signal_l, float *signal_r);
-void Delay_Process_Buff(float *signal_l, int buffLen);
-void Delay_Process_Buff2(float *signal_l, float *signal_r, int buffLen);
-void Delay_SetInputLevel(uint8_t unused, float value);
-void Delay_SetFeedback(uint8_t unused, float value);
-void Delay_SetOutputLevel(uint8_t unused, float value);
-void Delay_SetLength(uint8_t unused, float value);
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 
-#endif /* SRC_ML_DELAY_H_ */
+void ScopeOled_Setup(void);
+void ScopeOled_Process(void);
+void ScopeOled_AddSamples(float *left, float *right, uint32_t len);
+
+
+#endif /* SRC_ML_SCOPE_H_ */
