@@ -45,6 +45,10 @@
 #include "./boards/board_audio_kit_es8388.h"
 #elif (defined BOARD_ESP32_DOIT)
 #include "./boards/board_esp32_doit.h"
+#elif (defined ARDUINO_GENERIC_F407VGTX)
+#include "boards/board_stm32f407g-disc1.h"
+#elif (defined ARDUINO_DISCO_F407VG)
+#include "boards/board_stm32f407g-disc1.h"
 #else
 /* no include here */
 #endif
