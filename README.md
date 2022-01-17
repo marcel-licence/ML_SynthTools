@@ -52,6 +52,8 @@ Add the following line:
 
 	compiler.libraries.ldflags=
 	
+Ref: https://youtu.be/c7TL8jcrnzs?t=419
+	
 If you get a lot of "undefined reference to" errors the library couldn't be found by Arduino.
 
 To support new platforms I need the information in which folder Arduino was looking for the library. 
