@@ -12,7 +12,7 @@ This library supports different platforms:
 - Teensy 4.1 (imxrt1062)
 - Daisy Seed (cortex-m7)
 - Raspberry Pi Pico (rp2040)
-- STM32F407 (cortex-m4) - not fully tested yet
+- STM32F407 (cortex-m4)
 
 The organ example can be found here: https://github.com/marcel-licence/ml_synth_organ_example
 
@@ -40,3 +40,29 @@ The library contains the following modules:
 - vu meter (helper) <a href="extras/ml_vu_meter.md">more details</a>
 - oled scope <a href="extras/ml_scope.md">more details</a>
 
+# Compiling note
+
+In some cases the following error might occur: 
+	
+	The plaform does not support 'compiler.libraries.ldflags' for precompiled libraries.
+	
+To fix this you can look for platform.txt
+
+Add the following line: 
+
+	compiler.libraries.ldflags=
+	
+If you get a lot of "undefined reference to" errors the library couldn't be found by Arduino.
+
+To support new platforms I need the information in which folder Arduino was looking for the library. 
+Example:
+
+	Compiling libraries...
+	Compiling library "ML_SynthTools"
+	Library ML_SynthTools has been declared precompiled:
+	Precompiled library in "C:\Users\...\Documents\Arduino\libraries\ML_SynthTools\src\cortex-m4\fpv4-sp-d16-hard" not found
+	Precompiled library in "C:\Users\...\Documents\Arduino\libraries\ML_SynthTools\src\cortex-m4" not found
+
+---
+
+Please feel free to share your experience and ideas. 
