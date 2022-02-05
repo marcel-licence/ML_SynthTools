@@ -95,8 +95,10 @@ static struct
 void Arp_Init(uint32_t sample_rate)
 {
     arp_sample_rate = sample_rate;
+
     arpModule.tempo = (uint32_t)(arp_sample_rate * (1.0f - 0.875f));
     arpModule.gate = (uint32_t)(arp_sample_rate * (1.0f - 0.875f) * 0.5f);
+    arpModule.arpState = arp_idle;
 
     Arp_Tempo(0, 0.5f);
 }
@@ -278,7 +280,10 @@ void Arp_Idle()
 {
     Arp_Status_LogMessage("Arp Idle");
     arpModule.arpState = arp_idle;
-    Arp_Cb_NoteOff(arpModule.activeCh, arpModule.activeNote);
+    if (arpNote != 0xFF)
+    {
+        Arp_Cb_NoteOff(arpModule.activeCh, arpModule.activeNote);
+    }
     arpNote = 0xFF;
     arp_key = 0;
 }
