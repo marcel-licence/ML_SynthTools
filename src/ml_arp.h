@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Marcel Licence
+ * Copyright (c) 2022 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@
  * @date 01.01.2021
  *
  * @brief   This is a little arpeggiator
+ *
+ * @see https://youtu.be/o-XjbrZHfWA
  */
 
 
