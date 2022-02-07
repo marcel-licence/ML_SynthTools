@@ -76,7 +76,7 @@ public:
 
     bool isFree(void);
     bool isCon(void);
-    bool isCon(float *sig);
+    bool isCon(const float *sig);
 
     /*
      * set parameter for all oscillators
