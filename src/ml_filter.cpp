@@ -27,7 +27,7 @@
  * Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  * Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>.
  */
- 
+
 /**
  * @file ml_filter.cpp
  * @author Marcel Licence
@@ -51,6 +51,19 @@
 
 /* will be removed in future */
 extern float sine[WAVEFORM_CNT];
+
+void Filter_Init(struct filterProcT *const filterP, struct filterCoeffT *const filterC)
+{
+    filterP->w[0] = 0.0f;
+    filterP->w[1] = 0.0f;
+    filterP->w[2] = 0.0f;
+    filterP->filterCoeff = filterC;
+    filterP->filterCoeff->aNorm[0] = 0.0f;
+    filterP->filterCoeff->aNorm[1] = 0.0f;
+    filterP->filterCoeff->bNorm[0] = 1.0f;
+    filterP->filterCoeff->bNorm[1] = 0.0f;
+    filterP->filterCoeff->bNorm[2] = 0.0f;
+}
 
 void Filter_Proc_Init(struct filterProcT *const filterP)
 {
@@ -148,3 +161,4 @@ void Filter_Calculate(float c, float reso, struct filterCoeffT *const filterC)
     bNorm[1] = b[1] * factor;
     bNorm[2] = b[2] * factor;
 }
+

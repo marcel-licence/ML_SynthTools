@@ -64,6 +64,7 @@ struct filterProcT
 };
 
 
+void Filter_Init(struct filterProcT *const filterP, struct filterCoeffT *const filterC);
 void Filter_Proc_Init(struct filterProcT *const filterP);
 void Filter_Coeff_Init(struct filterCoeffT *const filterC);
 void Filter_Reset(struct filterProcT *filter);
