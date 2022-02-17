@@ -42,7 +42,10 @@
 #define BOARDS_BOARD_AUDIO_KIT_AC101_H_
 
 
-#define BLINK_LED_PIN     19 // IO19 -> D5
+#define LED_D4_PIN  22
+#define LED_D5_PIN  19
+
+#define BLINK_LED_PIN     LED_D5_PIN
 
 #define MIDI_PORT2_ACTIVE
 //#define MIDI_RX2_PIN 22 /* U2RRXD */
