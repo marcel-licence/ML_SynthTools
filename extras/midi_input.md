@@ -14,14 +14,18 @@ When the transistor opens the signal will be pulled to GND.
 
 In some cases you can use the internal pull-up of your microcontroller. In that case you do not net the external resistor.
 
-Some opto-coupler require an operating voltage of 5V and may also work with 3.3V. 
+Some opto-coupler require an operating voltage of 5V and may also work with 3.3V.
+The capacitor can be added in parallel for better EMI suppression.
 
 Please ensure that your opto-coupler does not drive 5V at the output to your 3.3V microcontroller. If your microcontroller does not have a 5V tolerant input it may destroy your RX pin.
 
+Note using ESP32: do not connect MIDI in to RX of the ESP32 in case it is also used for the serial interface via USB. In that case you may have some short circuits because the USB-serial IC will also try to send data to RX. For MIDI you should utilize a free RX pin which is not connected to any other component.
+
 Here are some examples:
-<img src="extras/MIDI_IN_H11L1.png" /><br>
-<img src="extras/MIDI_IN_6N138.png" /><br>
-<img src="extras/MIDI_IN_6N137.png" /><br>
+
+<img src="MIDI_IN_H11L1.png" /><br>
+<img src="MIDI_IN_6N138.png" /><br>
+<img src="MIDI_IN_6N137.png" /><br>
 
 Please feel free to use the discussion area for questions, ideas etc.
 https://github.com/marcel-licence/ML_SynthTools/discussions/12
