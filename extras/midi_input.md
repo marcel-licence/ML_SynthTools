@@ -14,7 +14,8 @@ When the transistor opens the signal will be pulled to GND.
 
 In some cases you can use the internal pull-up of your microcontroller. In that case you do not net the external resistor.
 
-Some opto-coupler require an operating voltage of 5V and may also work with 3.3V. 
+Some opto-coupler require an operating voltage of 5V and may also work with 3.3V.
+The capacitor can be added in parallel for better EMI suppression.
 
 Please ensure that your opto-coupler does not drive 5V at the output to your 3.3V microcontroller. If your microcontroller does not have a 5V tolerant input it may destroy your RX pin.
 
