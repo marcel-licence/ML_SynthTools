@@ -19,9 +19,10 @@ Some opto-coupler require an operating voltage of 5V and may also work with 3.3V
 Please ensure that your opto-coupler does not drive 5V at the output to your 3.3V microcontroller. If your microcontroller does not have a 5V tolerant input it may destroy your RX pin.
 
 Here are some examples:
-<img src="extras/MIDI_IN_H11L1.png" /><br>
-<img src="extras/MIDI_IN_6N138.png" /><br>
-<img src="extras/MIDI_IN_6N137.png" /><br>
+
+<img src="MIDI_IN_H11L1.png" /><br>
+<img src="MIDI_IN_6N138.png" /><br>
+<img src="MIDI_IN_6N137.png" /><br>
 
 Please feel free to use the discussion area for questions, ideas etc.
 https://github.com/marcel-licence/ML_SynthTools/discussions/12
