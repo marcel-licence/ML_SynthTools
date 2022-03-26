@@ -59,6 +59,7 @@
 
 #define MIDI_PORT2_ACTIVE
 #define MIDI_RX2_PIN 21 /* D5 LED will blink then */
+
 #define LED_STRIP_PIN         12
 
 #if ES8388_CFG_I2C==1
@@ -105,6 +106,13 @@
 #define ES8388_PIN_LRCK 25
 #define ES8388_PIN_SCLK 27
 #define ES8388_PIN_MCLK 0
+#elif ES8388_CFG_I2S==6
+/* same as above but using IO1 for MCLK instead of IO0 */
+#define ES8388_PIN_DOUT 35
+#define ES8388_PIN_DIN  26
+#define ES8388_PIN_LRCK 25
+#define ES8388_PIN_SCLK 27
+#define ES8388_PIN_MCLK 1
 #endif
 
 
