@@ -65,6 +65,10 @@ Example:
 	Precompiled library in "C:\Users\...\Documents\Arduino\libraries\ML_SynthTools\src\cortex-m4\fpv4-sp-d16-hard" not found
 	Precompiled library in "C:\Users\...\Documents\Arduino\libraries\ML_SynthTools\src\cortex-m4" not found
 
+## Compiling RP2040 (v1.13.1)
+
+Some changes in the toolchain cause that the linker searches the lib in the cortex-m0plus instead of the rp2040 path. Please copy the ML_SynthTools.a from src/rp2040 to src/cortex-m0plus and replace the existing file in case you want to use the lib with the RP2040
+
 ---
 
 Please feel free to share your experience and ideas. 
