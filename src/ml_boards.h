@@ -49,6 +49,8 @@
 #include "boards/board_stm32f407g-disc1.h"
 #elif (defined ARDUINO_DISCO_F407VG)
 #include "boards/board_stm32f407g-disc1.h"
+#elif (defined ARDUINO_GENERIC_RP2040)
+#include "boards/board_tiny2040.h"
 #else
 /* no include here */
 #endif

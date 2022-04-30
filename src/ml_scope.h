@@ -48,10 +48,9 @@
 
 #include <Arduino.h>
 
-
 #include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include <Adafruit_GFX.h> /* requires library Adafruit-GFX-Library from https://github.com/adafruit/Adafruit-GFX-Library */
+#include <Adafruit_SSD1306.h> /* requires library  Adafruit_SSD1306 from https://github.com/adafruit/Adafruit_SSD1306 */
 
 
 void ScopeOled_Setup(void);
