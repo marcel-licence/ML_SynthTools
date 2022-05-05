@@ -70,7 +70,7 @@
 #elif ES8388_CFG_I2C==2
 #define ES8388_PIN_SDA  33
 #define ES8388_PIN_SCL  32
-#elif ES8388_CFG_I2C==2
+#elif ES8388_CFG_I2C==3
 #define ES8388_PIN_SDA  27
 #define ES8388_PIN_SCL  28
 #endif
