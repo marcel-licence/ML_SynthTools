@@ -48,7 +48,12 @@
  */
 #define MIDI_PORT2_ACTIVE
 #define MIDI_RX2_PIN 35
-#define MIDI_TX2_PIN 34 /* only available on header */
+/* pin 34 is input only - do not use as TX pin */
+
+#if 0 /* not tested yet */
+#define MIDI_PORT1_ACTIVE
+#define MIDI_RX1_PIN 34 /* only available on header */
+#endif
 
 /*
  * I2S Audio In/Out
