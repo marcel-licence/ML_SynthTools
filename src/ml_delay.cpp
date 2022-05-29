@@ -96,6 +96,13 @@ void Delay_Reset(void)
     {
         delayLine_l[i] = 0;
     }
+    if (delayLine_r != NULL)
+    {
+        for (int i = 0; i < delayLenMax; i++)
+        {
+            delayLine_r[i] = 0;
+        }
+    }
 }
 
 void Delay_Process(float *signal_l, float *signal_r)
