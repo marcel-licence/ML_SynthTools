@@ -39,6 +39,7 @@ The library contains the following modules:
 - saw/square pulse width modulated oscillator <a href="extras/ml_oscillator.md">more details</a>
 - vu meter (helper) <a href="extras/ml_vu_meter.md">more details</a>
 - oled scope <a href="extras/ml_scope.md">more details</a>
+- midi file stream player <a href="extras/ml_midi_file_stream.md">more details</a>
 
 # Compiling note
 

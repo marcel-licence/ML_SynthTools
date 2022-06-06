@@ -70,7 +70,7 @@ void Delay_Init(int16_t *buffer, uint32_t len)
 
     if (delayLine_l == NULL)
     {
-        Serial.printf("Not memory available!\n");
+        Serial.printf("Not enough memory available for mono delay line!\n");
     }
 
     Delay_Reset();
@@ -84,7 +84,7 @@ void Delay_Init2(int16_t *left, int16_t *right, uint32_t len)
 
     if ((delayLine_l == NULL) || (delayLine_r == NULL))
     {
-        Serial.printf("Not memory available!\n");
+        Serial.printf("Not enough memory available for stereo delay line!!\n");
     }
 
     Delay_Reset();
