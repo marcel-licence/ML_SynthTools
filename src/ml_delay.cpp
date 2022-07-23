@@ -103,6 +103,8 @@ void Delay_Reset(void)
             delayLine_r[i] = 0;
         }
     }
+
+    delayLen = delayLenMax - 2;
 }
 
 void Delay_Process(float *signal_l, float *signal_r)
