@@ -53,6 +53,8 @@
 #include "boards/board_tiny2040.h"
 #elif (defined BOARD_WEMOS_D1_MINI_ESP32)
 #include "boards/board_wemos_d1_mini_esp32.h"
+#elif (defined BOARD_ADAFRUIT_QT_PY_ESPS2)
+#include "boards/board_adafruit_qt_py_esp32s2.h"
 #else
 /* no include here */
 #endif
