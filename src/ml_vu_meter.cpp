@@ -89,7 +89,7 @@ void VuMeter_Process(void)
 
 void VuMeter_PutSamples(float *left, float *right, uint32_t len)
 {
-    for (int i = 0; i < len; i++)
+    for (uint32_t i = 0; i < len; i++)
     {
         if (ABS_F(left[i]) > _vuMeterValueInBf[0])
         {

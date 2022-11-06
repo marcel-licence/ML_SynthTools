@@ -92,13 +92,13 @@ void Delay_Init2(int16_t *left, int16_t *right, uint32_t len)
 
 void Delay_Reset(void)
 {
-    for (int i = 0; i < delayLenMax; i++)
+    for (uint32_t i = 0; i < delayLenMax; i++)
     {
         delayLine_l[i] = 0;
     }
     if (delayLine_r != NULL)
     {
-        for (int i = 0; i < delayLenMax; i++)
+        for (uint32_t i = 0; i < delayLenMax; i++)
         {
             delayLine_r[i] = 0;
         }
