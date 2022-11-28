@@ -56,6 +56,28 @@
 #define CTRL_ROTARY_ACTIVE  6
 
 
+#ifdef ARDUINO_ARCH_SAMD
+#define Organ_Setup(...)    OrganSAMD21_Setup(__VA_ARGS__)
+#define Organ_Process(...)    OrganSAMD21_Process(__VA_ARGS__)
+#define Organ_Process_Buf(...)    OrganSAMD21_Process_Buf(__VA_ARGS__)
+#define Organ_NoteOn    OrganSAMD21_NoteOn
+#define Organ_NoteOff    OrganSAMD21_NoteOff
+#define Organ_PercussionSet(...)    OrganSAMD21_PercussionSet(__VA_ARGS__)
+#define Organ_SetLeslCtrl(...)    OrganSAMD21_SetLeslCtrl(__VA_ARGS__)
+#define Organ_SetDrawbar(...)    OrganSAMD21_SetDrawbar(__VA_ARGS__)
+#endif
+
+#ifdef ARDUINO_ARCH_RP2040
+#define Organ_Setup(...)    OrganRP2040_Setup(__VA_ARGS__)
+#define Organ_Process(...)    OrganRP2040_Process(__VA_ARGS__)
+#define Organ_Process_Buf(...)    OrganRP2040_Process_Buf(__VA_ARGS__)
+#define Organ_NoteOn    OrganRP2040_NoteOn
+#define Organ_NoteOff    OrganRP2040_NoteOff
+#define Organ_PercussionSet(...)    OrganRP2040_PercussionSet(__VA_ARGS__)
+#define Organ_SetLeslCtrl(...)    OrganRP2040_SetLeslCtrl(__VA_ARGS__)
+#define Organ_SetDrawbar(...)    OrganRP2040_SetDrawbar(__VA_ARGS__)
+#endif
+
 /**
  * call this first before using the module to initialize it
  */
