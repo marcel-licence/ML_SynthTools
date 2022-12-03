@@ -277,7 +277,7 @@ void Reverb_Setup(float *buffer)
     }
 }
 
-void Reverb_SetLevel(uint8_t not_used, float value)
+void Reverb_SetLevel(uint8_t not_used __attribute__((unused)), float value)
 {
     rev_level = value;
     //Status_ValueChangedFloat("ReverbLevel", rev_level);

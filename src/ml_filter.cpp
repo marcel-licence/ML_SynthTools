@@ -98,7 +98,7 @@ void Filter_Process(float *const signal, struct filterProcT *const filterP)
 
 void Filter_Process_Buffer(float *const signal, struct filterProcT *const filterP, uint32_t len)
 {
-    for (int n = 0; n < len; n++)
+    for (uint32_t n = 0; n < len; n++)
     {
         const float out = filterP->filterCoeff->bNorm[0] * signal[n] + filterP->w[0];
         filterP->w[0] = filterP->filterCoeff->bNorm[1] * signal[n] - filterP->filterCoeff->aNorm[0] * out + filterP->w[1];

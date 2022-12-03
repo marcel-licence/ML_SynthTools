@@ -268,7 +268,7 @@ void Arp_SelectSequence(uint8_t seq, float value)
     }
 }
 
-void Arp_StartRecord(uint8_t seq, float value)
+void Arp_StartRecord(uint8_t seq __attribute__((unused)), float value __attribute__((unused)))
 {
     Arp_Status_LogMessage("Arp Record");
     arpModule.arpState = arp_rec;
@@ -295,7 +295,7 @@ void Arp_Active()
     arp_key = 0;
 }
 
-void Arp_Tempo(uint8_t unused, float value)
+void Arp_Tempo(uint8_t unused __attribute__((unused)), float value)
 {
     float f_tempo = ((float)arp_sample_rate);// - (value * ((float)(arp_sample_rate)));
     for (int i = 0; i < value * 8; i++)
@@ -307,7 +307,7 @@ void Arp_Tempo(uint8_t unused, float value)
     Arp_Status_ValueChangedFloat("ArpTempo", value);
 }
 
-void Arp_GateTime(uint8_t unused, float value)
+void Arp_GateTime(uint8_t unused __attribute__((unused)), float value)
 {
     arpModule.f_gate = value;
     arpModule.gate = ((float)arpModule.tempo) * arpModule.f_gate;

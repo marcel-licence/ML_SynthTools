@@ -107,7 +107,7 @@ void Delay_Reset(void)
     delayLen = delayLenMax - 2;
 }
 
-void Delay_Process(float *signal_l, float *signal_r)
+void Delay_Process(float *signal_l, float *signal_r __attribute__((unused)))
 {
 #if 0
     *signal_l *= (1.0f - delayFeedback);
@@ -204,25 +204,25 @@ void Delay_Process_Buff2(float *signal_l, float *signal_r, int buffLen)
     }
 }
 
-void Delay_SetInputLevel(uint8_t unused, float value)
+void Delay_SetInputLevel(uint8_t unused __attribute__((unused)), float value)
 {
     delayInLvl = value;
     // Status_ValueChangedFloat("DelayInputLevel", value);
 }
 
-void Delay_SetFeedback(uint8_t unused, float value)
+void Delay_SetFeedback(uint8_t unused __attribute__((unused)), float value)
 {
     delayFeedback = value;
     // Status_ValueChangedFloat("DelayFeedback", value);
 }
 
-void Delay_SetOutputLevel(uint8_t unused, float value)
+void Delay_SetOutputLevel(uint8_t unused __attribute__((unused)), float value)
 {
     delayToMix = value;
     // Status_ValueChangedFloat("DelayOutputLevel", value);
 }
 
-void Delay_SetLength(uint8_t unused, float value)
+void Delay_SetLength(uint8_t unused __attribute__((unused)), float value)
 {
     delayLen = (uint32_t)(((float)delayLenMax - 1.0f) * value);
     // Status_ValueChangedFloat("DelayLenMs", delayLen * (1000.0f / ((float)sampleRate)));
