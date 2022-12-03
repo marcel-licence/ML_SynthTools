@@ -59,7 +59,7 @@
 #include <stdint.h>
 
 
-void RP2040_Audio_Pwm_Init(unsigned char gpio_pin_number, float sample_rate, uint32_t *audio_buffer_a, uint32_t *audio_buffer_b, uint8_t len);
+void RP2040_Audio_Pwm_Init(uint8_t gpio_pin_number, float sample_rate, uint32_t *audio_buffer_a, uint32_t *audio_buffer_b, uint8_t len);
 bool RP2040_Audio_Pwm_BufferReady();
 uint32_t *RP2040_Audio_Pwm_getFreeBuff();
 
