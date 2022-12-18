@@ -61,7 +61,6 @@
 #define I2S_BCLK_PIN    32
 #define I2S_WCLK_PIN    25
 #define I2S_DOUT_PIN    33
-// #define I2S_DIN_PIN      26 /* optional, extern, should be disabled when not used otherwise  */
 
 /*
  * I2C
@@ -114,12 +113,8 @@
 #define MCP23_MODULE_ENABLED
 #define LED_MATRIX_ENABLED
 #define OLED_OSC_DISP_ENABLED
-//#define SPI_DISP_ENABLED
 #define DISPLAY_160x80
-//#define DISPLAY_FROM_STATUS_ENABLED
-//#define ADC_TO_MIDI_ENABLED
 #define ADC_MCP_CTRL_ENABLED
-//#define ADC_TO_MIDI_LOOKUP_SIZE 8
 #define ADC_INPUTS 8
 
 

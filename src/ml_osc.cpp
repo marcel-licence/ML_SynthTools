@@ -48,6 +48,7 @@ static void OscProcessSingle(oscillatorT *osc, uint32_t len);
 
 
 /* will be removed in future */
+//extern float *saw;
 extern float sine[WAVEFORM_CNT];
 extern float saw[WAVEFORM_CNT];
 
@@ -57,14 +58,28 @@ static void OscProcessSingle(oscillatorT *osc, uint32_t len)
     {
         osc->samplePos += (uint32_t)((*osc->cfg->pitchMultiplier) * ((float)osc->addVal) * osc->cfg->pitchOctave * osc->cfg->pitch * *osc->pitchMod);
         uint32_t samplePos = osc->samplePos;
-
-        float morphMod = osc->cfg->morphWaveForm[WAVEFORM_I(osc->samplePos)];
+#if 1
+        float morphMod = /*(*osc->cfg->morph) * */ osc->cfg->morphWaveForm[WAVEFORM_I(osc->samplePos)];
         morphMod *= ((float)89478480);
         morphMod *= (*osc->cfg->morph) * 64;
         samplePos += morphMod;
 
+        //samplePos = (89478480 * n);
+#endif
         float sig = osc->cfg->selectedWaveForm[WAVEFORM_I(samplePos)];
-
+        //Serial.printf("%d %d %0.6f\n", len, samplePos, sig);
+#if 0
+        float sig = 0;
+        if (saw == NULL)
+        {
+            Serial.printf("saw not ready!\n");
+        }
+        else
+        {
+            sig = sine[WAVEFORM_I(osc->samplePos)];
+            sig *= osc->cfg->volume;
+        }
+#endif
         sig *= osc->cfg->volume;
 
 #if 0

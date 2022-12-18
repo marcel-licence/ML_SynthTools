@@ -48,7 +48,6 @@
 #define BLINK_LED_PIN     LED_D5_PIN
 
 #define MIDI_PORT2_ACTIVE
-//#define MIDI_RX2_PIN 22 /* U2RRXD */
 #define MIDI_RX2_PIN 21
 #define LED_STRIP_PIN         12
 

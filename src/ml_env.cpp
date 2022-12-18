@@ -79,6 +79,7 @@ bool ADSR_Process(const struct adsrT *ctrl, struct adsr_ctrl_t *adsr)
         if (adsr->ctrl < 0.0f)
         {
             adsr->ctrl = 0.0f;
+            //voice->active = false;
             return false;
         }
     }
@@ -125,6 +126,7 @@ bool ASRM_Process(const struct adsrT *ctrl, struct adsr_ctrl_t *asr)
         if (asr->ctrl < 0.0f)
         {
             asr->ctrl = 0.0f;
+            //voice->active = false;
             return false;
         }
     }

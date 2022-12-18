@@ -41,12 +41,14 @@
 #include "./boards/board_ml_v1.h"
 #elif (defined BOARD_ESP32_AUDIO_KIT_AC101)
 #include "./boards/board_audio_kit_ac101.h"
+#elif (defined BOARD_ESP32_AUDIO_KIT_AC101_CASE)
+#include "./boards/board_audio_kit_ac101_case.h"
 #elif (defined BOARD_ESP32_AUDIO_KIT_ES8388)
 #include "./boards/board_audio_kit_es8388.h"
 #elif (defined BOARD_ESP32_DOIT)
 #include "./boards/board_esp32_doit.h"
-#elif (defined BOARD_ESP32_LYRA_T)
-#include "./boards/board_esp32_lyrat.h"
+#elif (defined BOARD_SAA_S2132)
+#include "./boards/board_saa_s2132.h"
 #elif (defined ARDUINO_GENERIC_F407VGTX)
 #include "boards/board_stm32f407g-disc1.h"
 #elif (defined ARDUINO_DISCO_F407VG)

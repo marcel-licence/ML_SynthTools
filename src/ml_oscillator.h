@@ -44,8 +44,19 @@
 #define SRC_ML_OSCILLATOR_H_
 
 
-#include "Arduino.h"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wpedantic"
+
+#ifdef ARDUINO
+#include <Arduino.h>
+#else
+#include <stream.h>
+#endif
 #include <stdint.h>
+
+#pragma GCC diagnostic pop
+
 
 /* controllable parameters, some of them might not work, but added in future */
 #define SYNTH_PWM_OSC_PARAM_PULSE_WIDTH     17 /* offset of the pulse width */
@@ -54,6 +65,11 @@
 #define SYNTH_PWM_OSC_PARAM_PULSE_MOD_DEPTH 20 /* intensity of the automated modulation */
 #define SYNTH_PWM_OSC_PARAM_PULSE_MOD_SPEED 21 /* speed of the automated modulation */
 #define SYNTH_PWM_OSC_PARAM_PULSE_OFFSET    22
+
+/* useable waveforms for the main oscillator */
+#define SYNTH_PWM_OSC_WAVEFORM_SAW    0
+#define SYNTH_PWM_OSC_WAVEFORM_SAW_PWM    1
+#define SYNTH_PWM_OSC_WAVEFORM_SQR_PWM    2
 
 
 class ML_Oscillator

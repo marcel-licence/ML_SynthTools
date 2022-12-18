@@ -47,8 +47,8 @@
 struct file_access_f
 {
     uint8_t (*open)(const char *path, const char *mode);
-    int (*read)(void *buf, uint8_t unused, size_t size, struct file_access_f *ff);
-    int (*write)(void *buf, uint8_t unused, size_t size, struct file_access_f *ff);
+    int (*read)(void *buf, uint8_t unused __attribute__((unused)), size_t size, struct file_access_f *ff);
+    int (*write)(void *buf, uint8_t unused __attribute__((unused)), size_t size, struct file_access_f *ff);
     void (*close)(struct file_access_f *ff);
     uint32_t file; /* just for compatibility */
     char (*getc)(struct file_access_f *ff);

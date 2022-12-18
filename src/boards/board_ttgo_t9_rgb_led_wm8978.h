@@ -29,47 +29,42 @@
  */
 
 /**
- * @file ml_arp.h
+ * @file board_audio_kit_es8388.h
  * @author Marcel Licence
- * @date 01.01.2021
+ * @date 22.09.2021
  *
- * @brief   This is a little arpeggiator
- *
- * @see https://youtu.be/o-XjbrZHfWA
+ * @brief Board description for TTGO-T9-RGB_LED-WM8978
+ * @see https://github.com/LilyGO/TTGO-TAudio
  */
 
 
-#ifndef SRC_ML_ARP_H_
-#define SRC_ML_ARP_H_
+#ifndef BOARDS_BOARD_TTGO_T9_RGB_LED_WM8978_H_
+#define BOARDS_BOARD_TTGO_T9_RGB_LED_WM8978_H_
 
 
-#include <Arduino.h>
+/* on board led, green */
+#define BLINK_LED_PIN     22 
+
+#define MIDI_PORT2_ACTIVE
+#define MIDI_RX2_PIN 34 /* use a free pin! */
+
+#define LED_STRIP_PIN 22 /* onboard LEDs */
 
 
-void Arp_Init(uint32_t sample_rate);
-void Arp_Process(uint64_t elapsed_ms);
-void Arp_Reset(void);
-void Arp_NoteOn(uint8_t ch, uint8_t note, float vel);
-void Arp_NoteOff(uint8_t ch, uint8_t note);
-void Synth_ArpActive(float value);
-void Arp_SelectSequence(uint8_t seq, float value);
-void Arp_StartRecord(uint8_t seq, float value);
-void Arp_Idle(void);
-void Arp_Active(void);
-void Arp_Tempo(uint8_t unused __attribute__((unused)), float value);
-void Arp_GateTime(uint8_t unused __attribute__((unused)), float value);
-uint32_t Arp_GetPos(void);
-
-/*
- * Following functions shall be implemented in your application
- * They will be called from the arp module
- */
-void Arp_Cb_NoteOn(uint8_t ch, uint8_t note, float vel);
-void Arp_Cb_NoteOff(uint8_t ch, uint8_t note);
-void Arp_Status_ValueChangedInt(const char *msg, int value);
-void Arp_Status_LogMessage(const char *msg);
-void Arp_Status_ValueChangedFloat(const char *msg, float value);
-void Arp_Cb_Step(uint8_t step);
+#define I2C_SDA 19
+#define I2C_SCL 18
 
 
-#endif /* SRC_ML_ARP_H_ */
+//#define I2C_SDA 23
+//#define I2C_SCL 5
+
+
+/* WM8978 */
+#define I2S_MCLK_PIN 0 /* 24 MHz */
+#define I2S_BCLK_PIN 33
+#define I2S_WCLK_PIN 25
+#define I2S_DOUT_PIN 26 /* DAC */
+#define I2S_DIN_PIN 27 /* ADC */
+
+
+#endif /* BOARDS_BOARD_TTGO_T9_RGB_LED_WM8978_H_ */

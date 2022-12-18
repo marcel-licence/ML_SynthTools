@@ -47,14 +47,23 @@
 #ifndef ML_FILTER_H_
 #define ML_FILTER_H_
 
-
+#ifdef ARDUINO
 #include <Arduino.h>
-
+#else
+#include <stdint.h>
+#endif
 
 struct filterCoeffT
 {
-    float aNorm[2] = {0.0f, 0.0f};
-    float bNorm[3] = {1.0f, 0.0f, 0.0f};
+    union
+    {
+        struct
+        {
+            float bNorm[3];
+            float aNorm[2];
+        };
+        float coef[5];
+    };
 };
 
 struct filterProcT
@@ -71,6 +80,7 @@ void Filter_Reset(struct filterProcT *filter);
 void Filter_Process(float *const signal, struct filterProcT *const filterP);
 void Filter_Process_Buffer(float *const signal, struct filterProcT *const filterP, uint32_t len);
 void Filter_Calculate(float c, float reso, struct filterCoeffT *const  filterC);
+void Filter_CalculateNotch(float c, float reso, struct filterCoeffT *const filterC);
 
 
 #endif /* ML_FILTER_H_ */

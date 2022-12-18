@@ -48,6 +48,10 @@
 #include "ml_filter.h"
 #include "ml_waveform.h"
 
+#ifndef ARDUINO
+#include <math.h>
+#endif
+
 
 /* will be removed in future */
 extern float sine[WAVEFORM_CNT];
@@ -162,3 +166,81 @@ void Filter_Calculate(float c, float reso, struct filterCoeffT *const filterC)
     bNorm[2] = b[2] * factor;
 }
 
+/*
+ * @see https://www.atlantis-press.com/article/5887.pdf
+ */
+void Filter_CalculateNotch(float c, float reso __attribute__((unused)), struct filterCoeffT *const filterC)
+{
+    float *aNorm = filterC->aNorm;
+    float *bNorm = filterC->bNorm;
+
+#if 0
+    float Q = reso;
+    float  cosOmega, omega, sinOmega, a[3], b[3];
+#else
+    float  cosOmega, omega, a[3], b[3];
+#endif
+
+    /*
+     * change curve of cutoff a bit
+     * maybe also log or exp function could be used
+     */
+    // c = f0 / fs
+
+    if (c >= 1.0f)
+    {
+        omega = 1.0f;
+    }
+    else if (c < 0.0025f)
+    {
+        omega = 0.0025f;
+    }
+    else
+    {
+        omega = c;
+    }
+
+    float r;
+
+    /*
+     * use lookup here to get quicker results
+     */
+    cosOmega = sine[WAVEFORM_I((uint32_t)((float)((1ULL << 31) - 1) * omega + (float)((1ULL << 30) - 1)))];
+#if 0
+    sinOmega = sine[WAVEFORM_I((uint32_t)((float)((1ULL << 31) - 1) * omega))];
+#endif
+
+    b[0] = 1;
+    b[1] = -2 * cosOmega;
+    b[2] = 1;
+    r = 0.99f;
+    a[0] = 1;
+    a[1] = -2 * r * cosOmega;
+    a[2] = r * r;
+
+    // Normalize filter coefficients
+    float factor = 1.0f / a[0];
+
+    aNorm[0] = a[1] * factor;
+    aNorm[1] = a[2] * factor;
+
+    bNorm[0] = b[0] * factor;
+    bNorm[1] = b[1] * factor;
+    bNorm[2] = b[2] * factor;
+}
+
+float Filter_AmplitudeFilterResponse(float c, struct filterCoeffT *const filterC)
+{
+    float *a = filterC->aNorm;
+    float *b = filterC->bNorm;
+
+    float omega = c;
+    float cosOmega = sine[WAVEFORM_I((uint32_t)((float)((1ULL << 31) - 1) * omega + (float)((1ULL << 30) - 1)))];
+    float cos2Omega = sine[WAVEFORM_I((uint32_t)((float)((1ULL << 31) - 1) * 2 * omega + (float)((1ULL << 30) - 1)))];
+
+    return sqrt((a[0] * a[0]) *
+
+                (2 + ((a[1] / a[0]) * (a[1] / a[0])) + 4 * (a[1] / a[0]) * cosOmega * 2 * cos2Omega)
+                / (1 + (b[1] * b[1]) + (b[2] * b[2]) + 2 * b[1] * (1 + b[2]) * cosOmega + 2 * b[2] * cos2Omega)
+               );
+}
