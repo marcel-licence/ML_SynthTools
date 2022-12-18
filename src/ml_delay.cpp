@@ -37,6 +37,7 @@
  * - level adjustable
  * - feedback
  * - length adjustable
+ * @see https://youtu.be/Kac9AB02BcQ
  */
 
 
@@ -48,6 +49,11 @@
 #include <ml_delay.h>
 
 
+#ifndef ARDUINO
+#include <stdio.h>
+#endif
+
+
 /*
  * module variables
  */
@@ -57,11 +63,13 @@ static int16_t *delayLine_r;
 static float delayToMix = 0;
 static float delayInLvl = 1.0f;
 static float delayFeedback = 0;
+static float delayShift = 2.0f / 3.0f;
 static uint32_t delayLenMax = 0;
 static uint32_t delayLen = 11098;
 static uint32_t delayIn = 0;
 static uint32_t delayOut = 0;
-//static uint32_t sampleRate = 44100;
+static uint32_t delayOut2 = 0;
+static uint32_t delayOut3 = 0;
 
 void Delay_Init(int16_t *buffer, uint32_t len)
 {
@@ -70,7 +78,7 @@ void Delay_Init(int16_t *buffer, uint32_t len)
 
     if (delayLine_l == NULL)
     {
-        Serial.printf("Not enough memory available for mono delay line!\n");
+        printf("Not enough memory available for mono delay line!\n");
     }
 
     Delay_Reset();
@@ -84,7 +92,7 @@ void Delay_Init2(int16_t *left, int16_t *right, uint32_t len)
 
     if ((delayLine_l == NULL) || (delayLine_r == NULL))
     {
-        Serial.printf("Not enough memory available for stereo delay line!!\n");
+        printf("Not enough memory available for stereo delay line!!\n");
     }
 
     Delay_Reset();
@@ -103,17 +111,10 @@ void Delay_Reset(void)
             delayLine_r[i] = 0;
         }
     }
-
-    delayLen = delayLenMax - 2;
 }
 
 void Delay_Process(float *signal_l, float *signal_r __attribute__((unused)))
 {
-#if 0
-    *signal_l *= (1.0f - delayFeedback);
-    *signal_r *= (1.0f - delayFeedback);
-#endif
-
     delayLine_l[delayIn] = (((float)0x8000) * *signal_l * delayInLvl);
 
 
@@ -125,7 +126,6 @@ void Delay_Process(float *signal_l, float *signal_r __attribute__((unused)))
     }
 
     *signal_l += ((float)delayLine_l[delayOut]) * delayToMix / ((float)0x8000);
-
 
     delayLine_l[delayIn] += (((float)delayLine_l[delayOut]) * delayFeedback);
 
@@ -140,14 +140,9 @@ void Delay_Process(float *signal_l, float *signal_r __attribute__((unused)))
 
 void Delay_Process_Buff(float *signal_l, int buffLen)
 {
-#if 0
-    *signal_l *= (1.0f - delayFeedback);
-    *signal_r *= (1.0f - delayFeedback);
-#endif
-
     for (int n = 0; n < buffLen; n++)
     {
-        delayLine_l[delayIn] = (((float)0x8000) * signal_l[n] * delayInLvl);
+        delayLine_l[delayIn] = (((float)0x4000) * signal_l[n] * delayInLvl);
 
         delayOut = delayIn + (1 + delayLenMax - delayLen);
 
@@ -156,7 +151,7 @@ void Delay_Process_Buff(float *signal_l, int buffLen)
             delayOut -= delayLenMax;
         }
 
-        signal_l[n] += ((float)delayLine_l[delayOut]) * delayToMix / ((float)0x8000);
+        signal_l[n] += ((float)delayLine_l[delayOut]) * delayToMix / ((float)0x4000);
 
         delayLine_l[delayIn] += (((float)delayLine_l[delayOut]) * delayFeedback);
 
@@ -169,14 +164,137 @@ void Delay_Process_Buff(float *signal_l, int buffLen)
     }
 }
 
+void Delay_Process_Buff(int16_t *signal_l, int buffLen)
+{
+    for (int n = 0; n < buffLen; n++)
+    {
+        delayLine_l[delayIn] = ((float)signal_l[n] * delayInLvl);
+
+        delayOut = delayIn + (1 + delayLenMax - delayLen);
+
+        if (delayOut >= delayLenMax)
+        {
+            delayOut -= delayLenMax;
+        }
+
+        signal_l[n] += ((float)delayLine_l[delayOut]) * delayToMix;
+
+        delayLine_l[delayIn] += (((float)delayLine_l[delayOut]) * delayFeedback);
+
+        delayIn ++;
+
+        if (delayIn >= delayLenMax)
+        {
+            delayIn = 0;
+        }
+    }
+}
+
+int16_t mul(int16_t a, float b);
+float mul_f(int16_t a, float b);
+
+int16_t mul(int16_t a, float b)
+{
+    float c = a;
+    c *= b;
+    return (int16_t)c;
+}
+
+float mul_f(int16_t a, float b)
+{
+    float c = a;
+    c *= b;
+    c /= (float)0x4000;
+    return c;
+}
+
+
+void Delay_Process_Buff(float *in, float *left, float *right, int buffLen)
+{
+    for (int n = 0; n < buffLen; n++)
+    {
+        delayLine_l[delayIn] = (((float)0x4000) * in[n] * delayInLvl);
+
+        delayOut = delayIn + (1 + delayLenMax - delayLen);
+        delayOut2 = delayIn + (1 + delayLenMax - (delayLen - 1000));
+        delayOut3 = delayIn + (1 + delayLenMax - (delayLen * delayShift));
+
+        if (delayOut >= delayLenMax)
+        {
+            delayOut -= delayLenMax;
+        }
+
+        if (delayOut2 >= delayLenMax)
+        {
+            delayOut2 -= delayLenMax;
+        }
+
+        if (delayOut3 >= delayLenMax)
+        {
+            delayOut3 -= delayLenMax;
+        }
+
+        left[n] += mul_f(delayLine_l[delayOut], delayToMix);
+        right[n] += mul_f(delayLine_l[delayOut2], delayToMix);
+        left[n] += mul_f(delayLine_l[delayOut3], delayToMix);
+
+        delayLine_l[delayOut2] += (((float)delayLine_l[delayOut]) * delayFeedback);
+        delayLine_l[delayIn] += (((float)delayLine_l[delayOut3]) * delayFeedback);
+
+        delayIn ++;
+
+        if (delayIn >= delayLenMax)
+        {
+            delayIn = 0;
+        }
+    }
+}
+
+
+
+void Delay_Process_Buff(int16_t *in, int16_t *left, int16_t *right, int buffLen)
+{
+    for (int n = 0; n < buffLen; n++)
+    {
+        delayLine_l[delayIn] = mul(in[n], delayInLvl);
+
+        delayOut = delayIn + (1 + delayLenMax - delayLen);
+        delayOut2 = delayIn + (1 + delayLenMax - (delayLen - 1000));
+        delayOut3 = delayIn + (1 + delayLenMax - (delayLen / 3 * 2));
+
+        if (delayOut >= delayLenMax)
+        {
+            delayOut -= delayLenMax;
+        }
+
+        if (delayOut2 >= delayLenMax)
+        {
+            delayOut2 -= delayLenMax;
+        }
+
+        if (delayOut3 >= delayLenMax)
+        {
+            delayOut3 -= delayLenMax;
+        }
+
+        left[n] += mul(delayLine_l[delayOut], delayToMix);
+        right[n] += mul(delayLine_l[delayOut2], delayToMix);
+        left[n] += mul(delayLine_l[delayOut3], delayToMix);
+
+        delayLine_l[delayOut2] += mul(delayLine_l[delayOut], delayFeedback);
+        delayLine_l[delayIn] += mul(delayLine_l[delayOut3], delayFeedback);
+
+        delayIn ++;
+
+        if (delayIn >= delayLenMax)
+        {
+            delayIn = 0;
+        }
+    }
+}
 
 void Delay_Process_Buff2(float *signal_l, float *signal_r, int buffLen)
 {
-#if 0
-    *signal_l *= (1.0f - delayFeedback);
-    *signal_r *= (1.0f - delayFeedback);
-#endif
-
     for (int n = 0; n < buffLen; n++)
     {
         delayLine_l[delayIn] = (((float)0x8000) * signal_l[n] * delayInLvl);
@@ -207,23 +325,24 @@ void Delay_Process_Buff2(float *signal_l, float *signal_r, int buffLen)
 void Delay_SetInputLevel(uint8_t unused __attribute__((unused)), float value)
 {
     delayInLvl = value;
-    // Status_ValueChangedFloat("DelayInputLevel", value);
 }
 
 void Delay_SetFeedback(uint8_t unused __attribute__((unused)), float value)
 {
     delayFeedback = value;
-    // Status_ValueChangedFloat("DelayFeedback", value);
 }
 
 void Delay_SetOutputLevel(uint8_t unused __attribute__((unused)), float value)
 {
     delayToMix = value;
-    // Status_ValueChangedFloat("DelayOutputLevel", value);
 }
 
 void Delay_SetLength(uint8_t unused __attribute__((unused)), float value)
 {
     delayLen = (uint32_t)(((float)delayLenMax - 1.0f) * value);
-    // Status_ValueChangedFloat("DelayLenMs", delayLen * (1000.0f / ((float)sampleRate)));
+}
+
+void Delay_SetShift(uint8_t unused __attribute__((unused)), float value)
+{
+    delayShift = value;
 }
