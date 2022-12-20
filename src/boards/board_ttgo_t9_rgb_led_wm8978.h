@@ -29,9 +29,9 @@
  */
 
 /**
- * @file board_audio_kit_es8388.h
+ * @file board_ttgo_t9_rgb_led_wm8978.h
  * @author Marcel Licence
- * @date 22.09.2021
+ * @date 20.12.2022
  *
  * @brief Board description for TTGO-T9-RGB_LED-WM8978
  * @see https://github.com/LilyGO/TTGO-TAudio
@@ -43,7 +43,7 @@
 
 
 /* on board led, green */
-#define BLINK_LED_PIN     22 
+#define BLINK_LED_PIN     22
 
 #define MIDI_PORT2_ACTIVE
 #define MIDI_RX2_PIN 34 /* use a free pin! */

@@ -45,6 +45,8 @@
 #include "./boards/board_audio_kit_ac101_case.h"
 #elif (defined BOARD_ESP32_AUDIO_KIT_ES8388)
 #include "./boards/board_audio_kit_es8388.h"
+#elif (defined BOARD_TTGO_T9_RGB_LED_WM8978)
+#include "./boards/board_ttgo_t9_rgb_led_wm8978.h"
 #elif (defined BOARD_ESP32_DOIT)
 #include "./boards/board_esp32_doit.h"
 #elif (defined BOARD_SAA_S2132)
