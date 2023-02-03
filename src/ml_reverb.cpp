@@ -113,7 +113,7 @@ static void Do_Comb(struct comb_s *cf, const float *inSample, float *outSample, 
         float newV = readback * cf->g + inSample[n];
         cf->buf[cf->p] = newV;
         cf->p++;
-        if (cf->p == cf->lim)
+        if (cf->p >= cf->lim)
         {
             cf->p = 0;
         }
@@ -162,7 +162,7 @@ static void Do_Allpass(struct allpass_s *ap, float *inSample, int buffLen)
         float newV = readback * ap->g + inSample[n];
         ap->buf[ap->p] = newV;
         ap->p++;
-        if (ap->p == ap->lim)
+        if (ap->p >= ap->lim)
         {
             ap->p = 0;
         }
