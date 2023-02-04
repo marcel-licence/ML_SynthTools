@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Marcel Licence
+ * Copyright (c) 2023 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,7 +82,6 @@ void RP2040_Audio_Pwm_Init(uint8_t gpio_pin_number, float sample_rate, uint32_t 
      */
 
     pwm_config config = pwm_get_default_config();
-    //pwm_config_set_clkdiv(&config, 2.834);
     pwm_init(audio_pwm_slice_num, &config, true);
 
     /* setup for 48000 sample rate */
@@ -107,13 +106,11 @@ uint32_t *RP2040_Audio_Pwm_getFreeBuff()
 static void RP2040_Audio_Pwm_dma_irq_handler()
 {
 #if 1
-    // Clear the interrupt request.
     dma_hw->ints0 = 1u << audio_dma_ch;
 
 
     dma_start_channel_mask(1 << audio_dma_ch);
 
-    // Give the channel a new wave table entry to read from, and re-trigger it
     dma_channel_set_read_addr(audio_dma_ch, lastRead2, true);
 #endif
 
@@ -140,7 +137,6 @@ static void RP2040_Audio_Pwm_Start_Audio(uint32_t *audio_buffer_a, uint32_t *aud
     lastRead = audio_buffer_a;
     lastRead2 = audio_buffer_b;
 
-    unsigned char Result = false;
     dma_channel_config audio_dma_ch_cfg;
 
     if (!audio_dma_ch)
@@ -163,27 +159,22 @@ static void RP2040_Audio_Pwm_Start_Audio(uint32_t *audio_buffer_a, uint32_t *aud
         /****************************************************/
         audio_dma_ch_cfg = dma_channel_get_default_config(audio_dma_ch);
 
-        //channel_config_set_irq_quiet(&audio_dma_ch_cfg, true);
         channel_config_set_read_increment(&audio_dma_ch_cfg, true);
         channel_config_set_write_increment(&audio_dma_ch_cfg, false);
         channel_config_set_transfer_data_size(&audio_dma_ch_cfg, DMA_SIZE_32);
-        //channel_config_set_transfer_data_size(&audio_dma_ch_cfg, DMA_SIZE_32);
 
         /* Select a transfer request signal in a channel configuration object */
         channel_config_set_dreq(&audio_dma_ch_cfg, pwm_get_dreq(audio_pwm_slice_num));
 
-        //channel_config_set_high_priority(&audio_dma_ch_cfg, true);
 
         /*
          * using 8 gives 344 base frequency
          * using 7 bits -> 689 hz
          */
-        //channel_config_set_ring(&audio_dma_ch_cfg, false, 8);
 
         dma_channel_configure(audio_dma_ch, &audio_dma_ch_cfg, (void *)(PWM_BASE + PWM_CH0_CC_OFFSET), &(audio_buffer_a[0]), buffSize, false);
 
 
-        // Setup interrupt handler to fire when trigger DMA channel is done with its transfers
         dma_channel_set_irq0_enabled(audio_dma_ch, true);
         irq_set_exclusive_handler(DMA_IRQ_0, RP2040_Audio_Pwm_dma_irq_handler);
         irq_set_enabled(DMA_IRQ_0, true);
