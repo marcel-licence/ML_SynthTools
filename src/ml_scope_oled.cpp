@@ -37,6 +37,9 @@
  */
 
 
+#if (!defined ARDUINO_RASPBERRY_PI_PICO) && (!defined ARDUINO_GENERIC_RP2040)
+
+
 #include <ml_scope.h>
 
 
@@ -150,4 +153,6 @@ void ScopeOled_DrawData(const float *dispData, uint8_t idx)
     }
     d[idx].oled->display();
 }
+
+#endif
 

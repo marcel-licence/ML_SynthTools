@@ -173,6 +173,7 @@ void Filter_CalculateNotch(float c, float reso __attribute__((unused)), struct f
     float *aNorm = filterC->aNorm;
     float *bNorm = filterC->bNorm;
 
+    float  cosOmega, omega, a[3], b[3];
     /*
      * change curve of cutoff a bit
      * maybe also log or exp function could be used

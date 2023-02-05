@@ -47,15 +47,20 @@
 #include <stdint.h>
 
 
+#include <ml_types.h>
+
+
 class ML_EPiano
 {
 public:
     ML_EPiano();
     ~ML_EPiano() {};
 
+    void Init(float sample_rate);
+
     void setSampleRate(float sample_rate);
 
-    void Process(int16_t *samples, int sampleLen);
+    void Process(Q1_14 *samples, int sampleLen);
     void Process(float *samples, int sampleLen);
 
     void NoteOn(uint8_t ch, uint8_t note, float vel);

@@ -46,6 +46,7 @@
 #endif
 
 
+void Status_Init(uint32_t sample_rate);
 void Status_ValueChangedFloat(const char *descr, float value);
 void Status_ValueChangedFloatArr(const char *descr, float value, int index);
 void Status_ValueChangedIntArr(const char *descr, int value, int index);
