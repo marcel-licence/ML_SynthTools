@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Marcel Licence
+ * Copyright (c) 2023 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ ML_Tremolo::ML_Tremolo(float sample_rate)
     speedU32 = var;
 }
 
-void ML_Tremolo::process(float *left, float *right, int len)
+void ML_Tremolo::process(float *left, float *right, int32_t len)
 {
     for (int n = 0; n < len; n++)
     {
