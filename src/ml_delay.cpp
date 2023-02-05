@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Marcel Licence
+ * Copyright (c) 2023 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -250,7 +250,53 @@ void Delay_Process_Buff(float *in, float *left, float *right, int buffLen)
     }
 }
 
+/*
+ * this implementation is not complete
+ */
+void Delay_Process_Buff(float *in_l, float *in_r, float *left, float *right, int buffLen)
+{
+    for (int n = 0; n < buffLen; n++)
+    {
+        delayLine_l[delayIn] = (((float)0x4000) * in_l[n] * delayInLvl);
+        delayLine_r[delayIn] = (((float)0x4000) * in_r[n] * delayInLvl);
 
+        delayOut = delayIn + (1 + delayLenMax - delayLen);
+        delayOut2 = delayIn + (1 + delayLenMax - (delayLen - 1000));
+        delayOut3 = delayIn + (1 + delayLenMax - (delayLen * delayShift));
+
+        if (delayOut >= delayLenMax)
+        {
+            delayOut -= delayLenMax;
+        }
+
+        if (delayOut2 >= delayLenMax)
+        {
+            delayOut2 -= delayLenMax;
+        }
+
+        if (delayOut3 >= delayLenMax)
+        {
+            delayOut3 -= delayLenMax;
+        }
+
+        left[n] += mul_f(delayLine_l[delayOut], delayToMix);
+        right[n] += mul_f(delayLine_r[delayOut2], delayToMix);
+        left[n] += mul_f(delayLine_l[delayOut3], delayToMix);
+
+        delayLine_l[delayOut2] += (((float)delayLine_l[delayOut]) * delayFeedback);
+        delayLine_l[delayIn] += (((float)delayLine_l[delayOut3]) * delayFeedback);
+
+        delayLine_r[delayOut2] += (((float)delayLine_r[delayOut]) * delayFeedback);
+        delayLine_r[delayIn] += (((float)delayLine_r[delayOut3]) * delayFeedback);
+
+        delayIn ++;
+
+        if (delayIn >= delayLenMax)
+        {
+            delayIn = 0;
+        }
+    }
+}
 
 void Delay_Process_Buff(int16_t *in, int16_t *left, int16_t *right, int buffLen)
 {
@@ -340,6 +386,14 @@ void Delay_SetOutputLevel(uint8_t unused __attribute__((unused)), float value)
 void Delay_SetLength(uint8_t unused __attribute__((unused)), float value)
 {
     delayLen = (uint32_t)(((float)delayLenMax - 1.0f) * value);
+}
+
+void Delay_SetLength(uint8_t unused __attribute__((unused)), uint32_t value)
+{
+    if (value != delayLen)
+    {
+        delayLen = value < delayLenMax ? value : delayLenMax;
+    }
 }
 
 void Delay_SetShift(uint8_t unused __attribute__((unused)), float value)

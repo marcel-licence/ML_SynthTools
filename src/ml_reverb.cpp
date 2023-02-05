@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Marcel Licence
+ * Copyright (c) 2023 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,13 +57,9 @@
 #include <ml_reverb.h>
 
 
-//define wet 0.0 <-> 1.0
-//float wet = 1.0f;
-//define time delay 0.0 <-> 1.0 (max)
 static float rev_time = 1.0f;
 static float rev_level = 0.0f;
 
-//define pointer limits = delay time
 
 struct comb_s
 {
@@ -280,5 +276,4 @@ void Reverb_Setup(float *buffer)
 void Reverb_SetLevel(uint8_t not_used __attribute__((unused)), float value)
 {
     rev_level = value;
-    //Status_ValueChangedFloat("ReverbLevel", rev_level);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Marcel Licence
+ * Copyright (c) 2023 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,12 +56,10 @@ uint8_t arp[7][ARP_STEPS] =
     { 12 - 12, 12 - 12, 12, 12, 12 + 12, 12, 12, 12 + 15, 12 - 12, 12 - 12, 12, 12, 12 + 12, 12, 12, 12 + 15}, /* Drax Ltd. II - Amphetamine */
     {0, 12, 24, 0, 12, 24, 0, 12, 24, 0, 12, 24, 0, 12, 24, 36}, /* popcorn bass riff */
     {0, 0, 12, 0, 12, 12, 0, 12, 0, 0, 12, 0, 12, 12, 0, 12},
-    //{12 + 0, 36 + 3, 24 + 0, 36 - 2, 24 - 4, 12 - 6, 12 - 6, 24 - 6, 36 - 4, 12 - 4, 36 - 2, 36 + 00, 12 + 1, 12 + 0, 12 - 7, 24 + 00}, /* daft punk - da funk */
     {0, 0, 12, 0, 10, 12, 0, 0, 12, 0, 10, 12, 0, 13, 0, 10},
     {0, 0, 12, 7, 0, 0, 12, 7, 0, 0, 12, 7, 0, 0, 7, 12 },
     {12, 24, 12, 24, 12 - 5, 24 - 5, 12 - 2, 24 - 2, 12, 24, 12, 24, 12 - 5, 24 - 5, 12 - 2, 24 - 2}, /* I Feel Love */
 
-    //  {12, 0, 12, 0, 12, 12, 0, 12, 0, 12, 12,  0, 12, 0, 10, 11}, /* my first own */
     {0, 12, 12, 0, 12, 12, 0, 0, 12, 12, 0, 10, 0, 10, 11, 12},   /* my first own */
 };
 

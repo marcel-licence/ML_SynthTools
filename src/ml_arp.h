@@ -56,8 +56,8 @@ void Arp_SelectSequence(uint8_t seq, float value);
 void Arp_StartRecord(uint8_t seq, float value);
 void Arp_Idle(void);
 void Arp_Active(void);
-void Arp_Tempo(uint8_t unused __attribute__((unused)), float value);
-void Arp_GateTime(uint8_t unused __attribute__((unused)), float value);
+void Arp_Tempo(uint8_t unused, float value);
+void Arp_GateTime(uint8_t unused, float value);
 uint32_t Arp_GetPos(void);
 
 /*

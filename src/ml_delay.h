@@ -33,7 +33,7 @@
  * @author Marcel Licence
  * @date 06.01.2022
  *
- * @brief This file contains an implementation of a simple reverb effect
+ * @brief This file contains the declarations of functions of a simple delay effect
  */
 
 
@@ -54,12 +54,14 @@ void Delay_Reset(void);
 void Delay_Process_Buff(float *signal_l, int buffLen);
 void Delay_Process_Buff(int16_t *signal_l, int buffLen);
 void Delay_Process_Buff(float *in, float *left, float *right, int buffLen);
+void Delay_Process_Buff(float *in_l, float *in_r, float *left, float *right, int buffLen);
 void Delay_Process_Buff(int16_t *in, int16_t *left, int16_t *right, int buffLen);
 void Delay_Process_Buff2(float *signal_l, float *signal_r, int buffLen);
 void Delay_SetInputLevel(uint8_t unused __attribute__((unused)), float value);
 void Delay_SetFeedback(uint8_t unused __attribute__((unused)), float value);
 void Delay_SetOutputLevel(uint8_t unused __attribute__((unused)), float value);
 void Delay_SetLength(uint8_t unused __attribute__((unused)), float value);
+void Delay_SetLength(uint8_t unused __attribute__((unused)), uint32_t value);
 void Delay_SetShift(uint8_t unused __attribute__((unused)), float value);
 
 
