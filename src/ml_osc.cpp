@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Marcel Licence
+ * Copyright (c) 2023 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,6 @@ static void OscProcessSingle(oscillatorT *osc, uint32_t len);
 
 
 /* will be removed in future */
-//extern float *saw;
 extern float sine[WAVEFORM_CNT];
 extern float saw[WAVEFORM_CNT];
 
@@ -64,10 +63,8 @@ static void OscProcessSingle(oscillatorT *osc, uint32_t len)
         morphMod *= (*osc->cfg->morph) * 64;
         samplePos += morphMod;
 
-        //samplePos = (89478480 * n);
 #endif
         float sig = osc->cfg->selectedWaveForm[WAVEFORM_I(samplePos)];
-        //Serial.printf("%d %d %0.6f\n", len, samplePos, sig);
 #if 0
         float sig = 0;
         if (saw == NULL)

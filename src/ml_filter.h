@@ -36,6 +36,8 @@
  * @brief This file contains the declarations and structures of the filter module
  *
  * @see First time used here: https://youtu.be/WJGOIgaY-1s
+ *
+ * Look here: https://www.musicdsp.org/en/latest/Filters/229-lpf-24db-oct.html
  */
 
 

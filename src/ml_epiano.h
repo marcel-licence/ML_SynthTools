@@ -74,8 +74,6 @@ public:
     void SetQuickDampingThr(float value);
 
     void SetModulationDepth(float value);
-    void SetTremoloDepth(float value);
-
 };
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Marcel Licence
+ * Copyright (c) 2023 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,7 +79,6 @@ bool ADSR_Process(const struct adsrT *ctrl, struct adsr_ctrl_t *adsr)
         if (adsr->ctrl < 0.0f)
         {
             adsr->ctrl = 0.0f;
-            //voice->active = false;
             return false;
         }
     }
@@ -126,7 +125,6 @@ bool ASRM_Process(const struct adsrT *ctrl, struct adsr_ctrl_t *asr)
         if (asr->ctrl < 0.0f)
         {
             asr->ctrl = 0.0f;
-            //voice->active = false;
             return false;
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Marcel Licence
+ * Copyright (c) 2023 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -155,7 +155,6 @@ void Filter_Calculate(float c, float reso, struct filterCoeffT *const filterC)
     a[1] = -2 * cosOmega;
     a[2] = 1 - alpha;
 
-    // Normalize filter coefficients
     float factor = 1.0f / a[0];
 
     aNorm[0] = a[1] * factor;
@@ -174,18 +173,10 @@ void Filter_CalculateNotch(float c, float reso __attribute__((unused)), struct f
     float *aNorm = filterC->aNorm;
     float *bNorm = filterC->bNorm;
 
-#if 0
-    float Q = reso;
-    float  cosOmega, omega, sinOmega, a[3], b[3];
-#else
-    float  cosOmega, omega, a[3], b[3];
-#endif
-
     /*
      * change curve of cutoff a bit
      * maybe also log or exp function could be used
      */
-    // c = f0 / fs
 
     if (c >= 1.0f)
     {
@@ -206,10 +197,6 @@ void Filter_CalculateNotch(float c, float reso __attribute__((unused)), struct f
      * use lookup here to get quicker results
      */
     cosOmega = sine[WAVEFORM_I((uint32_t)((float)((1ULL << 31) - 1) * omega + (float)((1ULL << 30) - 1)))];
-#if 0
-    sinOmega = sine[WAVEFORM_I((uint32_t)((float)((1ULL << 31) - 1) * omega))];
-#endif
-
     b[0] = 1;
     b[1] = -2 * cosOmega;
     b[2] = 1;
@@ -218,7 +205,6 @@ void Filter_CalculateNotch(float c, float reso __attribute__((unused)), struct f
     a[1] = -2 * r * cosOmega;
     a[2] = r * r;
 
-    // Normalize filter coefficients
     float factor = 1.0f / a[0];
 
     aNorm[0] = a[1] * factor;
