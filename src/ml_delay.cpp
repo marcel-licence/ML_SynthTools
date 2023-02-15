@@ -47,6 +47,7 @@
 
 
 #include <ml_delay.h>
+#include <ml_alg.h>
 
 
 #ifndef ARDUINO
@@ -70,6 +71,7 @@ static uint32_t delayIn = 0;
 static uint32_t delayOut = 0;
 static uint32_t delayOut2 = 0;
 static uint32_t delayOut3 = 0;
+
 
 void Delay_Init(int16_t *buffer, uint32_t len)
 {
@@ -188,24 +190,6 @@ void Delay_Process_Buff(int16_t *signal_l, int buffLen)
             delayIn = 0;
         }
     }
-}
-
-int16_t mul(int16_t a, float b);
-float mul_f(int16_t a, float b);
-
-int16_t mul(int16_t a, float b)
-{
-    float c = a;
-    c *= b;
-    return (int16_t)c;
-}
-
-float mul_f(int16_t a, float b)
-{
-    float c = a;
-    c *= b;
-    c /= (float)0x4000;
-    return c;
 }
 
 
