@@ -47,7 +47,7 @@
 #include <math.h>
 
 
-#include <ml_alg.h>
+#include <ml_types.h>
 
 
 class ML_Tremolo
@@ -70,6 +70,19 @@ private:
 
     uint32_t speedU32;
     uint32_t valueU32;
+};
+
+
+class ML_TremoloQ
+{
+public:
+    ML_TremoloQ() {};
+    ~ML_TremoloQ() {};
+    void init(float sample_rate);
+    void process(Q1_14 *left, Q1_14 *right, uint32_t len);
+    void setSpeed(float speed);
+    void setPhaseShift(float shift);
+    void setDepth(float new_depth);
 };
 
 

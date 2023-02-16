@@ -33,9 +33,7 @@
  * @author Marcel Licence
  * @date 20.12.2022
  *
- * @brief This file contains the declarations of a simple stereo chorus effect
- *
- * @see little demo: https://youtu.be/ZIiSp7yM6o8
+ * @brief This file contains an implementation of a simple stereo chorus effect
  */
 
 
@@ -50,9 +48,18 @@
 #endif
 
 
+#include <ml_types.h>
+
+
 void Chorus_Init(int16_t *buffer, uint32_t len);
+void Chorus_Init2(int16_t *left, int16_t *right, uint32_t len);
 void Chorus_Reset(void);
+void Chorus_Process_Buff(float *signal_l, int buffLen);
+void Chorus_Process_Buff(int16_t *signal_l, int buffLen);
 void Chorus_Process_Buff(float *in, float *left, float *right, int buffLen);
+void Chorus_Process_Buff(int16_t *in, int16_t *left, int16_t *right, int buffLen);
+void Chorus_Process_Buff(Q1_14 *in, Q1_14 *left, Q1_14 *right, int buffLen);
+void Chorus_Process_Buff2(float *signal_l, float *signal_r, int buffLen);
 void Chorus_SetupDefaultPreset(uint8_t unused __attribute__((unused)), float value);
 void Chorus_SetInputLevel(uint8_t unused __attribute__((unused)), float value);
 void Chorus_SetThrough(uint8_t unused __attribute__((unused)), float value);
@@ -60,6 +67,7 @@ void Chorus_SetDelay(uint8_t unused __attribute__((unused)), float value);
 void Chorus_SetPhaseShift(uint8_t unused __attribute__((unused)), float value);
 void Chorus_SetDepth(uint8_t unused __attribute__((unused)), float value);
 void Chorus_SetOutputLevel(uint8_t unused __attribute__((unused)), float value);
+void Chorus_SetLength(uint8_t unused __attribute__((unused)), float value);
 void Chorus_SetSpeed(uint8_t unused __attribute__((unused)), float value);
 
 

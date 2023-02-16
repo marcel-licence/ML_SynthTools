@@ -39,6 +39,9 @@
  */
 
 
+#if (!defined ARDUINO_RASPBERRY_PI_PICO) && (!defined ARDUINO_GENERIC_RP2040)
+
+
 #include <ml_tremolo.h>
 
 #include <stdio.h>
@@ -97,3 +100,6 @@ void ML_Tremolo::setDepth(float new_depth)
 {
     this->depth = new_depth;
 }
+
+#endif /* #if (!defined ARDUINO_RASPBERRY_PI_PICO) && (!defined ARDUINO_GENERIC_RP2040) */
+

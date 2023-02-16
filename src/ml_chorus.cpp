@@ -44,6 +44,9 @@
 #endif
 
 
+#if (!defined ARDUINO_RASPBERRY_PI_PICO) && (!defined ARDUINO_GENERIC_RP2040)
+
+
 #include <ml_chorus.h>
 #include <ml_alg.h>
 #include <ml_status.h>
@@ -308,3 +311,6 @@ void Chorus_SetSpeed(uint8_t unused __attribute__((unused)), float value)
 
     Status_ValueChangedFloat("Chorus_SetSpeed", chorusSpeed);
 }
+
+#endif /* #if (!defined ARDUINO_RASPBERRY_PI_PICO) && (!defined ARDUINO_GENERIC_RP2040) */
+
