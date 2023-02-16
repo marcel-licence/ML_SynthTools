@@ -168,9 +168,15 @@ void Delay_Process_Buff(float *signal_l, int buffLen)
 
 void Delay_Process_Buff(int16_t *signal_l, int buffLen)
 {
+    uint16_t delayInLvl_u = delayInLvl * 32768;
+    uint16_t delayToMix_u = delayToMix * 32768;
+    uint16_t delayFeedback_u = delayFeedback * 32768;
+
     for (int n = 0; n < buffLen; n++)
     {
-        delayLine_l[delayIn] = ((float)signal_l[n] * delayInLvl);
+        int32_t sigIn = (int32_t)signal_l[n] * (uint32_t)delayInLvl_u;
+        sigIn >>= 15;
+        delayLine_l[delayIn] = sigIn;
 
         delayOut = delayIn + (1 + delayLenMax - delayLen);
 
@@ -179,9 +185,13 @@ void Delay_Process_Buff(int16_t *signal_l, int buffLen)
             delayOut -= delayLenMax;
         }
 
-        signal_l[n] += ((float)delayLine_l[delayOut]) * delayToMix;
+        int32_t sigMix = (int32_t)delayLine_l[delayOut] * (uint32_t)delayToMix_u;
+        sigMix >>= 15;
+        signal_l[n] += sigMix;
 
-        delayLine_l[delayIn] += (((float)delayLine_l[delayOut]) * delayFeedback);
+        int32_t sigFb = (int32_t)delayLine_l[delayOut] * (uint32_t)delayFeedback_u;
+        sigFb >>= 15;
+        delayLine_l[delayIn] += sigFb;
 
         delayIn ++;
 
@@ -191,7 +201,6 @@ void Delay_Process_Buff(int16_t *signal_l, int buffLen)
         }
     }
 }
-
 
 void Delay_Process_Buff(float *in, float *left, float *right, int buffLen)
 {
