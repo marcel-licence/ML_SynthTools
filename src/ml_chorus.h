@@ -33,7 +33,9 @@
  * @author Marcel Licence
  * @date 20.12.2022
  *
- * @brief This file contains an implementation of a simple stereo chorus effect
+ * @brief This file contains the declarations of a simple stereo chorus effect
+ *
+ * @see little demo: https://youtu.be/ZIiSp7yM6o8
  */
 
 
