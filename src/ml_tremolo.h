@@ -82,6 +82,7 @@ public:
     void process(Q1_14 *left, Q1_14 *right, uint32_t len);
     void setSpeed(float speed);
     void setPhaseShift(float shift);
+    void updatePhaseShift();
     void setDepth(float new_depth);
 };
 

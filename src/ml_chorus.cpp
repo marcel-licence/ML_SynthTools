@@ -78,8 +78,6 @@ static uint32_t chorusOut = 0;
 static uint32_t chorusOut2 = 0;
 
 
-static float rad = 0;
-
 #define SINE_BIT    11
 #define SINE_CNT    (1<<SINE_BIT)
 #define SINE_CNT_HALF   (1<<(SINE_BIT-1))
@@ -200,7 +198,6 @@ void Chorus_Process(float *signal_l, float *signal_r __attribute__((unused)))
 
 void Chorus_Process_Buff(float *in, float *left, float *right, int buffLen)
 {
-    const float radAdd = 2.0 * M_PI * (0.05 + 7 * chorusSpeed) / 44100.0f;
     const float mult = chorusDepth * 0.5f;
 
     for (int n = 0; n < buffLen; n++)

@@ -48,6 +48,7 @@
 
 #include <ml_delay.h>
 #include <ml_alg.h>
+#include <ml_status.h>
 
 
 #ifndef ARDUINO
@@ -364,21 +365,25 @@ void Delay_Process_Buff2(float *signal_l, float *signal_r, int buffLen)
 void Delay_SetInputLevel(uint8_t unused __attribute__((unused)), float value)
 {
     delayInLvl = value;
+    Status_ValueChangedFloat("Delay_SetInputLevel", value);
 }
 
 void Delay_SetFeedback(uint8_t unused __attribute__((unused)), float value)
 {
     delayFeedback = value;
+    Status_ValueChangedFloat("Delay_SetFeedback", value);
 }
 
 void Delay_SetOutputLevel(uint8_t unused __attribute__((unused)), float value)
 {
     delayToMix = value;
+    Status_ValueChangedFloat("Delay_SetOutputLevel", value);
 }
 
 void Delay_SetLength(uint8_t unused __attribute__((unused)), float value)
 {
     delayLen = (uint32_t)(((float)delayLenMax - 1.0f) * value);
+    Status_ValueChangedFloat("Delay_SetLength", value);
 }
 
 void Delay_SetLength(uint8_t unused __attribute__((unused)), uint32_t value)
@@ -387,9 +392,11 @@ void Delay_SetLength(uint8_t unused __attribute__((unused)), uint32_t value)
     {
         delayLen = value < delayLenMax ? value : delayLenMax;
     }
+    Status_ValueChangedInt("Delay_SetLength", value);
 }
 
 void Delay_SetShift(uint8_t unused __attribute__((unused)), float value)
 {
     delayShift = value;
+    Status_ValueChangedFloat("Delay_SetShift", value);
 }
