@@ -19,6 +19,7 @@ The PCM5102a might have the following PINs which should be all connected to ensu
 
 Definitions of I2S_BCLK_PIN, I2S_DOUT_PIN, I2S_WCLK_PIN can be found in the selected board or could be placed in the config.h.
 Please ensure that all defined PINs are capable being used as output. Some PINs of the ESP32 can be used as input only.
+I2S_DOUT_PIN refers to the digital output of the ESP32 which shall be connected to DIN of the codec (like tx and rx).
 
 In case ml_boards.h is included you would find there some define depended specific board include which might contain the defines of the I2S PINs.
 
