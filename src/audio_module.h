@@ -61,6 +61,7 @@ void Audio_Output(float *left, float *right);
 #else
 void Audio_Output(const float *left, const float *right);
 #endif
+void Audio_Input(float *left, float *right);
 void DaisySeed_Setup(void);
 void Teensy_Setup();
 void SAMD21_Synth_Init();

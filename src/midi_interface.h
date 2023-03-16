@@ -67,6 +67,10 @@ void Midi_Process();
  * a uart compatible signal
  */
 
+#ifndef MIDI_SERIAL_BAUDRATE
+#define MIDI_SERIAL_BAUDRATE   SERIAL_BAUDRATE
+#endif
+
 #ifndef MIDI_SERIAL1_BAUDRATE
 #define MIDI_SERIAL1_BAUDRATE   31250
 #endif
