@@ -95,9 +95,9 @@ void Filter_Reset(struct filterProcT *filter)
 void Filter_Process(float *const signal, struct filterProcT *const filterP)
 {
     const float out = filterP->filterCoeff->bNorm[0] * (*signal) + filterP->w[0];
-     filterP->w[0] = filterP->filterCoeff->bNorm[1] * (*signal) - filterP->filterCoeff->aNorm[0] * out + filterP->w[1];
-     filterP->w[1] = filterP->filterCoeff->bNorm[2] * (*signal) - filterP->filterCoeff->aNorm[1] * out;
-     *signal = out;
+    filterP->w[0] = filterP->filterCoeff->bNorm[1] * (*signal) - filterP->filterCoeff->aNorm[0] * out + filterP->w[1];
+    filterP->w[1] = filterP->filterCoeff->bNorm[2] * (*signal) - filterP->filterCoeff->aNorm[1] * out;
+    *signal = out;
 }
 
 void Filter_Process_Buffer(float *const signal, struct filterProcT *const filterP, uint32_t len)
@@ -116,54 +116,53 @@ void Filter_Process_Buffer(float *const signal, struct filterProcT *const filter
  */
 void Filter_Calculate(float c, float reso, struct filterCoeffT *const filterC)
 {
-     float *aNorm = filterC->aNorm;
-     float *bNorm = filterC->bNorm;
+    float *aNorm = filterC->aNorm;
+    float *bNorm = filterC->bNorm;
 
-     float Q = reso;
-     float  cosOmega, omega, sinOmega, alpha, a[3], b[3];
+    float Q = reso;
+    float  cosOmega, omega, sinOmega, alpha, a[3], b[3];
 
-     /*
-      * change curve of cutoff a bit
-      * maybe also log or exp function could be used
-      */
-     c = c * c * c;
+    /*
+     * change curve of cutoff a bit
+     * maybe also log or exp function could be used
+     */
+    c = c * c * c;
 
-     if (c >= 1.0f)
-     {
-         omega = 1.0f;
-     }
-     else if (c < 0.0025f)
-     {
-         omega = 0.0025f;
-     }
-     else
-     {
-         omega = c;
-     }
+    if (c >= 1.0f)
+    {
+        omega = 1.0f;
+    }
+    else if (c < 0.0025f)
+    {
+        omega = 0.0025f;
+    }
+    else
+    {
+        omega = c;
+    }
 
-     /*
-      * use lookup here to get quicker results
-      */
-     cosOmega = sine[WAVEFORM_I((uint32_t)((float)((1ULL << 31) - 1) * omega + (float)((1ULL << 30) - 1)))];
-     sinOmega = sine[WAVEFORM_I((uint32_t)((float)((1ULL << 31) - 1) * omega))];
+    /*
+     * use lookup here to get quicker results
+     */
+    cosOmega = sine[WAVEFORM_I((uint32_t)((float)((1ULL << 31) - 1) * omega + (float)((1ULL << 30) - 1)))];
+    sinOmega = sine[WAVEFORM_I((uint32_t)((float)((1ULL << 31) - 1) * omega))];
 
-     alpha = sinOmega / (2.0 * Q);
-     b[0] = (1 - cosOmega) / 2;
-     b[1] = 1 - cosOmega;
-     b[2] = b[0];
-     a[0] = 1 + alpha;
-     a[1] = -2 * cosOmega;
-     a[2] = 1 - alpha;
+    alpha = sinOmega / (2.0 * Q);
+    b[0] = (1 - cosOmega) / 2;
+    b[1] = 1 - cosOmega;
+    b[2] = b[0];
+    a[0] = 1 + alpha;
+    a[1] = -2 * cosOmega;
+    a[2] = 1 - alpha;
 
-     // Normalize filter coefficients
-     float factor = 1.0f / a[0];
+    float factor = 1.0f / a[0];
 
-     aNorm[0] = a[1] * factor;
-     aNorm[1] = a[2] * factor;
+    aNorm[0] = a[1] * factor;
+    aNorm[1] = a[2] * factor;
 
-     bNorm[0] = b[0] * factor;
-     bNorm[1] = b[1] * factor;
-     bNorm[2] = b[2] * factor;
+    bNorm[0] = b[0] * factor;
+    bNorm[1] = b[1] * factor;
+    bNorm[2] = b[2] * factor;
 }
 
 /*
