@@ -161,7 +161,7 @@ struct midiMapping_s
 #ifdef MIDI_FMT_INT
     void (*noteOn)(uint8_t ch, uint8_t note, uint8_t vel);
     void (*noteOff)(uint8_t ch, uint8_t note);
-    void (*pitchBend)(uint8_t ch, uint8_t bend);
+    void (*pitchBend)(uint8_t ch, uint16_t bend);
     void (*modWheel)(uint8_t ch, uint8_t value);
 #else
     void (*noteOn)(uint8_t ch, uint8_t note, float vel);
