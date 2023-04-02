@@ -49,7 +49,7 @@
 #ifdef ES8388_ENABLED
 
 
-
+void ES8388_Setup();
 
 
 #endif // ES8388_ENABLED
