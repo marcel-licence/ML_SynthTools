@@ -41,7 +41,7 @@
 
 
 #ifdef __CDT_PARSER__
-#include "cdt.h"
+#include <cdt.h>
 #endif
 
 
