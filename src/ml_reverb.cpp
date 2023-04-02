@@ -277,3 +277,10 @@ void Reverb_SetLevel(uint8_t not_used __attribute__((unused)), float value)
 {
     rev_level = value;
 }
+
+void Reverb_SetLevelInt(uint8_t not_used, uint8_t value)
+{
+	float val_f = value;
+	val_f *= 1.0f/127.0f;
+	Reverb_SetLevel(not_used, value);
+}

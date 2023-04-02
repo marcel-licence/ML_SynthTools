@@ -50,6 +50,7 @@
 
 
 void ES8388_Setup();
+void ES8388_SetIn2OoutVOL(uint8_t unused, float vol);
 
 
 #endif // ES8388_ENABLED

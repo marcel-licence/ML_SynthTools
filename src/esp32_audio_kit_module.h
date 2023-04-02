@@ -49,17 +49,11 @@
 #ifdef ML_SYNTH_INLINE_DECLARATION
 #ifdef ESP32_AUDIO_KIT
 
+typedef void(*audioKitButtonCb)(uint8_t, uint8_t);
+extern audioKitButtonCb audioKitButtonCallback;
+void button_setup();
+void button_loop();
 
-#endif // ESP32_AUDIO_KIT
-#endif // #ifdef ML_SYNTH_INLINE_DECLARATION
-
-
-#ifdef ML_SYNTH_INLINE_DEFINITION
-#ifdef ESP32_AUDIO_KIT
-
-#ifdef AC101_ENABLED
-#include "AC101.h" /* only compatible with forked repo: https://github.com/marcel-licence/AC101 */
-#endif
 
 
 //#define BUTTON_DEBUG_MSG
@@ -126,8 +120,21 @@ static AC101 ac;
 #define LRCK    (SAMPLE_RATE*CHANNEL_COUNT)
 
 
-typedef void(*audioKitButtonCb)(uint8_t, uint8_t);
-extern audioKitButtonCb audioKitButtonCallback;
+#endif // ESP32_AUDIO_KIT
+#endif // #ifdef ML_SYNTH_INLINE_DECLARATION
+
+
+#ifdef ML_SYNTH_INLINE_DEFINITION
+#ifdef ESP32_AUDIO_KIT
+
+#ifdef AC101_ENABLED
+#include "AC101.h" /* only compatible with forked repo: https://github.com/marcel-licence/AC101 */
+#endif
+
+
+
+
+
 
 #ifdef AC101_ENABLED
 /*
