@@ -59,6 +59,7 @@ void MultiSawSynth_Process(Q1_14 *ch_l, Q1_14 *ch_r, int sampleLen);
 void MultiSawSynth_NoteOn(uint8_t ch, uint8_t note, uint8_t vel);
 void MultiSawSynth_NoteOff(uint8_t ch, uint8_t note);
 void MultiSawSynth_NoteSetPitch(uint8_t ch, uint8_t note, uint32_t pitch);
+void MultiSawSynth_NoteSetVolume(uint8_t ch, uint8_t note, uint16_t volume);
 void MultiSawSynth_PitchBend(uint8_t ch, uint16_t bend);
 void MultiSawSynth_SetProfile(uint8_t value);
 void MultiSawSynth_SetCurrentCh(uint8_t value);

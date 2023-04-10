@@ -203,6 +203,7 @@ void Delay_Process_Buff(int16_t *signal_l, int buffLen)
     }
 }
 
+
 void Delay_Process_Buff(float *in, float *left, float *right, int buffLen)
 {
     for (int n = 0; n < buffLen; n++)
@@ -374,9 +375,25 @@ void Delay_SetFeedback(uint8_t unused __attribute__((unused)), float value)
     Status_ValueChangedFloat("Delay_SetFeedback", value);
 }
 
+void Delay_SetFeedback(uint8_t unused __attribute__((unused)), uint8_t value)
+{
+    float value_f = value;
+    value_f /= 127.0;
+    delayFeedback = value_f;
+    Status_ValueChangedFloat("Delay_SetFeedback", value);
+}
+
 void Delay_SetOutputLevel(uint8_t unused __attribute__((unused)), float value)
 {
     delayToMix = value;
+    Status_ValueChangedFloat("Delay_SetOutputLevel", value);
+}
+
+void Delay_SetOutputLevel(uint8_t unused __attribute__((unused)), uint8_t value)
+{
+    float value_f = value;
+    value_f /= 127.0;
+    delayToMix = value_f;
     Status_ValueChangedFloat("Delay_SetOutputLevel", value);
 }
 

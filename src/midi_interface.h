@@ -295,11 +295,18 @@ inline void Midi_PitchBend(uint8_t ch, uint16_t bend)
     Ble_PitchBend(ch, bend);
 #endif
 
+#ifdef MIDI_FMT_INT
+    if (midiMapping.pitchBend != NULL)
+    {
+        midiMapping.pitchBend(ch, bend);
+    }
+#else
     float value = ((float)bend - 8192.0f) * (1.0f / 8192.0f);
     if (midiMapping.pitchBend != NULL)
     {
         midiMapping.pitchBend(ch, value);
     }
+#endif
 }
 
 inline void Midi_SongPositionPointer(uint16_t pos)

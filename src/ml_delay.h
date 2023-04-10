@@ -56,13 +56,24 @@ void Delay_Process_Buff(int16_t *signal_l, int buffLen);
 void Delay_Process_Buff(float *in, float *left, float *right, int buffLen);
 void Delay_Process_Buff(float *in_l, float *in_r, float *left, float *right, int buffLen);
 void Delay_Process_Buff(int16_t *in, int16_t *left, int16_t *right, int buffLen);
+void Delay_Process_Buff(int16_t *in_l, int16_t *in_r, int16_t *out_l, int16_t *out_r, int buffLen);
 void Delay_Process_Buff2(float *signal_l, float *signal_r, int buffLen);
 void Delay_SetInputLevel(uint8_t unused __attribute__((unused)), float value);
 void Delay_SetFeedback(uint8_t unused __attribute__((unused)), float value);
+void Delay_SetFeedback(uint8_t unused __attribute__((unused)), uint8_t value);
 void Delay_SetOutputLevel(uint8_t unused __attribute__((unused)), float value);
+void Delay_SetOutputLevel(uint8_t unused __attribute__((unused)), uint8_t value);
 void Delay_SetLength(uint8_t unused __attribute__((unused)), float value);
 void Delay_SetLength(uint8_t unused __attribute__((unused)), uint32_t value);
 void Delay_SetShift(uint8_t unused __attribute__((unused)), float value);
+
+
+void DelayQ_Init(int16_t *buffer, uint32_t len);
+void DelayQ_Init2(int16_t *left, int16_t *right, uint32_t len);
+void DelayQ_Process_Buff(int16_t *in_l, int16_t *in_r, int16_t *out_l, int16_t *out_r, int buffLen);
+void DelayQ_SetFeedback(uint8_t unused __attribute__((unused)), uint8_t value);
+void DelayQ_SetOutputLevel(uint8_t unused __attribute__((unused)), uint8_t value);
+void DelayQ_SetLength(uint8_t unused __attribute__((unused)), uint32_t value);
 
 
 #endif /* SRC_ML_DELAY_H_ */
