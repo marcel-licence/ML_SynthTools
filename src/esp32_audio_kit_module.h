@@ -55,6 +55,10 @@ void button_setup();
 void button_loop();
 
 
+#ifdef AC101_ENABLED
+void ac101_setup();
+#endif
+
 
 //#define BUTTON_DEBUG_MSG
 
@@ -101,9 +105,7 @@ uint32_t keyMax[7] = {4095 + 32, 0 + 32, 525 + 32, 1006 + 32, 1374 + 32, 1570 + 
 #define MCLK_CH 0
 #define PWM_BIT 1
 
-#ifdef AC101_ENABLED
-static AC101 ac;
-#endif
+
 
 /* actually only supporting 16 bit */
 #define SAMPLE_SIZE_16BIT
@@ -129,14 +131,10 @@ static AC101 ac;
 
 #ifdef AC101_ENABLED
 #include "AC101.h" /* only compatible with forked repo: https://github.com/marcel-licence/AC101 */
-#endif
 
 
+static AC101 ac;
 
-
-
-
-#ifdef AC101_ENABLED
 /*
  * this function could be used to set up the masterclock
  * it is not necessary to use the ac101
