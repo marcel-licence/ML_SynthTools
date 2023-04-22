@@ -54,6 +54,8 @@
 #else
 #include <stdint.h>
 #endif
+#include <ml_types.h>
+
 
 struct filterCoeffT
 {
@@ -74,6 +76,25 @@ struct filterProcT
     float w[3];
 };
 
+struct filterQCoeffT
+{
+    union
+    {
+        struct
+        {
+            Q1_14 bNorm[3];
+            Q1_14 aNorm[2];
+        };
+        Q1_14 coef[5];
+    };
+};
+
+struct filterQProcT
+{
+    struct filterQCoeffT *filterCoeff;
+    Q1_14 w[3];
+};
+
 
 void Filter_Init(struct filterProcT *const filterP, struct filterCoeffT *const filterC);
 void Filter_Proc_Init(struct filterProcT *const filterP);
@@ -83,6 +104,14 @@ void Filter_Process(float *const signal, struct filterProcT *const filterP);
 void Filter_Process_Buffer(float *const signal, struct filterProcT *const filterP, uint32_t len);
 void Filter_Calculate(float c, float reso, struct filterCoeffT *const  filterC);
 void Filter_CalculateNotch(float c, float reso, struct filterCoeffT *const filterC);
+
+
+void Filter_Init(struct filterQProcT *const filterP, struct filterQCoeffT *const filterC);
+void Filter_Proc_Init(struct filterQProcT *const filterP);
+void Filter_Coeff_Init(struct filterQCoeffT *const filterC);
+void Filter_Reset(struct filterQProcT *filter);
+void Filter_Process_Buffer(Q1_14 *const signal, struct filterQProcT *const filterP, uint32_t len);
+void Filter_Calculate(float c, float reso, struct filterQCoeffT *const filterC);
 
 
 #endif /* ML_FILTER_H_ */

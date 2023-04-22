@@ -56,6 +56,7 @@
 /* will be removed in future */
 extern float *sine;
 
+
 void Filter_Init(struct filterProcT *const filterP, struct filterCoeffT *const filterC)
 {
     filterP->w[0] = 0.0f;
