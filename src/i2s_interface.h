@@ -47,6 +47,7 @@
 #ifdef ML_SYNTH_INLINE_DECLARATION
 
 void setup_i2s();
+bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen);
 bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sample, const int buffLen);
 void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int buffLen);
 
@@ -66,6 +67,12 @@ void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int 
 #error internal dac not supported by your current configuration
 /* this message appears in case you cannot use the I2S interface to push audio data to the internal DAC */
 #endif
+#endif
+
+
+#ifdef OUTPUT_SAW_TEST
+int16_t sampleDataI16SawTest[SAMPLE_BUFFER_SIZE];
+float sampleDataFSawTest[SAMPLE_BUFFER_SIZE];
 #endif
 
 
@@ -215,6 +222,50 @@ bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sa
 }
 #endif
 
+#ifdef SAMPLE_SIZE_16BIT
+bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen)
+{
+    size_t bytes_written = 0;
+
+    static union sampleTUNT
+    {
+        uint32_t sample;
+        int16_t ch[2];
+    } sampleDataU[SAMPLE_BUFFER_SIZE];
+
+#ifdef OUTPUT_SAW_TEST
+    for (int n = 0; n < buffLen; n++)
+    {
+        sampleDataU[n].ch[1] = sampleDataI16SawTest[n];
+        sampleDataU[n].ch[0] = sampleDataI16SawTest[n];
+    }
+#else
+    for (int n = 0; n < buffLen; n++)
+    {
+        sampleDataU[n].ch[1] = fr_sample[n];
+        sampleDataU[n].ch[0] = fl_sample[n];
+    }
+#endif
+
+#ifdef CYCLE_MODULE_ENABLED
+    calcCycleCountPre();
+#endif
+    i2s_write(i2s_port_number, (const char *)&sampleDataU[0].sample, 4 * buffLen, &bytes_written, portMAX_DELAY);
+#ifdef CYCLE_MODULE_ENABLED
+    calcCycleCount();
+#endif
+
+    if (bytes_written > 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+#endif
+
 #ifdef SAMPLE_BUFFER_SIZE
 bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sample, const int buffLen)
 {
@@ -297,6 +348,14 @@ bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sampl
 #endif
 #endif
     }
+
+#ifdef OUTPUT_SAW_TEST
+    for (int n = 0; n < buffLen; n++)
+    {
+        sampleDataU[n].ch[1] = sampleDataI16SawTest[n];
+        sampleDataU[n].ch[0] = sampleDataI16SawTest[n];
+    }
+#endif
 
     static size_t bytes_written = 0;
 
@@ -494,6 +553,21 @@ void setup_i2s()
     Serial.printf("    DIN: %d\n", pins.data_in_num);
 #else
     Serial.printf("I2S configured using internal DAC (DAC_1, DAC_2 as output)\n");
+#endif
+
+#ifdef OUTPUT_SAW_TEST
+    /*
+       * base frequency: SAMPLE_FREQ / SAMPLE_BUFFER_SIZE
+       * for example: Fs : 44100Hz, Lsb = 48 -> Freq: 918.75 Hz
+       */
+    for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
+    {
+        float saw = ((float)i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
+        sampleDataFSawTest[i] = saw;
+        saw -= 1;
+        saw *= 0x7FFF;
+        sampleDataI16SawTest[i] = saw;
+    }
 #endif
 }
 

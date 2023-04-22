@@ -61,7 +61,6 @@ bool I2S_isNotFull(void);
 
 
 #ifdef ESP8266
-//#include <driver/i2s.h>
 #include <I2S.h>
 #include <i2s_reg.h>
 #endif

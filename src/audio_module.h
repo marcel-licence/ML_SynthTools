@@ -49,18 +49,10 @@
 
 
 void Audio_Setup(void);
-#ifdef OUTPUT_SAW_TEST
-void Audio_OutputMono(int32_t *samples);
-#else
+void Audio_Output(const float *left, const float *right);
 void Audio_OutputMono(const int32_t *samples);
-#endif
 void Audio_Output(const int16_t *left, const int16_t *right);
 void Audio_Output(const Q1_14 *left, const Q1_14 *right);
-#ifdef OUTPUT_SAW_TEST
-void Audio_Output(float *left, float *right);
-#else
-void Audio_Output(const float *left, const float *right);
-#endif
 void Audio_Input(float *left, float *right);
 void DaisySeed_Setup(void);
 void Teensy_Setup();
@@ -255,26 +247,8 @@ void ProcessAudio(uint16_t *buff, size_t len)
 
 #endif
 
-#ifdef OUTPUT_SAW_TEST
-void Audio_OutputMono(int32_t *samples)
-#else
 void Audio_OutputMono(const int32_t *samples)
-#endif
 {
-#ifdef OUTPUT_SAW_TEST
-    /*
-     * base frequency: SAMPLE_FREQ / SAMPLE_BUFFER_SIZE
-     * for example: Fs : 44100Hz, Lsb = 48 -> Freq: 918.75 Hz
-     */
-    for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
-    {
-        float left = ((float)i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
-        left -= 1;
-        left *= 0x7FFF;
-        samples[i] = left;
-    }
-#endif
-
 #ifdef ESP8266
     for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
     {
@@ -441,6 +415,10 @@ void Audio_Output(const Q1_14 *left, const Q1_14 *right)
 
 void Audio_Output(const int16_t *left, const int16_t *right)
 {
+#ifdef ESP32
+    i2s_write_stereo_samples_i16(left, right, SAMPLE_BUFFER_SIZE);
+#endif /* ESP32 */
+
 #if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
 #ifdef RP2040_AUDIO_PWM
     union sample
