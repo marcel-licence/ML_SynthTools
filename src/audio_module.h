@@ -419,6 +419,34 @@ void Audio_Output(const int16_t *left, const int16_t *right)
     i2s_write_stereo_samples_i16(left, right, SAMPLE_BUFFER_SIZE);
 #endif /* ESP32 */
 
+#ifdef ARDUINO_DAISY_SEED
+
+    float sig_l[SAMPLE_BUFFER_SIZE];
+    float sig_r[SAMPLE_BUFFER_SIZE];
+
+#ifdef CYCLE_MODULE_ENABLED
+    calcCycleCountPre();
+#endif
+    while (!dataReady)
+    {
+        /* just do nothing */
+    }
+#ifdef CYCLE_MODULE_ENABLED
+    calcCycleCount();
+#endif
+
+    for (size_t i = 0; i < SAMPLE_BUFFER_SIZE; i++)
+    {
+        sig_l[i] = ((float)left[i]) * (1.0f / ((float)INT16_MAX));
+        sig_r[i] = ((float)right[i]) * (1.0f / ((float)INT16_MAX));
+    }
+
+    memcpy(out_temp[0], sig_l, sizeof(out_temp[0]));
+    memcpy(out_temp[1], sig_r, sizeof(out_temp[1]));
+
+    dataReady = false;
+#endif /* ARDUINO_DAISY_SEED */
+
 #if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
 #ifdef RP2040_AUDIO_PWM
     union sample
