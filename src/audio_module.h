@@ -87,7 +87,7 @@ void SAMD21_Synth_Init();
 #endif
 
 #ifdef ARDUINO_DAISY_SEED
-#include "DaisyDuino.h"
+#include "DaisyDuino.h" /* requires the DaisyDuino library: https://github.com/electro-smith/DaisyDuino */
 #endif
 
 #if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
