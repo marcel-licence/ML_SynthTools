@@ -95,6 +95,14 @@ void Midi_Process();
 #define MIDI_PORT2_ACTIVE
 #endif
 
+#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
+#define PIN_CAPTION "GP"
+#elif (defined ESP32)
+#define PIN_CAPTION "IO"
+#else
+#define PIN_CAPTION ""
+#endif
+
 struct midi_port_s
 {
     Stream *serial; /* this can be software or hardware serial */
@@ -402,10 +410,10 @@ void Midi_Setup()
 
 #ifdef MIDI_RX1_PIN
 #ifdef MIDI_TX1_PIN
-    Serial.printf("Setup Serial1 with %d baud with rx: %d and tx %d\n", MIDI_SERIAL1_BAUDRATE, MIDI_RX1_PIN, MIDI_TX1_PIN);
+    Serial.printf("Setup Serial1 with %d baud with rx: "PIN_CAPTION"%d and tx %d\n", MIDI_SERIAL1_BAUDRATE, MIDI_RX1_PIN, MIDI_TX1_PIN);
     Serial1.begin(MIDI_SERIAL1_BAUDRATE, SERIAL_8N1, MIDI_RX1_PIN, MIDI_TX1_PIN);
 #else
-    Serial.printf("Setup Serial1 with %d baud with rx: %d only\n", MIDI_SERIAL1_BAUDRATE, MIDI_RX1_PIN);
+    Serial.printf("Setup Serial1 with %d baud with rx: "PIN_CAPTION"%d only\n", MIDI_SERIAL1_BAUDRATE, MIDI_RX1_PIN);
     Serial1.begin(MIDI_SERIAL1_BAUDRATE, SERIAL_8N1, MIDI_RX1_PIN);
 #endif
     pinMode(MIDI_RX1_PIN, INPUT_PULLUP); /* can be connected to open collector output */
@@ -427,10 +435,10 @@ void Midi_Setup()
 
 #ifdef MIDI_RX2_PIN
 #ifdef MIDI_TX2_PIN
-    Serial.printf("Setup Serial2 with %d baud with rx: %d and tx %d\n", MIDI_SERIAL2_BAUDRATE, MIDI_RX2_PIN, MIDI_TX2_PIN);
+    Serial.printf("Setup Serial2 with %d baud with rx: "PIN_CAPTION"%d and tx %d\n", MIDI_SERIAL2_BAUDRATE, MIDI_RX2_PIN, MIDI_TX2_PIN);
     Serial2.begin(MIDI_SERIAL2_BAUDRATE, SERIAL_8N1, MIDI_RX2_PIN, MIDI_TX2_PIN);
 #else
-    Serial.printf("Setup Serial2 with %d baud with rx: %d only\n", MIDI_SERIAL2_BAUDRATE, MIDI_RX2_PIN);
+    Serial.printf("Setup Serial2 with %d baud with rx: "PIN_CAPTION"%d only\n", MIDI_SERIAL2_BAUDRATE, MIDI_RX2_PIN);
 #if (!defined ARDUINO_RASPBERRY_PI_PICO) && (!defined ARDUINO_GENERIC_RP2040)
     Serial2.begin(MIDI_SERIAL2_BAUDRATE, SERIAL_8N1, MIDI_RX2_PIN);
 #else
