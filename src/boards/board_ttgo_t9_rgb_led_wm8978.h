@@ -44,28 +44,29 @@
  
  PIN	FUNCTION			Note
   0		I2S_MCLK_PIN		DAC WM8978 /HEADER
-  1		TX UART0			CP210x USB 
-  2		SPI_MISO			SD-card /HEADER
-  3		RX UART0			CP210x USB
-  4 	BLINK_LED_PIN		HEADER
-  5		I2C_SCL_2			HEADER
- 12		FREE				HEADER
- 13		SPI_CS				SD-card /HEADER
- 14		SPI_SCK				SD-card
- 15		SPI_MOSI			SD-card /HEADER
- 18		I2C_SCL				Control WM8978 
- 19		I2C_SDA				Control WM8978
- 22 	LED_STRIP_PIN		WS2812b LED strip
- 23		I2C_SDA_2			HEADER
+  1		TX UART0		CP210x USB 
+  2		SPI_MISO		SD-card /HEADER
+  3		RX UART0		CP210x USB
+  4 		FREE			HEADER
+  5		I2C_SCL_2		HEADER
+ 12		FREE			HEADER
+ 13		SPI_CS			SD-card /HEADER
+ 14		SPI_SCK			SD-card
+ 15		SPI_MOSI		SD-card /HEADER
+ 18		I2C_SCL			Control WM8978 
+ 19		I2C_SDA			Control WM8978
+ 21		BLINK_LED_PIN		Connector
+ 22 		LED_STRIP_PIN		WS2812b LED strip /Connector
+ 23		I2C_SDA_2		HEADER
  25		I2S_WCLK_PIN		DAC WM8978
  26		I2S_DOUT_PIN		DAC WM8978
- 27		I2S_DIN_PIN			ADC WM9878
- 32		FREE				HEADER
+ 27		I2S_DIN_PIN		ADC WM9878
+ 32		FREE			HEADER
  33		I2S_BCLK_PIN		DAC WM8978
- 34		PIN_KEY_4			Button 4 /HEADER
- 35		MIDI_RX2			MIDI in /HEADER
- 36		PIN_KEY_3			Button 3
- 39		PIN_KEY_2			Button 2
+ 34		PIN_KEY_4		Button 4 /HEADER
+ 35		MIDI_RX2		MIDI in /HEADER
+ 36		PIN_KEY_3		Button 3
+ 39		PIN_KEY_2		Button 2
  
 
  */
@@ -86,7 +87,7 @@
 
 /* on board led, green */
 //#define BLINK_LED_PIN     22
-#define BLINK_LED_PIN     4 /* use external free pin on header */
+#define BLINK_LED_PIN     21 /* use external free pin on connector */
 
 
 /* For WS2812B leds */
