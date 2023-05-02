@@ -122,6 +122,12 @@ void Audio_Setup(void)
 #endif
 #endif
 
+
+#ifdef WM8978_ENABLED
+	WM8978_Setup();
+#endif
+
+
 #ifdef ESP32
     setup_i2s();
 #endif
