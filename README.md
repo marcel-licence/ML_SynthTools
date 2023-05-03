@@ -5,8 +5,22 @@
   <a href="https://youtu.be/9AHQ4mQrjE8">link to the video</a>
 </p>
 
+
+# Introduction
+
+This library is made to be used for synthesizer projects. It contains modules to create sound, to drive an audio codec and create some audio effects. 
+
+In this documentation you will find:
+- information about supported platforms
+- information about the supported modules of this library
+
+There are some references to the organ project because this was the first which supports the highest count of platforms/boards.
+
+
+# Platform support
+
 This library supports different platforms:
-- ESP32
+- ESP32, ESP32S2, ESP32S3
 - ESP8266
 - Seeedstudio XIAO (samd21 - cortex-m0plus)
 - Teensy 4.1 (imxrt1062)
@@ -28,9 +42,11 @@ Demo using the Teensy4.1: https://youtu.be/H-NDCQnSDV0
 
 More information will be available in future
 
+
 # Modules of this library
 
 The library contains the following modules:
+- midi module <a href="extras/midi_input.md">more details</a>
 - arpeggiator <a href="extras/ml_arp.md">more details</a>
 - board pinout definitions <a href="extras/ml_boards.md">more details</a>
 - a simple delay <a href="extras/ml_delay.md">more details</a>
@@ -41,11 +57,30 @@ The library contains the following modules:
 - oled scope <a href="extras/ml_scope.md">more details</a>
 - midi file stream player <a href="extras/ml_midi_file_stream.md">more details</a>
 
+
+# Board definitions
+
+There are a lot of audio boards available on the market (for example ESP32-Audio-Kit).
+For that reason you can use some of the existing board includes to get all defines
+required to set up your board, codec etc.
+-> please look here for more information <a href="extras/ml_board.md">more details</a>
+
+
+# Examples
+
+There are some "multi-platform" examples available:
+- ml_epiano_example <a href="examples/ml_epiano_example/README.md">more details</a>
+- ml_synth_basic_example <a href="examples/ml_synth_basic_example/README.md">more details</a>
+- ml_synth_multi_saw_example <a href="examples/ml_synth_multi_saw_example/README.md">more details</a>
+- ml_synth_organ_example <a href="examples/ml_synth_organ_example/README.md">more details</a>
+- ml_synth_pwm_osc_example <a href="examples/ml_synth_pwm_osc_example/README.md">more details</a>
+
+
 # Compiling note
 
 In some cases the following error might occur: 
 	
-	The plaform does not support 'compiler.libraries.ldflags' for precompiled libraries.
+	The platform does not support 'compiler.libraries.ldflags' for precompiled libraries.
 	
 To fix this you can look for platform.txt
 
