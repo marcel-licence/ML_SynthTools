@@ -1,0 +1,3 @@
+[submodule "examples/ml_synth_organ_example"]
+	path = examples/ml_synth_organ_example
+	url = https://github.com/marcel-licence/ml_synth_organ_example.git
