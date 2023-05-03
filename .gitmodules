@@ -1,3 +1,15 @@
 [submodule "examples/ml_synth_organ_example"]
 	path = examples/ml_synth_organ_example
 	url = https://github.com/marcel-licence/ml_synth_organ_example.git
+[submodule "examples/ml_synth_multi_saw_example"]
+	path = examples/ml_synth_multi_saw_example
+	url = https://github.com/marcel-licence/ml_synth_multi_saw_example.git
+[submodule "examples/ml_epiano_example"]
+	path = examples/ml_epiano_example
+	url = https://github.com/marcel-licence/ml_epiano_example.git
+[submodule "examples/ml_synth_basic_example"]
+	path = examples/ml_synth_basic_example
+	url = https://github.com/marcel-licence/ml_synth_basic_example.git
+[submodule "examples/ml_synth_pwm_osc_example"]
+	path = examples/ml_synth_pwm_osc_example
+	url = https://github.com/marcel-licence/ml_synth_pwm_osc_example.git
