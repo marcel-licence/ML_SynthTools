@@ -10,4 +10,5 @@ Available boards:
    Note: please check the board_audio_kit_es8388.h for more configuration options.
         There is more than one version available
  - BOARD_ESP32_DOIT (DOIT ESP32 DEVKIT)
+ - BOARDS_BOARD_TTGO_T9_RGB_LED_WM8978 (LilyGO TTGO T9 with the WM8978 codec and WS2812b LEDS)
  - ARDUINO_GENERIC_F407VGTX, ARDUINO_DISCO_F407VG (STM32F407VGT discovery / disco1)
