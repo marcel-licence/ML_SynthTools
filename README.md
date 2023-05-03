@@ -69,11 +69,11 @@ required to set up your board, codec etc.
 # Examples
 
 There are some "multi-platform" examples available:
-- ml_epiano_example <a href="examples/ml_epiano_example/README.md">more details</a>
-- ml_synth_basic_example <a href="examples/ml_synth_basic_example/README.md">more details</a>
-- ml_synth_multi_saw_example <a href="examples/ml_synth_multi_saw_example/README.md">more details</a>
-- ml_synth_organ_example <a href="examples/ml_synth_organ_example/README.md">more details</a>
-- ml_synth_pwm_osc_example <a href="examples/ml_synth_pwm_osc_example/README.md">more details</a>
+- ml_epiano_example <a href="https://github.com/marcel-licence/ml_epiano_example">more details</a>
+- ml_synth_basic_example <a href="https://github.com/marcel-licence/ml_synth_basic_example">more details</a>
+- ml_synth_multi_saw_example <a href="https://github.com/marcel-licence/ml_synth_multi_saw_example">more details</a>
+- ml_synth_organ_example <a href="https://github.com/marcel-licence/ml_synth_organ_example">more details</a>
+- ml_synth_pwm_osc_example <a href="https://github.com/marcel-licence/ml_synth_pwm_osc_example">more details</a>
 
 
 # Compiling note
