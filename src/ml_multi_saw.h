@@ -52,7 +52,7 @@
 #include <ml_types.h>
 
 
-void MultiSawSynth_Init();
+void MultiSawSynth_Init(float sample_rate);
 void MultiSawSynth_SetDetune(uint8_t value);
 void MultiSawSynth_SetCount(uint8_t value);
 void MultiSawSynth_Process(Q1_14 *ch_l, Q1_14 *ch_r, int sampleLen);
