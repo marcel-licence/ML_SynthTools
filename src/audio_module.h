@@ -96,6 +96,10 @@ void SAMD21_Synth_Init();
 #ifdef RP2040_AUDIO_PWM
 #include "RP2040_AudioPwm.h"
 
+#ifndef RP2040_AUDIO_PWM_PIN
+#define RP2040_AUDIO_PWM_PIN 0
+#endif
+
 uint32_t WavPwmDataBuff[SAMPLE_BUFFER_SIZE];
 uint32_t WavPwmDataBuff2[SAMPLE_BUFFER_SIZE];
 #endif
@@ -156,7 +160,7 @@ void Audio_Setup(void)
 
 #if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
 #ifdef RP2040_AUDIO_PWM
-    uint8_t pwmPinNumber = 0;
+    uint8_t pwmPinNumber = RP2040_AUDIO_PWM_PIN;
     Serial.printf("Initialize pwm audio used without DAC pin %d + pin %d:\n", pwmPinNumber, pwmPinNumber + 1);
     Serial.printf("    sample rate: %d\n", SAMPLE_RATE);
     Serial.printf("    buffer size: %d\n", SAMPLE_BUFFER_SIZE);
