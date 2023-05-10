@@ -103,6 +103,7 @@ void Midi_Process();
 #define PIN_CAPTION ""
 #endif
 
+
 struct midi_port_s
 {
     Stream *serial; /* this can be software or hardware serial */
@@ -303,18 +304,15 @@ inline void Midi_PitchBend(uint8_t ch, uint16_t bend)
     Ble_PitchBend(ch, bend);
 #endif
 
+    if (midiMapping.pitchBend != NULL)
+    {
 #ifdef MIDI_FMT_INT
-    if (midiMapping.pitchBend != NULL)
-    {
         midiMapping.pitchBend(ch, bend);
-    }
 #else
-    float value = ((float)bend - 8192.0f) * (1.0f / 8192.0f);
-    if (midiMapping.pitchBend != NULL)
-    {
+        float value = ((float)bend - 8192.0f) * (1.0f / 8192.0f);
         midiMapping.pitchBend(ch, value);
-    }
 #endif
+    }
 }
 
 inline void Midi_SongPositionPointer(uint16_t pos)
@@ -410,10 +408,10 @@ void Midi_Setup()
 
 #ifdef MIDI_RX1_PIN
 #ifdef MIDI_TX1_PIN
-    Serial.printf("Setup Serial1 with %d baud with rx: "PIN_CAPTION"%d and tx %d\n", MIDI_SERIAL1_BAUDRATE, MIDI_RX1_PIN, MIDI_TX1_PIN);
+    Serial.printf("Setup Serial1 with %d baud with rx: %s%d and tx %s%d\n", MIDI_SERIAL1_BAUDRATE, PIN_CAPTION, MIDI_RX1_PIN, PIN_CAPTION, MIDI_TX1_PIN);
     Serial1.begin(MIDI_SERIAL1_BAUDRATE, SERIAL_8N1, MIDI_RX1_PIN, MIDI_TX1_PIN);
 #else
-    Serial.printf("Setup Serial1 with %d baud with rx: "PIN_CAPTION"%d only\n", MIDI_SERIAL1_BAUDRATE, MIDI_RX1_PIN);
+    Serial.printf("Setup Serial1 with %d baud with rx: %s%d only\n", MIDI_SERIAL1_BAUDRATE, PIN_CAPTION, MIDI_RX1_PIN);
     Serial1.begin(MIDI_SERIAL1_BAUDRATE, SERIAL_8N1, MIDI_RX1_PIN);
 #endif
     pinMode(MIDI_RX1_PIN, INPUT_PULLUP); /* can be connected to open collector output */
@@ -460,7 +458,7 @@ void Midi_Setup()
 #endif /* MIDI_PORT2_ACTIVE */
 
 #ifdef USB_MIDI_ENABLED
-    UbsMidiSetup();
+    UsbMidiSetup(); /* not used yet */
 #endif
 }
 
@@ -547,7 +545,7 @@ void Midi_Process()
     Midi_CheckMidiPort(&MidiPort2);
 #endif
 #ifdef USB_MIDI_ENABLED
-    UbsMidiLoop();
+    UsbMidiLoop(); /* not used yet */
 #endif
 }
 
@@ -561,7 +559,6 @@ void Midi_SendShortMessage(uint8_t *msg)
 
 void Midi_SendRaw(uint8_t *msg)
 {
-
     /* sysex */
     if (msg[0] == 0xF0)
     {
