@@ -435,10 +435,10 @@ void Midi_Setup()
 
 #ifdef MIDI_RX2_PIN
 #ifdef MIDI_TX2_PIN
-    Serial.printf("Setup Serial2 with %d baud with rx: "PIN_CAPTION"%d and tx %d\n", MIDI_SERIAL2_BAUDRATE, MIDI_RX2_PIN, MIDI_TX2_PIN);
+    Serial.printf("Setup Serial2 with %d baud with rx: %s%d and tx %s%d\n", MIDI_SERIAL2_BAUDRATE, PIN_CAPTION, MIDI_RX2_PIN, PIN_CAPTION, MIDI_TX2_PIN);
     Serial2.begin(MIDI_SERIAL2_BAUDRATE, SERIAL_8N1, MIDI_RX2_PIN, MIDI_TX2_PIN);
 #else
-    Serial.printf("Setup Serial2 with %d baud with rx: "PIN_CAPTION"%d only\n", MIDI_SERIAL2_BAUDRATE, MIDI_RX2_PIN);
+    Serial.printf("Setup Serial2 with %d baud with rx: %s%d only\n", MIDI_SERIAL2_BAUDRATE, PIN_CAPTION, MIDI_RX2_PIN);
 #if (!defined ARDUINO_RASPBERRY_PI_PICO) && (!defined ARDUINO_GENERIC_RP2040)
     Serial2.begin(MIDI_SERIAL2_BAUDRATE, SERIAL_8N1, MIDI_RX2_PIN);
 #else
