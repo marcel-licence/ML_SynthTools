@@ -53,7 +53,16 @@
 
 void Midi_Setup();
 void Midi_Process();
-
+#ifdef MIDI_VIA_USB_ENABLED
+void Midi_HandleShortMsg(uint8_t *data, uint8_t cable __attribute__((unused)));
+#else
+eeee
+#endif
+#ifdef MIDI_TX2_PIN
+void Midi_SendShortMessage(uint8_t *msg);
+#else
+dddd
+#endif
 
 #endif /* ML_SYNTH_INLINE_DECLARATION */
 
@@ -330,7 +339,12 @@ inline void Midi_SongPositionPointer(uint16_t pos)
 /*
  * function will be called when a short message has been received over midi
  */
+#ifdef MIDI_VIA_USB_ENABLED
+void Midi_HandleShortMsg(uint8_t *data, uint8_t cable __attribute__((unused)))
+#else
+baaa
 inline void Midi_HandleShortMsg(uint8_t *data, uint8_t cable __attribute__((unused)))
+#endif
 {
     uint8_t ch = data[0] & 0x0F;
 
