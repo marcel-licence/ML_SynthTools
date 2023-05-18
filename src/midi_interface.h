@@ -339,7 +339,6 @@ inline void Midi_SongPositionPointer(uint16_t pos)
 #ifdef MIDI_VIA_USB_ENABLED
 void Midi_HandleShortMsg(uint8_t *data, uint8_t cable __attribute__((unused)))
 #else
-baaa
 inline void Midi_HandleShortMsg(uint8_t *data, uint8_t cable __attribute__((unused)))
 #endif
 {
