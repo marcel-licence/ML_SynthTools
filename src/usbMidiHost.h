@@ -111,8 +111,8 @@ extern struct usbMidiMapping_s usbMidiMapping; /* definition in z_config.ino */
 void UsbMidi_Setup()
 {
     vid = pid = 0;
-    Serial.println("Hello now we can start\n");
-
+    Serial.println("Initialize USB host module...\n");
+	Serial.println("    CS/SS: GPIO5\n    INT: GPIO17 (opt.)\n    SCK: GPIO18\n    MISO: GPIO19\n    MOSI: GPIO23\n");
     if (Usb.Init() == -1)
     {
         Serial.println("Usb init failed!\n");
