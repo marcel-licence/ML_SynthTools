@@ -232,6 +232,13 @@ void UsbMidi_HandleShortMsg(uint8_t *data)
 
 uint8_t MIDI_handleMsg(uint8_t *data, uint16_t len, uint8_t cable)
 {
+#ifdef USB_MIDI_CABLE_FILTER
+    if (USB_MIDI_CABLE_FILTER != cable)
+    {
+        return;
+    }
+#endif
+
     /* sometimes we got just zeros from some hardware */
     {
         int i = 0;
