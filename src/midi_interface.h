@@ -53,9 +53,11 @@
 
 void Midi_Setup();
 void Midi_Process();
+
 #ifdef MIDI_VIA_USB_ENABLED
 void Midi_HandleShortMsg(uint8_t *data, uint8_t cable __attribute__((unused)));
 #endif
+
 #ifdef MIDI_TX2_PIN
 void Midi_SendShortMessage(uint8_t *msg);
 #endif
