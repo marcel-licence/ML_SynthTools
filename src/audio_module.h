@@ -244,14 +244,31 @@ void DaisySeed_Setup(void)
 
 static int32_t u32buf[SAMPLE_BUFFER_SIZE];
 
+union ts
+{
+    int16_t i16;
+    uint16_t u16;
+};
+union ts testSineU[SAMPLE_BUFFER_SIZE] = {0};
+
 inline
 void ProcessAudio(uint16_t *buff, size_t len)
 {
     /* convert from u16 to u10 */
     for (size_t i = 0; i < len; i++)
     {
+#if 0
         const int32_t preDiv = 4194304; // 2 ^ (16 + 6)
         buff[i] = (uint16_t)(0x200 + (u32buf[i] / (preDiv)));
+#else
+        int32_t var = u32buf[i];
+        var >>= 16;
+        union ts varU;
+        varU.i16 = var;
+        varU.u16 /= 64;
+        varU.u16 += 512;
+        buff[i] = varU.u16;;
+#endif
     }
 }
 
@@ -343,6 +360,7 @@ void Audio_OutputMono(const int32_t *samples)
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCountPre();
 #endif
+    memcpy(u32buf, samples, sizeof(int32_t)*SAMPLE_BUFFER_SIZE);
     while (!SAMD21_Synth_Process(ProcessAudio))
     {
         /* just do nothing */
@@ -350,7 +368,6 @@ void Audio_OutputMono(const int32_t *samples)
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCount();
 #endif
-    memcpy(u32buf, samples, sizeof(int32_t)*SAMPLE_BUFFER_SIZE);
 #endif /* ARDUINO_SEEED_XIAO_M0 */
 
 #if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
@@ -423,6 +440,7 @@ void Audio_Output(const Q1_14 *left, const Q1_14 *right)
     Audio_Output((const int16_t *)left, (const int16_t *)right);
 }
 
+#ifndef ARDUINO_SEEED_XIAO_M0
 void Audio_Output(const int16_t *left, const int16_t *right)
 {
 #ifdef ESP32
@@ -514,6 +532,7 @@ void Audio_Output(const int16_t *left, const int16_t *right)
 #endif /* RP2040_AUDIO_PWM */
 #endif /* ARDUINO_RASPBERRY_PI_PICO, ARDUINO_GENERIC_RP2040 */
 }
+#endif
 
 #if (defined ESP32) || (defined TEENSYDUINO) || (defined ARDUINO_DAISY_SEED) || (defined ARDUINO_GENERIC_F407VGTX) || (defined ARDUINO_DISCO_F407VG) || (defined ARDUINO_BLACK_F407VE) || (((defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)) && (defined RP2040_AUDIO_PWM))
 void Audio_Input(float *left, float *right)
