@@ -55,6 +55,9 @@
 #ifdef MIDI_VIA_USB_ENABLED
 
 
+// #define USB_MIDI_DROP_REPEATED_MSGS /* use this to drop repeated messages, some controllers may generate all messages twice */
+
+
 void UsbMidi_Setup();
 void UsbMidi_Loop();
 void UsbMidi_ProcessSync(void);
@@ -112,7 +115,7 @@ void UsbMidi_Setup()
 {
     vid = pid = 0;
     Serial.println("Initialize USB host module...\n");
-	Serial.println("    CS/SS: GPIO5\n    INT: GPIO17 (opt.)\n    SCK: GPIO18\n    MISO: GPIO19\n    MOSI: GPIO23\n");
+    Serial.println("    CS/SS: GPIO5\n    INT: GPIO17 (opt.)\n    SCK: GPIO18\n    MISO: GPIO19\n    MOSI: GPIO23\n");
     if (Usb.Init() == -1)
     {
         Serial.println("Usb init failed!\n");
@@ -215,10 +218,27 @@ void UsbMidi_HandleLiveMsg(uint8_t msg)
     //Serial.printf("live msg\n");
 }
 
+#ifdef USB_MIDI_DROP_REPEATED_MSGS
+static uint8_t lastMsg[3] = {0, 0, 0};
+#endif
+
 inline
 void UsbMidi_HandleShortMsg(uint8_t *data)
 {
+#ifdef USB_MIDI_DROP_REPEATED_MSGS
+    if (memcmp(lastMsg, data, 3) == 0)
+    {
+        Serial.printf("short: %02x %02x %02x (dropped)\n", data[0], data[1], data[2]);
+        return;
+    }
+    else
+    {
+        memcpy(lastMsg, data, 3);
+        Serial.printf("short: %02x %02x %02x (new)\n", data[0], data[1], data[2]);
+    }
+#else
     Serial.printf("short: %02x %02x %02x\n", data[0], data[1], data[2]);
+#endif
 
     /* forward data to mapped function */
     for (int i = 0; i < usbMidiMapping.usbMidiMappingEntriesCount; i++)
@@ -232,10 +252,12 @@ void UsbMidi_HandleShortMsg(uint8_t *data)
 
 uint8_t MIDI_handleMsg(uint8_t *data, uint16_t len, uint8_t cable)
 {
+    Serial.printf("cable: %d\n", cable);
+
 #ifdef USB_MIDI_CABLE_FILTER
     if (USB_MIDI_CABLE_FILTER != cable)
     {
-        return;
+        return len;
     }
 #endif
 
