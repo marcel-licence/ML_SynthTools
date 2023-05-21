@@ -171,16 +171,16 @@ static void RP2040_Audio_Pwm_Start_Audio(uint32_t *audio_buffer_a, uint32_t *aud
          * using 8 gives 344 base frequency
          * using 7 bits -> 689 hz
          */
-		volatile void *pwm_counter_compare_addr = &pwm_hw->slice[audio_pwm_slice_num].cc; /* cc = counter compare */
+        volatile void *pwm_counter_compare_addr = &pwm_hw->slice[audio_pwm_slice_num].cc; /* cc = counter compare */
 
-		dma_channel_configure(
-			audio_dma_ch, /* DMA channel */
-			&audio_dma_ch_cfg, /* Pointer to DMA config structure */
-			pwm_counter_compare_addr, /* Initial write address */
-			&(audio_buffer_a[0]), /* Initial read address */
-			buffSize, /* Number of transfers to perform */
-			false /* True to start the transfer immediately */
-		);
+        dma_channel_configure(
+            audio_dma_ch, /* DMA channel */
+            &audio_dma_ch_cfg, /* Pointer to DMA config structure */
+            pwm_counter_compare_addr, /* Initial write address */
+            & (audio_buffer_a[0]), /* Initial read address */
+            buffSize, /* Number of transfers to perform */
+            false /* True to start the transfer immediately */
+        );
 
         dma_channel_set_irq0_enabled(audio_dma_ch, true);
         irq_set_exclusive_handler(DMA_IRQ_0, RP2040_Audio_Pwm_dma_irq_handler);

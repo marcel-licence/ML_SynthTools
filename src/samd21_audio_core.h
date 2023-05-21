@@ -49,6 +49,7 @@
 
 
 bool SAMD21_Synth_Process(void(*proc)(uint16_t *buff, size_t len));
+void SAMD21_Synth_Init();
 
 
 #endif  /* ML_SYNTH_INLINE_DECLARATION */
@@ -64,7 +65,6 @@ void SAMD21_Synth_DmaInit();
 void SAMD21_Synth_TimerInit();
 void SAMD21_Synth_DACInit();
 bool SAMD21_Synth_DmaDone();
-void DMAC_Handler();
 
 
 // DMA descriptor list entry point (and writeback buffer) per channel

@@ -128,7 +128,7 @@ void Audio_Setup(void)
 
 
 #ifdef WM8978_ENABLED
-	WM8978_Setup();
+    WM8978_Setup();
 #endif
 
 
