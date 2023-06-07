@@ -49,7 +49,11 @@
 
 
 void Audio_Setup(void);
+#ifdef OUTPUT_SAW_TEST
+void Audio_Output(float *left, float *right);
+#else
 void Audio_Output(const float *left, const float *right);
+#endif
 void Audio_OutputMono(const int32_t *samples);
 void Audio_Output(const int16_t *left, const int16_t *right);
 void Audio_Output(const Q1_14 *left, const Q1_14 *right);
