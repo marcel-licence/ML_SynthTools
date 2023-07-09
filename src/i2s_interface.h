@@ -50,6 +50,7 @@ void setup_i2s();
 bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen);
 bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sample, const int buffLen);
 void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int buffLen);
+void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const int buffLen);
 
 #endif /* ML_SYNTH_INLINE_DECLARATION */
 
@@ -75,6 +76,13 @@ int16_t sampleDataI16SawTest[SAMPLE_BUFFER_SIZE];
 float sampleDataFSawTest[SAMPLE_BUFFER_SIZE];
 #endif
 
+
+#ifdef SAMPLE_SIZE_16BIT
+#define BYTES_PER_SAMPLE    2
+#endif
+#ifdef SAMPLE_SIZE_32BIT
+#define BYTES_PER_SAMPLE    4
+#endif
 
 /*
  * no dac not tested within this code
@@ -174,12 +182,7 @@ bool i2s_write_stereo_samples(const float *fl_sample, const float *fr_sample)
 
     size_t bytes_written = 0;
 
-#ifdef SAMPLE_SIZE_16BIT
-    i2s_write(i2s_port_number, (const char *)&sampleDataU.sample, 4, &bytes_written, portMAX_DELAY);
-#endif
-#ifdef SAMPLE_SIZE_32BIT
-    i2s_write(i2s_port_number, (const char *)&sampleDataU.sample, 8, &bytes_written, portMAX_DELAY);
-#endif
+    i2s_write(i2s_port_number, (const char *)&sampleDataU.sample, 2*BYTES_PER_SAMPLE, &bytes_written, portMAX_DELAY);
 
     if (bytes_written > 0)
     {
@@ -250,7 +253,7 @@ bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sa
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCountPre();
 #endif
-    i2s_write(i2s_port_number, (const char *)&sampleDataU[0].sample, 4 * buffLen, &bytes_written, portMAX_DELAY);
+    i2s_write(i2s_port_number, (const char *)&sampleDataU[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_written, portMAX_DELAY);
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCount();
 #endif
@@ -362,12 +365,7 @@ bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sampl
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCountPre();
 #endif
-#ifdef SAMPLE_SIZE_16BIT
-    i2s_write(i2s_port_number, (const char *)&sampleDataU[0].sample, 4 * buffLen, &bytes_written, portMAX_DELAY);
-#endif
-#ifdef SAMPLE_SIZE_32BIT
-    i2s_write(i2s_port_number, (const char *)&sampleDataU[0].sample, 8 * buffLen, &bytes_written, portMAX_DELAY);
-#endif
+    i2s_write(i2s_port_number, (const char *)&sampleDataU[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_written, portMAX_DELAY);
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCount();
 #endif
@@ -407,6 +405,35 @@ void i2s_read_stereo_samples(float *fl_sample, float *fr_sample)
 }
 
 #ifdef SAMPLE_BUFFER_SIZE
+void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const int buffLen)
+{
+#ifdef I2S_DIN_PIN
+    static size_t bytes_read = 0;
+
+#ifdef SAMPLE_SIZE_16BIT
+    static union
+    {
+        uint32_t sample;
+        int16_t ch[2];
+    } sampleData[SAMPLE_BUFFER_SIZE];
+#endif
+
+    i2s_read(i2s_port_number, (char *)&sampleData[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_read, portMAX_DELAY);
+
+    //sampleData.ch[0] &= 0xFFFE;
+    //sampleData.ch[1] &= 0;
+
+    for (int n = 0; n < buffLen; n++)
+    {
+        /*
+         * using RIGHT_LEFT format
+         */
+        fr_sample[n] = ((float)sampleData[n].ch[0]);
+        fl_sample[n] = ((float)sampleData[n].ch[1]);
+    }
+#endif
+}
+
 void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int buffLen)
 {
 #ifdef I2S_DIN_PIN
@@ -420,7 +447,7 @@ void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int 
     } sampleData[SAMPLE_BUFFER_SIZE];
 #endif
 
-    i2s_read(i2s_port_number, (char *)&sampleData[0].sample, 4 * buffLen, &bytes_read, portMAX_DELAY);
+    i2s_read(i2s_port_number, (char *)&sampleData[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_read, portMAX_DELAY);
 
     //sampleData.ch[0] &= 0xFFFE;
     //sampleData.ch[1] &= 0;

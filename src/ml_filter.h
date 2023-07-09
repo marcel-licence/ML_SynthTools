@@ -102,7 +102,7 @@ void Filter_Coeff_Init(struct filterCoeffT *const filterC);
 void Filter_Reset(struct filterProcT *filter);
 void Filter_Process(float *const signal, struct filterProcT *const filterP);
 void Filter_Process_Buffer(float *const signal, struct filterProcT *const filterP, uint32_t len);
-void Filter_Calculate(float c, float reso, struct filterCoeffT *const  filterC);
+void Filter_Calculate(float c, float reso, struct filterCoeffT *const filterC);
 void Filter_CalculateNotch(float c, float reso, struct filterCoeffT *const filterC);
 
 

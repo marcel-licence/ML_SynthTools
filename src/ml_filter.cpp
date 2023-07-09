@@ -117,9 +117,6 @@ void Filter_Process_Buffer(float *const signal, struct filterProcT *const filter
  */
 void Filter_Calculate(float c, float reso, struct filterCoeffT *const filterC)
 {
-    float *aNorm = filterC->aNorm;
-    float *bNorm = filterC->bNorm;
-
     float Q = reso;
     float  cosOmega, omega, sinOmega, alpha, a[3], b[3];
 
@@ -158,12 +155,12 @@ void Filter_Calculate(float c, float reso, struct filterCoeffT *const filterC)
 
     float factor = 1.0f / a[0];
 
-    aNorm[0] = a[1] * factor;
-    aNorm[1] = a[2] * factor;
+    filterC->aNorm[0] = a[1] * factor;
+    filterC->aNorm[1] = a[2] * factor;
 
-    bNorm[0] = b[0] * factor;
-    bNorm[1] = b[1] * factor;
-    bNorm[2] = b[2] * factor;
+    filterC->bNorm[0] = b[0] * factor;
+    filterC->bNorm[1] = b[1] * factor;
+    filterC->bNorm[2] = b[2] * factor;
 }
 
 /*
