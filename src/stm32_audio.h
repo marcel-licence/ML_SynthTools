@@ -89,10 +89,11 @@ uint8_t I2C_ReadReg(uint8_t dev, uint8_t reg)
 {
     Wire.beginTransmission(dev);
     Wire.write(reg); // set memory pointer to reg address
-    Wire.endTransmission();
 
     Wire.requestFrom(dev, 1U); // request one byte of data from codec
-    return Wire.read(); // store the incoming byte into "inputs"
+    uint8_t result = Wire.read(); // store the incoming byte into "inputs"
+    Wire.endTransmission();
+    return result;
 }
 
 void I2C_WriteReg(uint8_t dev, uint8_t reg, uint8_t value)

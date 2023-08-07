@@ -139,7 +139,6 @@ uint8_t ES8388_ReadReg(uint8_t reg)
 {
     Wire.beginTransmission(ES8388_ADDR);
     Wire.write(reg);
-    Wire.endTransmission(false);
 
     uint8_t val = 0u;
     if (1 == Wire.requestFrom(uint16_t(ES8388_ADDR), uint8_t(1), true))
