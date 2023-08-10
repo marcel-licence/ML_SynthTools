@@ -57,7 +57,6 @@ void ES8388_SetIn2OoutVOL(uint8_t unused, float vol);
 #endif // #ifdef ML_SYNTH_INLINE_DECLARATION
 
 
-
 #ifdef ML_SYNTH_INLINE_DEFINITION
 #ifdef ES8388_ENABLED
 /*
@@ -139,13 +138,13 @@ uint8_t ES8388_ReadReg(uint8_t reg)
 {
     Wire.beginTransmission(ES8388_ADDR);
     Wire.write(reg);
+    Wire.endTransmission(false);
 
     uint8_t val = 0u;
     if (1 == Wire.requestFrom(uint16_t(ES8388_ADDR), uint8_t(1), true))
     {
         val = Wire.read();
     }
-    Wire.endTransmission(false);
 
     return val;
 }
@@ -399,12 +398,11 @@ void ES8388_Setup()
         delay(1000);
     }
 
-    ES8388_WriteReg(ES8388_CHIPPOWER, 0xFF);  //reset and stop es8388
+    ES8388_WriteReg(ES8388_CHIPPOWER, 0xFF); //reset and stop es8388
 
 
     ES8388_WriteReg(0x00, 0x80); /* reset control port register to default */
     ES8388_WriteReg(0x00, 0x06); /* restore default value */
-
 
 
     /*
@@ -507,7 +505,7 @@ void ES8388_Setup()
     /*
      * Setup Mixer
      */
-    ES8388_WriteReg(0x26, 0x09);//        ES8388_WriteReg(0x26, 0x00);
+    ES8388_WriteReg(0x26, 0x09);// ES8388_WriteReg(0x26, 0x00);
     ES8388_WriteReg(0x27, 0xD0); // ES8388_DACCONTROL17
     ES8388_WriteReg(0x28, 0x38);
     ES8388_WriteReg(0x29, 0x38);
