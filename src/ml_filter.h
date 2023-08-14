@@ -49,13 +49,15 @@
 #ifndef ML_FILTER_H_
 #define ML_FILTER_H_
 
+
+#include <ml_types.h>
+
+
 #ifdef ARDUINO
 #include <Arduino.h>
 #else
 #include <stdint.h>
 #endif
-#include <ml_types.h>
-
 
 struct filterCoeffT
 {
@@ -76,7 +78,7 @@ struct filterProcT
     float w[3];
 };
 
-struct filterQCoeffT
+struct filterCoeffQ16T
 {
     union
     {
@@ -89,11 +91,15 @@ struct filterQCoeffT
     };
 };
 
-struct filterQProcT
+
+struct filterProcQ16T
 {
-    struct filterQCoeffT *filterCoeff;
+    struct filterCoeffQ16T *filterCoeff;
     Q1_14 w[3];
 };
+
+
+#define Filter_Calculate(...)   Filter_CalculateLowPass(__VA_ARGS__)
 
 
 void Filter_Init(struct filterProcT *const filterP, struct filterCoeffT *const filterC);
@@ -102,16 +108,21 @@ void Filter_Coeff_Init(struct filterCoeffT *const filterC);
 void Filter_Reset(struct filterProcT *filter);
 void Filter_Process(float *const signal, struct filterProcT *const filterP);
 void Filter_Process_Buffer(float *const signal, struct filterProcT *const filterP, uint32_t len);
-void Filter_Calculate(float c, float reso, struct filterCoeffT *const filterC);
+void Filter_CalculateNone(struct filterCoeffT *const filterC);
+void Filter_CalculateLowPass(float c, float reso, struct filterCoeffT *const filterC);
 void Filter_CalculateNotch(float c, float reso, struct filterCoeffT *const filterC);
 
 
-void Filter_Init(struct filterQProcT *const filterP, struct filterQCoeffT *const filterC);
-void Filter_Proc_Init(struct filterQProcT *const filterP);
-void Filter_Coeff_Init(struct filterQCoeffT *const filterC);
-void Filter_Reset(struct filterQProcT *filter);
-void Filter_Process_Buffer(Q1_14 *const signal, struct filterQProcT *const filterP, uint32_t len);
-void Filter_Calculate(float c, float reso, struct filterQCoeffT *const filterC);
+void Filter_Init(struct filterProcQ16T *const filterP, struct filterCoeffQ16T *const filterC);
+void Filter_Proc_Init(struct filterProcQ16T *const filterP);
+void Filter_Coeff_Init(struct filterCoeffQ16T *const filterC);
+void Filter_Reset(struct filterProcQ16T *filter);
+void Filter_Process(Q1_14 *const signal, struct filterProcQ16T *const filterP);
+void Filter_Process_Buffer(Q1_14 *const signal, struct filterProcQ16T *const filterP, uint32_t len);
+void Filter_CalculateLowPass(Q1_14 c, Q1_14 reso, struct filterCoeffQ16T *const filterC);
+void Filter_CalculateNotch(Q1_14 c, Q1_14 reso, struct filterCoeffQ16T *const filterC);
+void Filter_CalculateLowPass(float c, float reso, struct filterCoeffQ16T *const filterC);
 
 
 #endif /* ML_FILTER_H_ */
+
