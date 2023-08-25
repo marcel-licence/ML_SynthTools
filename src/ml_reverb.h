@@ -63,6 +63,7 @@
 
 
 void Reverb_Process(float *signal_l, int buffLen);
+void Reverb_Process(const float *signal_l, float * out, int buffLen);
 void Reverb_Setup(float *buffer);
 void Reverb_SetLevel(uint8_t not_used, float value);
 void Reverb_SetLevelInt(uint8_t not_used, uint8_t value);

@@ -101,20 +101,23 @@ static struct comb_s cf3 =
     (int)(rev_time * l_CB3),
 };
 
-static void Do_Comb(struct comb_s *cf, const float *inSample, float *outSample, int buffLen)
+static inline void Do_Comb(struct comb_s *cf, const float *inSample, float *outSample, int buffLen)
 {
+    struct comb_s cf2;
+    memcpy(&cf2, cf, sizeof(cf2));
     for (int n = 0; n < buffLen; n++)
     {
-        float readback = cf->buf[cf->p];
-        float newV = readback * cf->g + inSample[n];
-        cf->buf[cf->p] = newV;
-        cf->p++;
-        if (cf->p >= cf->lim)
+        const float readback = cf2.buf[cf2.p];
+        const float newV = readback * cf2.g + inSample[n];
+        cf2.buf[cf2.p] = newV;
+        cf2.p++;
+        if (cf2.p >= cf2.lim)
         {
-            cf->p = 0;
+            cf2.p = 0;
         }
         outSample[n] += readback;
     }
+    memcpy(cf, &cf2, sizeof(cf2));
 }
 
 struct allpass_s
@@ -149,26 +152,35 @@ static struct allpass_s ap2 =
     (int)(rev_time * l_AP2)
 };
 
-static void Do_Allpass(struct allpass_s *ap, float *inSample, int buffLen)
+static inline void Do_Allpass(struct allpass_s *ap, const float *inSample, float *outSample, int buffLen)
 {
+    struct allpass_s ap2;
+    memcpy(&ap2, ap, sizeof(ap2));
+
     for (int n = 0; n < buffLen; n++)
     {
-        float readback = ap->buf[ap->p];
-        readback += (-ap->g) * inSample[n];
-        float newV = readback * ap->g + inSample[n];
-        ap->buf[ap->p] = newV;
-        ap->p++;
-        if (ap->p >= ap->lim)
+        float readback = ap2.buf[ap2.p];
+        readback += (-ap2.g) * inSample[n];
+        const float newV = readback * ap2.g + inSample[n];
+        ap2.buf[ap2.p] = newV;
+        ap2.p++;
+        if (ap2.p >= ap2.lim)
         {
-            ap->p = 0;
+            ap2.p = 0;
         }
-        inSample[n] = readback;
+        outSample[n] = readback;
     }
+    memcpy(ap, &ap2, sizeof(ap2));
 }
 
 void Reverb_Process(float *signal_l, int buffLen)
 {
-    float inSample[buffLen];
+    Reverb_Process(signal_l, signal_l, buffLen);
+}
+
+void Reverb_Process(const float *signal_l, float *out, int buffLen)
+{
+    static float inSample[96];
     for (int n = 0; n < buffLen; n++)
     {
         /* create mono sample */
@@ -185,15 +197,16 @@ void Reverb_Process(float *signal_l, int buffLen)
         newsample[n] *= 0.25f;
     }
 
-    Do_Allpass(&ap0, newsample, buffLen);
-    Do_Allpass(&ap1, newsample, buffLen);
-    Do_Allpass(&ap2, newsample, buffLen);
+    Do_Allpass(&ap0, newsample, newsample, buffLen);
+    Do_Allpass(&ap1, newsample, newsample, buffLen);
+    Do_Allpass(&ap2, newsample, newsample, buffLen);
 
     /* apply reverb level */
+    const float level = rev_level;
     for (int n = 0; n < buffLen; n++)
     {
-        newsample[n] *= rev_level;
-        signal_l[n] += newsample[n];
+        newsample[n] *= level;
+        out[n] = signal_l[n] + newsample[n];
     }
 }
 
@@ -282,5 +295,5 @@ void Reverb_SetLevelInt(uint8_t not_used, uint8_t value)
 {
     float val_f = value;
     val_f *= 1.0f / 127.0f;
-    Reverb_SetLevel(not_used, value);
+    Reverb_SetLevel(not_used, val_f);
 }
