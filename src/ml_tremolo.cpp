@@ -66,6 +66,15 @@ ML_Tremolo::ML_Tremolo(float sample_rate)
     speedU32 = var;
 }
 
+void ML_Tremolo::Process(const float *in_l, const float *in_r, const float *mod_in, float *out_l, float *out_r, uint32_t count)
+{
+    for (uint32_t n = 0; n < count; n++)
+    {
+        out_l[n] = (in_l[n] * depthInv) + (in_l[n] * (1.0f - mod_in[n]) * 0.5f * depth);
+        out_r[n] = (in_r[n] * depthInv) + (in_l[n] * (1.0f + mod_in[n]) * 0.5f * depth);
+    }
+}
+
 void ML_Tremolo::process(float *left, float *right, int32_t len)
 {
     for (int n = 0; n < len; n++)

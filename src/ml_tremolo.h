@@ -48,6 +48,7 @@
 
 
 #include <ml_types.h>
+#include <inttypes.h>
 
 
 class ML_Tremolo
@@ -55,6 +56,7 @@ class ML_Tremolo
 public:
     ML_Tremolo(float sample_rate);
     ~ML_Tremolo() {};
+    void Process(const float *in_l, const float *in_r, const float *mod_in, float *out_l, float *out_r, uint32_t count);
     void process(float *left, float *right, int32_t len);
     void setSpeed(float speed);
     void setPhaseShift(float shift);
