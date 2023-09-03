@@ -53,7 +53,8 @@ typedef void(*audioKitButtonCb)(uint8_t, uint8_t);
 extern audioKitButtonCb audioKitButtonCallback;
 void button_setup();
 void button_loop();
-
+void ac101_setSourceMic(void);
+void ac101_setSourceLine(void);
 
 #ifdef AC101_ENABLED
 void ac101_setup();
