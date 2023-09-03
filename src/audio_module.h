@@ -58,6 +58,8 @@ void Audio_OutputMono(const int32_t *samples);
 void Audio_Output(const int16_t *left, const int16_t *right);
 void Audio_Output(const Q1_14 *left, const Q1_14 *right);
 void Audio_Input(float *left, float *right);
+void Audio_Input(Q1_14 *left, Q1_14 *right);
+void Audio_Input(int16_t *left, int16_t *right);
 void DaisySeed_Setup(void);
 void Teensy_Setup();
 void SAMD21_Synth_Init();
@@ -66,10 +68,10 @@ void SAMD21_Synth_Init();
 #endif // #ifdef ML_SYNTH_INLINE_DECLARATION
 
 
-
 #ifdef ML_SYNTH_INLINE_DEFINITION
 
 
+#ifdef SAMPLE_RATE
 #include <ml_types.h>
 
 #ifdef ESP8266
@@ -190,17 +192,17 @@ void Audio_Setup(void)
 const int ledPin = LED_PIN; /* pin configured in config.h */
 
 
-AudioPlayQueue           queue1;
-AudioPlayQueue           queue2;
-AudioOutputI2S           i2s1;
-AudioConnection          patchCord1(queue1, 0, i2s1, 0); /* left channel */
-AudioConnection          patchCord2(queue2, 0, i2s1, 1); /* right channel */
+AudioPlayQueue queue1;
+AudioPlayQueue queue2;
+AudioOutputI2S i2s1;
+AudioConnection patchCord1(queue1, 0, i2s1, 0); /* left channel */
+AudioConnection patchCord2(queue2, 0, i2s1, 1); /* right channel */
 
 
-static int16_t   sampleBuffer[AUDIO_BLOCK_SAMPLES];
-static int16_t   sampleBuffer2[AUDIO_BLOCK_SAMPLES];
-static int16_t   *queueTransmitBuffer;
-static int16_t   *queueTransmitBuffer2;
+static int16_t sampleBuffer[AUDIO_BLOCK_SAMPLES];
+static int16_t sampleBuffer2[AUDIO_BLOCK_SAMPLES];
+static int16_t *queueTransmitBuffer;
+static int16_t *queueTransmitBuffer2;
 
 void Teensy_Setup()
 {
@@ -215,7 +217,7 @@ void Teensy_Setup()
 static DaisyHardware hw;
 static size_t num_channels;
 
-volatile static  bool dataReady = false;
+volatile static bool dataReady = false;
 static float out_temp[2][48];
 static float *outCh[2] = {out_temp[0], out_temp[1]};
 
@@ -539,12 +541,28 @@ void Audio_Output(const int16_t *left, const int16_t *right)
 #endif
 
 #if (defined ESP32) || (defined TEENSYDUINO) || (defined ARDUINO_DAISY_SEED) || (defined ARDUINO_GENERIC_F407VGTX) || (defined ARDUINO_DISCO_F407VG) || (defined ARDUINO_BLACK_F407VE) || (((defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)) && (defined RP2040_AUDIO_PWM))
+#ifdef ESP32
 void Audio_Input(float *left, float *right)
 {
-#ifdef ESP32
     i2s_read_stereo_samples_buff(left, right, SAMPLE_BUFFER_SIZE);
-#endif /* ESP32 */
 }
+
+void Audio_Input(Q1_14 *left, Q1_14 *right)
+{
+    i2s_read_stereo_samples_buff((int16_t *)left, (int16_t *)right, SAMPLE_BUFFER_SIZE);
+}
+
+void Audio_Input(int16_t *left, int16_t *right)
+{
+    i2s_read_stereo_samples_buff(left, right, SAMPLE_BUFFER_SIZE);
+}
+#else
+void Audio_Input(float *left __attribute__((__unused__)), float *right __attribute__((__unused__)))
+{
+
+}
+#endif /* ESP32 */
+
 
 #ifdef OUTPUT_SAW_TEST
 void Audio_Output(float *left, float *right)
@@ -673,6 +691,8 @@ void Audio_Output(const float *left, const float *right)
 #endif
 }
 #endif /* (defined ESP32) || (defined TEENSYDUINO) || (defined ARDUINO_DAISY_SEED) || (defined ARDUINO_GENERIC_F407VGTX) || (defined ARDUINO_DISCO_F407VG) */
+
+#endif
 
 #endif // ML_SYNTH_INLINE_DEFINITION
 
