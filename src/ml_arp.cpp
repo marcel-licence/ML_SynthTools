@@ -60,7 +60,7 @@ uint8_t arp[7][ARP_STEPS] =
     {0, 0, 12, 7, 0, 0, 12, 7, 0, 0, 12, 7, 0, 0, 7, 12 },
     {12, 24, 12, 24, 12 - 5, 24 - 5, 12 - 2, 24 - 2, 12, 24, 12, 24, 12 - 5, 24 - 5, 12 - 2, 24 - 2}, /* I Feel Love */
 
-    {0, 12, 12, 0, 12, 12, 0, 0, 12, 12, 0, 10, 0, 10, 11, 12},   /* my first own */
+    {0, 12, 12, 0, 12, 12, 0, 0, 12, 12, 0, 10, 0, 10, 11, 12}, /* my first own */
 };
 
 static uint32_t arp_sample_rate = 6;
@@ -113,20 +113,10 @@ void Arp_Process(uint64_t elapsed_ms)
          */
         if (arp_cnt > arpModule.gate)
         {
-#if 0
-            if (arpNote != 0xFF)
-            {
-                if ((voice->noteCount > 0) && (arp_sld[arpSelected][arp_act] == 0))
-                {
-                    Arp_Cb_NoteOff(0, voice->activeNote);
-                }
-            }
-#else
             if (arpNote != 0xFF)
             {
                 Arp_Cb_NoteOff(arpModule.activeCh, arpModule.activeNote);
             }
-#endif
         }
 
         if (arp_cnt >= arpModule.tempo)
@@ -134,28 +124,9 @@ void Arp_Process(uint64_t elapsed_ms)
             arp_cnt = 0;
             if (arpNote != 0xFF)
             {
-#if 1
                 Arp_Cb_NoteOff(arpModule.activeCh, arpModule.activeNote);
-#else
-                /*
-                 * stop note to avoid portamento
-                 */
-                if ((voice->noteCount > 0) && (arp_sld[arpSelected][arp_act] == 1))
-                {
-                    Arp_Cb_NoteOff(0, voice->activeNote);
-                }
-#endif
                 arpModule.activeNote = arpNote + arp[arpSelected][arp_pos];
                 Arp_Cb_NoteOn(arpModule.activeCh, arpModule.activeNote, 1);
-#if 0
-                /*
-                 * note off after note on to get portamento effect
-                 */
-                if ((voice->noteCount > 1) && (arp_sld[arpSelected][arp_act] == 2))
-                {
-                    Arp_Cb_NoteOff(0, voice->oldNote);
-                }
-#endif
                 arp_act = arp_pos;
                 arp_pos ++;
                 if (arp_pos >= ARP_STEPS)
@@ -197,7 +168,7 @@ void Arp_NoteOn(uint8_t ch, uint8_t note, float vel)
         arp_pos++;
         if (arp_pos >= ARP_STEPS)
         {
-            uint8_t arpMin  = 0xFF;
+            uint8_t arpMin = 0xFF;
             for (int i = 0; i < ARP_STEPS; i++)
             {
                 if (arp[arpSelected][i] < arpMin)

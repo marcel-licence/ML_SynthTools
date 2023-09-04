@@ -45,9 +45,11 @@
 
 
 void Status_Init(uint32_t sample_rate);
+void Status_ValueChangedFloat(const char *group, const char *descr, float value);
 void Status_ValueChangedFloat(const char *descr, float value);
 void Status_ValueChangedFloatArr(const char *descr, float value, int index);
 void Status_ValueChangedIntArr(const char *descr, int value, int index);
+void Status_ValueChangedInt(const char *group, const char *descr, int value);
 void Status_ValueChangedInt(const char *descr, int value);
 void Status_ValueChangedStr(const char *descr, const char *value);
 void Status_LogMessage(const char *text);

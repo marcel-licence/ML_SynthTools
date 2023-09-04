@@ -105,14 +105,12 @@ uint32_t *RP2040_Audio_Pwm_getFreeBuff()
 
 static void RP2040_Audio_Pwm_dma_irq_handler()
 {
-#if 1
     dma_hw->ints0 = 1u << audio_dma_ch;
 
 
     dma_start_channel_mask(1 << audio_dma_ch);
 
     dma_channel_set_read_addr(audio_dma_ch, lastRead2, true);
-#endif
 
     uint32_t *temp = lastRead2;
     lastRead2 = lastRead;
@@ -171,6 +169,7 @@ static void RP2040_Audio_Pwm_Start_Audio(uint32_t *audio_buffer_a, uint32_t *aud
          * using 8 gives 344 base frequency
          * using 7 bits -> 689 hz
          */
+
         volatile void *pwm_counter_compare_addr = &pwm_hw->slice[audio_pwm_slice_num].cc; /* cc = counter compare */
 
         dma_channel_configure(

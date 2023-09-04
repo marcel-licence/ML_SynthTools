@@ -64,7 +64,6 @@ void ac101_setup();
 //#define BUTTON_DEBUG_MSG
 
 
-
 #define PIN_LED4    (22)
 #define PIN_LED5    (19)
 
@@ -107,7 +106,6 @@ uint32_t keyMax[7] = {4095 + 32, 0 + 32, 525 + 32, 1006 + 32, 1374 + 32, 1570 + 
 #define PWM_BIT 1
 
 
-
 /* actually only supporting 16 bit */
 #define SAMPLE_SIZE_16BIT
 //#define SAMPLE_SIZE_24BIT
@@ -142,7 +140,6 @@ static AC101 ac;
  */
 void ac101_mclk_setup()
 {
-    // Put a signal out on pin
     uint32_t freq = SAMPLE_RATE * 512; /* The maximal frequency is 80000000 / 2^bit_num */
     Serial.printf("Output frequency: %d\n", freq);
     ledcSetup(MCLK_CH, freq, PWM_BIT);
@@ -188,21 +185,9 @@ void ac101_setup()
     ac.SetVolumeSpeaker(3);
     ac.SetVolumeHeadphone(99);
 
-#if 1
     ac.SetLineSource();
-#else
-    ac.SetMicSource(); /* handle with care: mic is very sensitive and might cause feedback using amp!!! */
-#endif
 
-#if 0
-    ac.DumpRegisters();
-#endif
 
-    // Enable amplifier
-#if 0 /* amplifier only required when speakers attached? */
-    pinMode(GPIO_PA_EN, OUTPUT);
-    digitalWrite(GPIO_PA_EN, HIGH);
-#endif
 }
 #endif /* #ifdef AC101_ENABLED */
 
@@ -212,7 +197,6 @@ void ac101_setup()
 void button_setup()
 {
 #ifdef AUDIO_KIT_BUTTON_DIGITAL
-    // Configure keys on ESP32 Audio Kit board
     pinMode(PIN_PLAY, INPUT_PULLUP);
     pinMode(PIN_VOL_UP, INPUT_PULLUP);
     pinMode(PIN_VOL_DOWN, INPUT_PULLUP);
@@ -286,10 +270,8 @@ void button_loop()
     keyAD = analogRead(PIN_KEY_ANALOG);
     if (keyAD != lastKeyAD)
     {
-        //Serial.printf("keyAd: %d\n", keyAD);
         lastKeyAD = keyAD;
 
-        //pressedKey = 0;
         for (int i = 0; i < 7; i ++)
         {
             if ((keyAD >= keyMin[i]) && (keyAD < keyMax[i]))

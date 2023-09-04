@@ -67,6 +67,7 @@ void ES8388_SetIn2OoutVOL(uint8_t unused, float vol);
 
 
 /* ES8388 address */
+//#define ES8388_ADDR 0x20  /*!< 0x22:CE=1;0x20:CE=0*/
 #define ES8388_ADDR 0x10  /*!< 0x22:CE=1;0x20:CE=0*/
 
 

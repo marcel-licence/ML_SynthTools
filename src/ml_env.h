@@ -48,7 +48,9 @@
 #define ML_ENV_H_
 
 
+#ifdef ARDUINO
 #include <Arduino.h>
+#endif
 
 
 struct adsrT
@@ -87,3 +89,4 @@ void ASRM_Start(const struct adsrT *ctrl, struct adsr_ctrl_t *asr);
 
 
 #endif /* ML_ENV_H_ */
+

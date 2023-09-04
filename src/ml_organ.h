@@ -44,7 +44,7 @@
 
 
 #include "Arduino.h"
-#include <stdint.h>
+#include <inttypes.h>
 
 
 #define CTRL_PERC_SWITCH    0

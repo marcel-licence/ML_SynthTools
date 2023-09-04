@@ -120,6 +120,7 @@ union sampleTUNT
  * no dac not tested within this code
  * - it has the purpose to generate a quasy analog signal without a DAC
  */
+//#define I2S_NODAC
 
 
 const i2s_port_t i2s_port_number = I2S_NUM_0;

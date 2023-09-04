@@ -84,7 +84,7 @@ void UsbMidi_SendRaw(uint8_t *buf, uint8_t cable);
 #include <SPI.h>
 
 USB Usb;
-USBH_MIDI  Midi(&Usb);
+USBH_MIDI Midi(&Usb);
 
 static void UsbMidi_Poll();
 
@@ -134,7 +134,7 @@ void UsbMidi_Loop()
     if (lastState != Usb.getUsbTaskState())
     {
         lastState = Usb.getUsbTaskState();
-        Serial.printf("state: %d\n",  Usb.getUsbTaskState());
+        Serial.printf("state: %d\n", Usb.getUsbTaskState());
         switch (Usb.getUsbTaskState())
         {
         case USB_STATE_DETACHED:
@@ -215,7 +215,6 @@ void UsbMidi_HandleSysEx(uint8_t *buf, uint8_t len)
 inline
 void UsbMidi_HandleLiveMsg(uint8_t msg)
 {
-    //Serial.printf("live msg\n");
 }
 
 #ifdef USB_MIDI_DROP_REPEATED_MSGS
@@ -277,7 +276,7 @@ uint8_t MIDI_handleMsg(uint8_t *data, uint16_t len, uint8_t cable)
     if ((data[0] & 0xF0) == 0xF0)
     {
         /* handle status msg */
-        if (data[0] ==  0xF0)
+        if (data[0] == 0xF0)
         {
             for (int i = 2; i < len; i++)
             {
@@ -332,7 +331,7 @@ void UsbMidi_ProcessSync(void)
 static void UsbMidi_Poll()
 {
     uint8_t bufMidi[MIDI_EVENT_PACKET_SIZE];
-    uint16_t  rcvd;
+    uint16_t rcvd;
 
     memset(bufMidi, 0xCC, sizeof(bufMidi));
 
@@ -343,7 +342,7 @@ static void UsbMidi_Poll()
         Serial.printf("VID: %04x, PID: %04x\n", vid, pid);
     }
 
-    if (Midi.RecvData(&rcvd,  bufMidi) == 0) /* use while instead of if to ensure the data will be collected completely instead of message by message */
+    if (Midi.RecvData(&rcvd, bufMidi) == 0) /* use while instead of if to ensure the data will be collected completely instead of message by message */
     {
         if (rcvd == 0)
         {
