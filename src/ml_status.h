@@ -41,9 +41,7 @@
 #define SRC_ML_STATUS_H_
 
 
-#ifdef ARDUINO
-#include <Arduino.h>
-#endif
+#include <inttypes.h>
 
 
 void Status_Init(uint32_t sample_rate);

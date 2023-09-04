@@ -30,5 +30,4 @@
 #define MIDI_RX_PIN 22
 
 
-
 #endif /* BOARDS_BOARD_ESP32_LYRAT_H_ */

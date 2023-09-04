@@ -59,6 +59,7 @@ void Blink_Process(void);
 #ifdef ML_SYNTH_INLINE_DEFINITION
 #ifdef BLINK_LED_PIN
 
+
 inline
 void Blink_Setup(void)
 {
@@ -71,11 +72,11 @@ void Blink_Process(void)
     static bool ledOn = true;
     if (ledOn)
     {
-        digitalWrite(BLINK_LED_PIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+        digitalWrite(BLINK_LED_PIN, HIGH); // turn the LED on (HIGH is the voltage level)
     }
     else
     {
-        digitalWrite(BLINK_LED_PIN, LOW);    // turn the LED off
+        digitalWrite(BLINK_LED_PIN, LOW); // turn the LED off
     }
     ledOn = !ledOn;
 }

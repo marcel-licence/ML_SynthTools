@@ -82,10 +82,13 @@
 #else
 /*
  * pins to connect a real DAC like PCM5201
+ * BCLK: Bit clock line. The bit clock for data line.
+ * WS: Word(Slot) select line. It is usually used to identify the vocal tract except PDM mode.
+ * DIN/DOUT: Serial data input/output line. (Data will loopback internally if din and dout are set to a same GPIO)
  */
-#define I2S_BCLK_PIN    25
-#define I2S_WCLK_PIN    27
-#define I2S_DOUT_PIN    26
+#define I2S_BCLK_PIN    25 /* R 3. */
+#define I2S_WCLK_PIN    27 /* R 2. */
+#define I2S_DOUT_PIN    26 /* L 3. */
 /* I2S_DIN_PIN is not used here */
 #endif
 

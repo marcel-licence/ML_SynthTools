@@ -61,7 +61,7 @@ inline float ValToDb(float in)
     {
         out = 8.0f;
     }
-    else if (in > 0.0f)   /* log would crash if you put in zero */
+    else if (in > 0.0f) /* log would crash if you put in zero */
     {
         out = 8 + (3.32f * log10(in));
     }

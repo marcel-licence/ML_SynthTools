@@ -110,7 +110,6 @@ void register_write(uint8_t reg, uint8_t value)
     I2C_WriteReg(0x4A, reg, value);
 }
 
-// Reads internal codec register over I2C
 void register_read(uint8_t reg, uint8_t &value)
 {
     value = I2C_ReadReg(0x4A, reg);

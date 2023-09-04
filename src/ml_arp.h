@@ -43,7 +43,7 @@
 #define SRC_ML_ARP_H_
 
 
-#include <Arduino.h>
+#include <inttypes.h>
 
 
 void Arp_Init(uint32_t sample_rate);

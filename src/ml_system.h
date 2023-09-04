@@ -44,7 +44,7 @@
 
 
 void System_PrintInfo(const char *user);
-char   *System_GetInfo(void);
+char *System_GetInfo(void);
 
 /* no pub start */
 bool CheckLc(void);

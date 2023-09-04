@@ -203,7 +203,6 @@ void Delay_Process_Buff(int16_t *signal_l, int buffLen)
     }
 }
 
-
 void Delay_Process_Buff(float *in, float *left, float *right, int buffLen)
 {
     for (int n = 0; n < buffLen; n++)

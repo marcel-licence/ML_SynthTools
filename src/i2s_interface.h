@@ -44,6 +44,9 @@
 #endif
 
 
+#ifdef SAMPLE_RATE
+
+
 #ifdef ML_SYNTH_INLINE_DECLARATION
 
 void setup_i2s();
@@ -79,16 +82,44 @@ float sampleDataFSawTest[SAMPLE_BUFFER_SIZE];
 
 #ifdef SAMPLE_SIZE_16BIT
 #define BYTES_PER_SAMPLE    2
+#define MULTIPLIER_CONST    (16383.0f)
+#define SAMPLE_DATA_TYPE    int16_t
 #endif
 #ifdef SAMPLE_SIZE_32BIT
 #define BYTES_PER_SAMPLE    4
+#define MULTIPLIER_CONST    (1073741823.0f)
+#define SAMPLE_DATA_TYPE    int32_t
+#endif
+
+
+#ifdef SAMPLE_SIZE_32BIT
+union sampleTUNT
+{
+    uint64_t sample;
+    int32_t ch[2];
+};
+#endif
+
+#ifdef SAMPLE_SIZE_24BIT
+union sampleTUNT
+{
+    int32_t ch[2];
+    uint8_t bytes[8];
+};
+#endif
+
+#ifdef SAMPLE_SIZE_16BIT
+union sampleTUNT
+{
+    uint32_t sample;
+    int16_t ch[2];
+};
 #endif
 
 /*
  * no dac not tested within this code
  * - it has the purpose to generate a quasy analog signal without a DAC
  */
-//#define I2S_NODAC
 
 
 const i2s_port_t i2s_port_number = I2S_NUM_0;
@@ -138,51 +169,17 @@ bool i2s_write_sample_24ch2(uint8_t *sample)
 
 bool i2s_write_stereo_samples(const float *fl_sample, const float *fr_sample)
 {
-#ifdef SAMPLE_SIZE_32BIT
-    static union sampleTUNT
-    {
-        uint64_t sample;
-        int32_t ch[2];
-    } sampleDataU;
-#endif
-#ifdef SAMPLE_SIZE_24BIT
-#if 0
-    static union sampleTUNT
-    {
-        uint8_t sample[8];
-        int32_t ch[2];
-    } sampleDataU;
-#else
-    static union sampleTUNT
-    {
-        int32_t ch[2];
-        uint8_t bytes[8];
-    } sampleDataU;
-#endif
-#endif
-#ifdef SAMPLE_SIZE_16BIT
-    static union sampleTUNT
-    {
-        uint32_t sample;
-        int16_t ch[2];
-    } sampleDataU;
-#endif
+    static union sampleTUNT sampleDataU;
 
     /*
      * using RIGHT_LEFT format
      */
-#ifdef SAMPLE_SIZE_16BIT
-    sampleDataU.ch[0] = int16_t(*fr_sample * 16383.0f); /* some bits missing here */
-    sampleDataU.ch[1] = int16_t(*fl_sample * 16383.0f);
-#endif
-#ifdef SAMPLE_SIZE_32BIT
-    sampleDataU.ch[0] = int32_t(*fr_sample * 1073741823.0f); /* some bits missing here */
-    sampleDataU.ch[1] = int32_t(*fl_sample * 1073741823.0f);
-#endif
+    sampleDataU.ch[0] = (SAMPLE_DATA_TYPE)(*fr_sample * MULTIPLIER_CONST);
+    sampleDataU.ch[1] = (SAMPLE_DATA_TYPE)(*fl_sample * MULTIPLIER_CONST);
 
     size_t bytes_written = 0;
 
-    i2s_write(i2s_port_number, (const char *)&sampleDataU.sample, 2*BYTES_PER_SAMPLE, &bytes_written, portMAX_DELAY);
+    i2s_write(i2s_port_number, (const char *)&sampleDataU.sample, 2 * BYTES_PER_SAMPLE, &bytes_written, portMAX_DELAY);
 
     if (bytes_written > 0)
     {
@@ -199,11 +196,7 @@ bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sa
 {
     size_t bytes_written = 0;
 
-    static union sampleTUNT
-    {
-        uint32_t sample;
-        int16_t ch[2];
-    } sampleDataU;
+    static union sampleTUNT sampleDataU;
 
     sampleDataU.ch[0] = *fl_sample;
     sampleDataU.ch[1] = *fr_sample;
@@ -230,11 +223,7 @@ bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sa
 {
     size_t bytes_written = 0;
 
-    static union sampleTUNT
-    {
-        uint32_t sample;
-        int16_t ch[2];
-    } sampleDataU[SAMPLE_BUFFER_SIZE];
+    static union sampleTUNT sampleDataU[SAMPLE_BUFFER_SIZE];
 
 #ifdef OUTPUT_SAW_TEST
     for (int n = 0; n < buffLen; n++)
@@ -272,35 +261,7 @@ bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sa
 #ifdef SAMPLE_BUFFER_SIZE
 bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sample, const int buffLen)
 {
-#ifdef SAMPLE_SIZE_32BIT
-    static union sampleTUNT
-    {
-        uint64_t sample;
-        int32_t ch[2];
-    } sampleDataU[SAMPLE_BUFFER_SIZE];
-#endif
-#ifdef SAMPLE_SIZE_24BIT
-#if 0
-    static union sampleTUNT
-    {
-        uint8_t sample[8];
-        int32_t ch[2];
-    } sampleDataU[SAMPLE_BUFFER_SIZE];
-#else
-    static union sampleTUNT
-    {
-        int32_t ch[2];
-        uint8_t bytes[8];
-    } sampleDataU[SAMPLE_BUFFER_SIZE];
-#endif
-#endif
-#ifdef SAMPLE_SIZE_16BIT
-    static union sampleTUNT
-    {
-        uint32_t sample;
-        int16_t ch[2];
-    } sampleDataU[SAMPLE_BUFFER_SIZE];
-#endif
+    static union sampleTUNT sampleDataU[SAMPLE_BUFFER_SIZE];
 
     for (int n = 0; n < buffLen; n++)
     {
@@ -308,15 +269,9 @@ bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sampl
         /*
          * using LEFT_RIGHT format
          */
-#ifdef SAMPLE_SIZE_16BIT
-        sampleDataU[n].ch[1] = int16_t(fr_sample[n] * 16383.0f); /* some bits missing here */
-        sampleDataU[n].ch[0] = int16_t(fl_sample[n] * 16383.0f);
-#endif
-#ifdef SAMPLE_SIZE_32BIT
-        sampleDataU[n].ch[1] = int32_t(fr_sample[n] * 1073741823.0f); /* some bits missing here */
-        sampleDataU[n].ch[0] = int32_t(fl_sample[n] * 1073741823.0f);
-#endif
-#else
+        sampleDataU[n].ch[1] = (SAMPLE_DATA_TYPE)(fr_sample[n] * MULTIPLIER_CONST);
+        sampleDataU[n].ch[0] = (SAMPLE_DATA_TYPE)(fl_sample[n] * MULTIPLIER_CONST);
+#else /* ES8388_ENABLED */
         /*
          * using RIGHT_LEFT format
          */
@@ -346,10 +301,10 @@ bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sampl
 #endif
 #endif
 #ifdef SAMPLE_SIZE_32BIT
-        sampleDataU[n].ch[0] = int32_t(fr_sample[n] * 1073741823.0f); /* some bits missing here */
-        sampleDataU[n].ch[1] = int32_t(fl_sample[n] * 1073741823.0f);
+        sampleDataU[n].ch[0] = (SAMPLE_DATA_TYPE)(fr_sample[n] * MULTIPLIER_CONST);
+        sampleDataU[n].ch[1] = (SAMPLE_DATA_TYPE)(fl_sample[n] * MULTIPLIER_CONST);
 #endif
-#endif
+#endif /* ES8388_ENABLED */
     }
 
 #ifdef OUTPUT_SAW_TEST
@@ -385,17 +340,10 @@ void i2s_read_stereo_samples(float *fl_sample, float *fr_sample)
 {
     static size_t bytes_read = 0;
 
-    static union
-    {
-        uint32_t sample;
-        int16_t ch[2];
-    } sampleData;
-
+    static union sampleTUNT sampleData;
 
     i2s_read(i2s_port_number, (char *)&sampleData.sample, 4, &bytes_read, portMAX_DELAY);
 
-    //sampleData.ch[0] &= 0xFFFE;
-    //sampleData.ch[1] &= 0;
 
     /*
      * using RIGHT_LEFT format
@@ -410,18 +358,10 @@ void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const 
 #ifdef I2S_DIN_PIN
     static size_t bytes_read = 0;
 
-#ifdef SAMPLE_SIZE_16BIT
-    static union
-    {
-        uint32_t sample;
-        int16_t ch[2];
-    } sampleData[SAMPLE_BUFFER_SIZE];
-#endif
+    static union sampleTUNT sampleData[SAMPLE_BUFFER_SIZE];
 
     i2s_read(i2s_port_number, (char *)&sampleData[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_read, portMAX_DELAY);
 
-    //sampleData.ch[0] &= 0xFFFE;
-    //sampleData.ch[1] &= 0;
 
     for (int n = 0; n < buffLen; n++)
     {
@@ -439,28 +379,20 @@ void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int 
 #ifdef I2S_DIN_PIN
     static size_t bytes_read = 0;
 
-#ifdef SAMPLE_SIZE_16BIT
-    static union
-    {
-        uint32_t sample;
-        int16_t ch[2];
-    } sampleData[SAMPLE_BUFFER_SIZE];
-#endif
+    static union sampleTUNT sampleData[SAMPLE_BUFFER_SIZE];
 
-    i2s_read(i2s_port_number, (char *)&sampleData[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_read, portMAX_DELAY);
 
-    //sampleData.ch[0] &= 0xFFFE;
-    //sampleData.ch[1] &= 0;
+    i2s_read(i2s_port_number, (char *)&sampleData[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_read, 0);
+
 
     for (int n = 0; n < buffLen; n++)
     {
         /*
          * using RIGHT_LEFT format
          */
-        //fr_sample[n] = ((float)sampleData[n].ch[0] * (5.5f / 65535.0f));
-        //fl_sample[n] = ((float)sampleData[n].ch[1] * (5.5f / 65535.0f));
-        fr_sample[n] = ((float)sampleData[n].ch[0] / (16383.0f));
-        fl_sample[n] = ((float)sampleData[n].ch[1] / (16383.0f));
+
+        fr_sample[n] = ((float)sampleData[n].ch[0] * (1.0f / MULTIPLIER_CONST));
+        fl_sample[n] = ((float)sampleData[n].ch[1] * (1.0f / MULTIPLIER_CONST));
     }
 #endif
 }
@@ -474,11 +406,11 @@ static const i2s_config_t i2s_configuration =
 {
     .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_DAC_BUILT_IN),
     .sample_rate = SAMPLE_RATE * 1,
-    .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,  // only the top 8 bits will actually be used by the internal DAC, but using 8 bits straight away seems buggy
-    .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,  // always use stereo output. mono seems to be buggy, and the overhead is insignifcant on the ESP32
-    .communication_format = (i2s_comm_format_t)(I2S_COMM_FORMAT_STAND_I2S | I2S_COMM_FORMAT_STAND_MSB),  // this appears to be the correct setting for internal DAC and PT8211, but not for other dacs
+    .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT, // only the top 8 bits will actually be used by the internal DAC, but using 8 bits straight away seems buggy
+    .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT, // always use stereo output. mono seems to be buggy, and the overhead is insignifcant on the ESP32
+    .communication_format = (i2s_comm_format_t)(I2S_COMM_FORMAT_STAND_I2S | I2S_COMM_FORMAT_STAND_MSB), // this appears to be the correct setting for internal DAC and PT8211, but not for other dacs
     .intr_alloc_flags = 0, // default interrupt priority
-    .dma_buf_count = 8,    // 8*128 bytes of buffer corresponds to 256 samples (2 channels, see above, 2 bytes per sample per channel)
+    .dma_buf_count = 8, // 8*128 bytes of buffer corresponds to 256 samples (2 channels, see above, 2 bytes per sample per channel)
     .dma_buf_len = 64,
 #ifdef I2S_USE_APLL
     .use_apll = true,
@@ -521,8 +453,8 @@ i2s_config_t i2s_configuration =
 #endif
 #endif
     .intr_alloc_flags = 0, // default interrupt priority
-    .dma_buf_count = 8,
-    .dma_buf_len = 64,
+    .dma_buf_count = 2,
+    .dma_buf_len = SAMPLE_BUFFER_SIZE,
 #ifdef I2S_USE_APLL
     .use_apll = true,
 #else
@@ -537,7 +469,7 @@ i2s_config_t i2s_configuration =
 i2s_pin_config_t pins =
 {
     .bck_io_num = I2S_PIN_NO_CHANGE,
-    .ws_io_num =  I2S_PIN_NO_CHANGE,
+    .ws_io_num = I2S_PIN_NO_CHANGE,
     .data_out_num = I2S_NODAC_OUT_PIN,
     .data_in_num = I2S_PIN_NO_CHANGE
 };
@@ -546,7 +478,7 @@ i2s_pin_config_t pins =
 i2s_pin_config_t pins =
 {
     .bck_io_num = I2S_BCLK_PIN,
-    .ws_io_num =  I2S_WCLK_PIN,
+    .ws_io_num = I2S_WCLK_PIN,
     .data_out_num = I2S_DOUT_PIN,
 #ifdef I2S_DIN_PIN
     .data_in_num = I2S_DIN_PIN
@@ -601,4 +533,8 @@ void setup_i2s()
 #endif /* ESP32 */
 
 
+#endif /* SAMPLE_RATE */
+
+
 #endif /* ML_SYNTH_INLINE_DEFINITION */
+

@@ -48,7 +48,7 @@
 #define ML_OSC_H_
 
 
-#include <Arduino.h>
+#include <inttypes.h>
 
 
 struct synth_osc_cfg_s

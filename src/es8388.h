@@ -67,7 +67,6 @@ void ES8388_SetIn2OoutVOL(uint8_t unused, float vol);
 
 
 /* ES8388 address */
-//#define ES8388_ADDR 0x20  /*!< 0x22:CE=1;0x20:CE=0*/
 #define ES8388_ADDR 0x10  /*!< 0x22:CE=1;0x20:CE=0*/
 
 
@@ -161,8 +160,7 @@ bool ES8388_begin(int sda, int scl, uint32_t frequency)
 {
     bool ok = Wire.begin(sda, scl, frequency);
 
-    // Reset all registers, readback default as sanity check
-    //ok &= WriteReg(CHIP_AUDIO_RS, 0x123);
+    /* Reset all registers, readback default as sanity check */
     delay(100);
 
     Serial.printf("0x00: 0x%02x\n", ES8388_ReadReg(ES8388_CONTROL1));
@@ -241,7 +239,7 @@ void ES8388_SetPGAGain(uint8_t unused, float vol)
     {
         volu8 = 8;
     }
-    // ES8388_ADCCONTROL1
+    /* ES8388_ADCCONTROL1 */
     ES8388_WriteReg(0x09, volu8 + (volu8 << 4)); // MicAmpL, MicAmpR
 }
 
@@ -266,7 +264,7 @@ void ES8388_SetInputCh(uint8_t ch, float var)
             Serial.printf("Illegal Input ch!\n");
             return;
         }
-        // ES8388_ADCCONTROL2
+        /* ES8388_ADCCONTROL2 */
         ES8388_WriteReg(0x0A, (in << 6) + (in << 4)); // LINSEL , RINSEL , DSSEL , DSR
 
 #ifdef STATUS_ENABLED
@@ -301,7 +299,7 @@ void ES8388_SetMixInCh(uint8_t ch, float var)
             Serial.printf("Illegal Mix Input ch!\n");
             return;
         }
-        // ES8388_DACCONTROL16
+        /* ES8388_DACCONTROL16 */
         ES8388_WriteReg(0x26, in + (in << 3)); // LMIXSEL, RMIXSEL
 #ifdef STATUS_ENABLED
         Status_ValueChangedInt("Mix In Ch", in);
@@ -430,25 +428,10 @@ void ES8388_Setup()
     ES8388_WriteReg(0x00, 0x05);
     /* Power Up Analog and Ibias */
     ES8388_WriteReg(0x01, 0x40);
-#if 0
-    /*
-     * Power down ADC, Power up
-     * Analog Input for Bypass
-     */
-    ES8388_WriteReg(0x03, 0x3F);
-#else
     ES8388_WriteReg(0x03, 0x3F); /* adc also on but no bias */
 
     ES8388_WriteReg(0x03, 0x00); // PdnAINL, PdinAINR, PdnADCL, PdnADCR, PdnMICB, PdnADCBiasgen, flashLP, Int1LP
-#endif
 
-#if 0
-    /*
-     * Power Down DAC, Power up
-     * Analog Output for Bypass
-     */
-    ES8388_WriteReg(0x04, 0xFC);
-#else
     /*
      * Power up DAC / Analog Output
      * for Record
@@ -456,7 +439,6 @@ void ES8388_Setup()
     ES8388_WriteReg(0x04, 0x3C);
 
 
-#if 1
     /*
      * Select Analog input channel for ADC
      */
@@ -465,22 +447,13 @@ void ES8388_Setup()
     /* Select PGA Gain for ADC analog input */
     ES8388_WriteReg(0x09, 0x00); // PGA gain?
 
-    //ES8388_WriteReg(0x0C, 0x18); // DATSEL, ADCLRP, ADCWL, ADCFORMAT
-    //ES8388_WriteReg(0x0C, 0x40); // DATSEL, ADCLRP, ADCWL, ADCFORMAT
     ES8388_WriteReg(0x0C, 0x0C); // DATSEL, ADCLRP, ADCWL, ADCFORMAT
     ES8388_WriteReg(0x0D, 0x02); // ADCFsMode , ADCFsRatio
-    //ES8388_WriteReg(0x0D, (1<<5) + 0x03); // ADCFsMode , ADCFsRatio Hasan
-    //ES8388_WriteReg(0x0D, 0); // ADCFsMode , ADCFsRatio Hasan
 
     /*
      * Set ADC Digital Volume
      */
-#if 1
     ES8388_SetADCVOL(0, 1.0f);
-#else
-    ES8388_WriteReg(0x10, 0x00); // LADCVOL
-    ES8388_WriteReg(0x11, 0x00); // RADCVOL
-#endif
 
     /* UnMute ADC */
     ES8388_WriteReg(0x0F, 0x30); //
@@ -489,7 +462,6 @@ void ES8388_Setup()
 
     ES8388_WriteReg(0x17, 0x18); // DACLRSWAP, DACLRP, DACWL, DACFORMAT
     ES8388_WriteReg(0x18, 0x02); // DACFsMode , DACFsRatio
-#endif
 
 
     /*
@@ -497,37 +469,23 @@ void ES8388_Setup()
      */
     ES8388_WriteReg(0x1A, 0x00);
     ES8388_WriteReg(0x1B, 0x02);
-    //ES8388_WriteReg(0x1B, (1<<5) + 0x03); // ADCFsMode , ADCFsRatio Hasan
-    //ES8388_WriteReg(0x1B, 0); // ADCFsMode , ADCFsRatio Hasan
     /* UnMute DAC */
     ES8388_WriteReg(0x19, 0x32);
-#endif
     /*
      * Setup Mixer
      */
-    ES8388_WriteReg(0x26, 0x09);// ES8388_WriteReg(0x26, 0x00);
+    ES8388_WriteReg(0x26, 0x09); // ES8388_WriteReg(0x26, 0x00);
     ES8388_WriteReg(0x27, 0xD0); // ES8388_DACCONTROL17
     ES8388_WriteReg(0x28, 0x38);
     ES8388_WriteReg(0x29, 0x38);
     ES8388_WriteReg(0x2A, 0xD0);
 
     /* Set Lout/Rout Volume */
-#if 1
     ES8388_SetOUT1VOL(0, 1);
     ES8388_SetOUT2VOL(0, 1);
-#else
-    ES8388_WriteReg(0x2E, 0x1E);
-    ES8388_WriteReg(0x2F, 0x1E);
-    ES8388_WriteReg(0x30, 0x1E);
-    ES8388_WriteReg(0x31, 0x1E);
-#endif
 
     /* Power up DEM and STM */
-#if 0
-    ES8388_WriteReg(0x02, 0xF0);
-#else
     ES8388_WriteReg(0x02, 0x00);
-#endif
 
     ES8388_SetInputCh(1, 1);
     ES8388_SetMixInCh(2, 1);
