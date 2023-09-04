@@ -67,10 +67,9 @@ void SAMD21_Synth_DACInit();
 bool SAMD21_Synth_DmaDone();
 
 
-// DMA descriptor list entry point (and writeback buffer) per channel
 __attribute__((__aligned__(16))) static DmacDescriptor ///< 128 bit alignment
-_descriptor[DMAC_CH_NUM] SECTION_DMAC_DESCRIPTOR,  ///< Descriptor table
-            _writeback[DMAC_CH_NUM] SECTION_DMAC_DESCRIPTOR;   ///< Writeback table
+_descriptor[DMAC_CH_NUM] SECTION_DMAC_DESCRIPTOR, ///< Descriptor table
+            _writeback[DMAC_CH_NUM] SECTION_DMAC_DESCRIPTOR; ///< Writeback table
 
 uint16_t audio_buffer[2][SAMPLE_BUFFER_SIZE];
 

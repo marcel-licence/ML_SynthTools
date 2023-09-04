@@ -217,13 +217,7 @@ char MIDI_putc(char c, struct file_access_f *ff)
 
 int MIDI_tell(struct file_access_f *ff)
 {
-#if 0
-    File *file = &midiFile;//ff->file;
-    return file->size();
-    return file->position(); /* Returns the current position inside the file, in bytes. */
-#else
     return ff->file - 1;
-#endif
 }
 
 char MIDI_seek(struct file_access_f *ff, int pos, uint8_t mode)
@@ -239,7 +233,6 @@ char MIDI_seek(struct file_access_f *ff, int pos, uint8_t mode)
         file->seek(pos, SeekCur);
         ff->file += pos;
     }
-    //ff->file = file->size() - pos;
     return 0;
 }
 
@@ -497,7 +490,6 @@ void MidiStreamPlayer_Tick(uint32_t ticks)
 
         while ((tickCnt > duration) && midiPlaying)
         {
-            //printf("%lld\n", tickCnt);
             tickCnt -= duration;
 
             midiPlaying &= MidiStreamReadSingleEvent(&midiStreamPlayerHandle);
@@ -507,7 +499,6 @@ void MidiStreamPlayer_Tick(uint32_t ticks)
             duration = shortDuration;
             duration *= SAMPLE_RATE;
             duration *= midiStreamPlayerHandle.midi_tempo;
-            //Serial.printf("duration: %ld\n", shortDuration);
         }
     }
 }
@@ -531,7 +522,7 @@ void MidiStreamPlayer_ListFiles(uint8_t filesystem)
             listDir(SPIFFS, "/", 3);
         }
         break;
-#endif
+#endif /* MIDI_FS_SPIFFS */
 #ifdef MIDI_FS_LITTLE_FS
     case MIDI_FS_LITTLE_FS:
         {
@@ -547,7 +538,7 @@ void MidiStreamPlayer_ListFiles(uint8_t filesystem)
             listDir(LittleFS, "/", 3);
         }
         break;
-#endif
+#endif /* MIDI_FS_LITTLE_FS */
 #ifdef MIDI_FS_SD_MMC
     case MIDI_FS_SD_MMC:
         {
@@ -590,7 +581,7 @@ void MidiStreamPlayer_ListFiles(uint8_t filesystem)
             listDir(SD_MMC, "/", 0);
         }
         break;
-#endif
+#endif /* MIDI_FS_SD_MMC */
     }
 }
 

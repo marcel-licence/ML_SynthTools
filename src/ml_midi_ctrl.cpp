@@ -64,7 +64,7 @@ void MidiCtrl_NoteOn(uint8_t ch, uint8_t note, float vel)
                 MidiCtrl_Cb_NoteOn(0, note + midiCtrlParam.transpose[0], vel);
 
             }
-#if 0
+#ifdef STATUS_MSG_ENABLED
             Status_ValueChangedInt("lower", note);
 #endif
         }
@@ -74,7 +74,7 @@ void MidiCtrl_NoteOn(uint8_t ch, uint8_t note, float vel)
             {
                 MidiCtrl_Cb_NoteOn(1, note + midiCtrlParam.transpose[1], vel);
             }
-#if 0
+#ifdef STATUS_MSG_ENABLED
             Status_ValueChangedInt("upper", note);
 #endif
         }

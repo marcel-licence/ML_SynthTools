@@ -128,9 +128,10 @@ void ScopeOled_DrawData(const float *dispData, uint8_t idx)
         }
     }
 
+
     float multiplier = 1.0f; // 2.0f
     {
-        multiplier =  1.0f / maxVal;
+        multiplier = 1.0f / maxVal;
     }
 
     /* determin if the display should draw the waveform or not */

@@ -118,6 +118,7 @@ void Delay_Reset(void)
 
 void Delay_Process(float *signal_l, float *signal_r __attribute__((unused)))
 {
+
     delayLine_l[delayIn] = (((float)0x8000) * *signal_l * delayInLvl);
 
 
@@ -143,6 +144,7 @@ void Delay_Process(float *signal_l, float *signal_r __attribute__((unused)))
 
 void Delay_Process_Buff(float *signal_l, int buffLen)
 {
+
     for (int n = 0; n < buffLen; n++)
     {
         delayLine_l[delayIn] = (((float)0x4000) * signal_l[n] * delayInLvl);
@@ -169,6 +171,7 @@ void Delay_Process_Buff(float *signal_l, int buffLen)
 
 void Delay_Process_Buff(int16_t *signal_l, int buffLen)
 {
+
     uint16_t delayInLvl_u = delayInLvl * 32768;
     uint16_t delayToMix_u = delayToMix * 32768;
     uint16_t delayFeedback_u = delayFeedback * 32768;
@@ -205,6 +208,7 @@ void Delay_Process_Buff(int16_t *signal_l, int buffLen)
 
 void Delay_Process_Buff(float *in, float *left, float *right, int buffLen)
 {
+
     for (int n = 0; n < buffLen; n++)
     {
         delayLine_l[delayIn] = (((float)0x4000) * in[n] * delayInLvl);
@@ -294,6 +298,7 @@ void Delay_Process_Buff(float *in_l, float *in_r, float *left, float *right, int
 
 void Delay_Process_Buff(int16_t *in, int16_t *left, int16_t *right, int buffLen)
 {
+
     for (int n = 0; n < buffLen; n++)
     {
         delayLine_l[delayIn] = mul(in[n], delayInLvl);
@@ -333,8 +338,10 @@ void Delay_Process_Buff(int16_t *in, int16_t *left, int16_t *right, int buffLen)
     }
 }
 
+
 void Delay_Process_Buff2(float *signal_l, float *signal_r, int buffLen)
 {
+
     for (int n = 0; n < buffLen; n++)
     {
         delayLine_l[delayIn] = (((float)0x8000) * signal_l[n] * delayInLvl);
