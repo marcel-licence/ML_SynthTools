@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Dieses Programm ist Freie Software: Sie k�nnen es unter den Bedingungen
+ * Dieses Programm ist Freie Software: Sie können es unter den Bedingungen
  * der GNU General Public License, wie von der Free Software Foundation,
  * Version 3 der Lizenz oder (nach Ihrer Wahl) jeder neueren
- * ver�ffentlichten Version, weiter verteilen und/oder modifizieren.
+ * veröffentlichten Version, weiter verteilen und/oder modifizieren.
  *
- * Dieses Programm wird in der Hoffnung bereitgestellt, dass es n�tzlich sein wird, jedoch
- * OHNE JEDE GEW�HR,; sogar ohne die implizite
- * Gew�hr der MARKTF�HIGKEIT oder EIGNUNG F�R EINEN BESTIMMTEN ZWECK.
- * Siehe die GNU General Public License f�r weitere Einzelheiten.
+ * Dieses Programm wird in der Hoffnung bereitgestellt, dass es nützlich sein wird, jedoch
+ * OHNE JEDE GEWÄHR,; sogar ohne die implizite
+ * Gewähr der MARKTFÄHIGKEIT oder EIGNUNG FÜR EINEN BESTIMMTEN ZWECK.
+ * Siehe die GNU General Public License für weitere Einzelheiten.
  *
  * Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
  * Programm erhalten haben. Wenn nicht, siehe <https://www.gnu.org/licenses/>.
@@ -74,15 +74,15 @@ void UsbMidiLoop();
 
 Adafruit_USBD_MIDI usb_midi; /* create instance */
 
-// Create a new instance of the Arduino MIDI Library,
-// and attach usb_midi as the transport.
+/* Create a new instance of the Arduino MIDI Library, */
+/* and attach usb_midi as the transport. */
 MIDI_CREATE_INSTANCE(Adafruit_USBD_MIDI, usb_midi, MIDI);
 
 
 void Midi_Usb_Setup()
 {
 #if defined(ARDUINO_ARCH_MBED) && defined(ARDUINO_ARCH_RP2040)
-    // Manual begin() is required on core without built-in support for TinyUSB such as mbed rp2040
+    /* Manual begin() is required on core without built-in support for TinyUSB such as mbed rp2040 */
     TinyUSB_Device_Init(0);
 #endif
 
@@ -210,7 +210,7 @@ void Midi_Usb_Loop()
 
         if (noteOn)
         {
-            MIDI.sendNoteOff(i++, 0, 1);  // note <i>, velocity 0 on channel 1
+            MIDI.sendNoteOff(i++, 0, 1); // note <i>, velocity 0 on channel 1
             Serial.print("NoteOff(tx): CH: ");
             Serial.print(1);
             Serial.print(" | ");
@@ -220,7 +220,7 @@ void Midi_Usb_Loop()
         }
         else
         {
-            MIDI.sendNoteOn(i, 100, 1);  // note <i>, velocity 100 on channel 1
+            MIDI.sendNoteOn(i, 100, 1); // note <i>, velocity 100 on channel 1
             Serial.print("NoteOn(tx): CH: ");
             Serial.print(1);
             Serial.print(" | ");
@@ -296,7 +296,7 @@ void Midi_Usb_PitchBend(uint8_t ch, uint16_t bend)
 
 void Midi_Usb_RttMsg(uint8_t msg __attribute__((unused)))
 {
-#if 0
+#ifdef EXAMPLE_CODE
     MIDI.sendRealTime((kMIDIType)msg);
 #endif
 }
@@ -342,7 +342,7 @@ void UsbMidiSetup(void)
     usbMIDI.setHandleNoteOff(myNoteOff);
     usbMIDI.setHandleNoteOn(myNoteOn);
     Serial.println("UsbMidiSetup done");
-#if 0
+#ifdef EXAMPLE_CODE
     usbMIDI.setHandleAfterTouchPoly(myAfterTouchPoly)
     usbMIDI.setHandleControlChange(myControlChange)
     usbMIDI.setHandleProgramChange(myProgramChange)
@@ -360,7 +360,6 @@ void UsbMidiSetup(void)
     usbMIDI.setHandleActiveSensing(myActiveSensing);
     usbMIDI.setHandleSystemReset(mySystemReset);
     usbMIDI.setHandleRealTimeSystem(myRealTimeSystem);
-
 #endif
 }
 
@@ -371,11 +370,11 @@ void UsbMidiTick(void)
 
     if (notePlaying)
     {
-        usbMIDI.sendNoteOff(60, 0, 0);  // 60 = C4
+        usbMIDI.sendNoteOff(60, 0, 0); // 60 = C4
     }
     else
     {
-        usbMIDI.sendNoteOn(60, 64, 0);  // 60 = C4
+        usbMIDI.sendNoteOn(60, 64, 0); // 60 = C4
     }
 
     notePlaying = !notePlaying;
@@ -394,21 +393,19 @@ void processMIDI(void)
 {
     byte type, channel, data1, data2, cable;
 
-    // fetch the MIDI message, defined by these 5 numbers (except SysEX)
-    //
-    type = usbMIDI.getType();       // which MIDI message, 128-255
+    /* fetch the MIDI message, defined by these 5 numbers (except SysEX) */
+    type = usbMIDI.getType(); // which MIDI message, 128-255
     channel = usbMIDI.getChannel(); // which MIDI channel, 1-16
-    data1 = usbMIDI.getData1();     // first data byte of message, 0-127
-    data2 = usbMIDI.getData2();     // second data byte of message, 0-127
-    cable = usbMIDI.getCable();     // which virtual cable with MIDIx8, 0-7
+    data1 = usbMIDI.getData1(); // first data byte of message, 0-127
+    data2 = usbMIDI.getData2(); // second data byte of message, 0-127
+    cable = usbMIDI.getCable(); // which virtual cable with MIDIx8, 0-7
 
-    // uncomment if using multiple virtual cables
+    /* uncomment if using multiple virtual cables */
     Serial.print("cable ");
     Serial.print(cable, DEC);
     Serial.print(": ");
 
-    // print info about the message
-    //
+    /* print info about the message */
     switch (type)
     {
     case usbMIDI.NoteOff: // 0x80
@@ -469,9 +466,11 @@ void processMIDI(void)
         break;
 
     case usbMIDI.SystemExclusive: // 0xF0
-        // Messages larger than usbMIDI's internal buffer are truncated.
-        // To receive large messages, you *must* use the 3-input function
-        // handler.  See InputFunctionsComplete for details.
+        /*
+         * Messages larger than usbMIDI's internal buffer are truncated.
+         * To receive large messages, you *must* use the 3-input function
+         * handler.  See InputFunctionsComplete for details.
+         */
         Serial.print("SysEx Message: ");
         printBytes(usbMIDI.getSysExArray(), data1 + data2 * 256);
         Serial.println();

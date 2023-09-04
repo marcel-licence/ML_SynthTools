@@ -65,10 +65,11 @@
 //#include <hardware/BLEMIDI_ArduinoBLE.h>
 
 BLEMIDI_CREATE_DEFAULT_INSTANCE(); /* Connect to first server found */
-//BLEMIDI_CREATE_INSTANCE("",MIDI)                  //Connect to the first server found
-//BLEMIDI_CREATE_INSTANCE("01:23:45:ab:cd:ef",MIDI) //Connect to a specific BLE address server
-//BLEMIDI_CREATE_INSTANCE("MyBLEserver",MIDI)       //Connect to a specific name server
-
+#ifdef OTHER_POSSIBLE_DEFINES
+BLEMIDI_CREATE_INSTANCE("", MIDI) //Connect to the first server found
+BLEMIDI_CREATE_INSTANCE("01:23:45:ab:cd:ef", MIDI) //Connect to a specific BLE address server
+BLEMIDI_CREATE_INSTANCE("MyBLEserver", MIDI) //Connect to a specific name server
+#endif
 #else
 
 #include <hardware/BLEMIDI_ESP32.h>
@@ -100,11 +101,11 @@ bool isConnected = false;
 extern struct midiMapping_s midiMapping; /* definition in z_config.ino */
 
 
-// -----------------------------------------------------------------------------
-// When BLE connected, LED will turn on (indication that connection was successful)
-// When receiving a NoteOn, LED will go out, on NoteOff, light comes back on.
-// This is an easy and conveniant way to show that the connection is alive and working.
-// -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
+ * When BLE connected, LED will turn on (indication that connection was successful)
+ * When receiving a NoteOn, LED will go out, on NoteOff, light comes back on.
+ * This is an easy and conveniant way to show that the connection is alive and working.
+ * ----------------------------------------------------------------------------- */
 void midi_ble_setup()
 {
     MIDI.begin(MIDI_CHANNEL_OMNI);
@@ -236,9 +237,6 @@ void midi_ble_setup()
     Serial.printf("BLE MIDI setup done\n");
 }
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 void midi_ble_loop()
 {
     MIDI.read();
@@ -254,7 +252,7 @@ void midi_ble_loop()
 
         if (noteOn)
         {
-            MIDI.sendNoteOff(i++, 0, 1);  // note <i>, velocity 0 on channel 1
+            MIDI.sendNoteOff(i++, 0, 1); // note <i>, velocity 0 on channel 1
             Serial.print("NoteOff(tx): CH: ");
             Serial.print(1);
             Serial.print(" | ");
@@ -264,7 +262,7 @@ void midi_ble_loop()
         }
         else
         {
-            MIDI.sendNoteOn(i, 100, 1);  // note <i>, velocity 100 on channel 1
+            MIDI.sendNoteOn(i, 100, 1); // note <i>, velocity 100 on channel 1
             Serial.print("NoteOn(tx): CH: ");
             Serial.print(1);
             Serial.print(" | ");
@@ -340,7 +338,7 @@ void Ble_PitchBend(uint8_t ch, uint16_t bend)
 
 void Ble_RttMsg(uint8_t msg)
 {
-#if 0
+#ifdef EXAMPLE_CODE
     MIDI.sendRealTime((kMIDIType)msg);
 #endif
 }
