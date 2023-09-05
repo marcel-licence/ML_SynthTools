@@ -29,63 +29,29 @@
  */
 
 /**
- * @file ml_alg.h
+ * @file ml_board_setup.h
  * @author Marcel Licence
- * @date 23.12.2022
+ * @date  01.07.2023
  *
- * @brief This file contains some useful algorithms
+ * @brief This file is prepared to keep board specific setup routines
  */
 
 
-#ifndef SRC_ML_ALG_H_
-#define SRC_ML_ALG_H_
+#ifdef ML_BOARD_SETUP
 
 
-#include <Arduino.h>
+#ifdef ML_SYNTH_INLINE_DECLARATION
+void Board_Setup();
+#endif
 
 
-
-
-static int16_t mul(int16_t a, float b);
-static float mul_f(int16_t a, float b);
-
-
-
-static inline
-int16_t mul(int16_t a, float b)
+#ifdef ML_SYNTH_INLINE_DEFINITION
+void Board_Setup()
 {
-    float c = a;
-    c *= b;
-    return (int16_t)c;
+    Serial.printf("Running board setup...\n");
 }
+#endif
 
 
-static inline
-float mul_f(int16_t a, float b)
-{
-    float c = a;
-    c *= b;
-    c /= (float)0x4000;
-    return c;
-}
-
-static inline
-float lerpOut(int16_t *buffer, float idx, uint32_t len_max)
-{
-    uint32_t idxFloor = round(idx);
-
-    if (idxFloor >= len_max)
-    {
-        idxFloor -= len_max;
-    }
-
-    return buffer[idxFloor];
-}
-
-
-
-
-
-
-#endif /* SRC_ML_ALG_H_ */
+#endif /* ML_BOARD_SETUP */
 
