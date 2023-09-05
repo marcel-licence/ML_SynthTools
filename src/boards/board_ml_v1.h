@@ -50,7 +50,7 @@
 #define MIDI_RX2_PIN 35
 /* pin 34 is input only - do not use as TX pin */
 
-#if 0 /* not tested yet */
+#ifdef SECOND_MIDI_PORT_ACTIVE /* not tested yet */
 #define MIDI_PORT1_ACTIVE
 #define MIDI_RX1_PIN 34 /* only available on header */
 #endif
@@ -61,6 +61,7 @@
 #define I2S_BCLK_PIN    32
 #define I2S_WCLK_PIN    25
 #define I2S_DOUT_PIN    33
+// #define I2S_DIN_PIN      26 /* optional, extern, should be disabled when not used otherwise  */
 
 /*
  * I2C
@@ -113,8 +114,12 @@
 #define MCP23_MODULE_ENABLED
 #define LED_MATRIX_ENABLED
 #define OLED_OSC_DISP_ENABLED
+//#define SPI_DISP_ENABLED
 #define DISPLAY_160x80
+//#define DISPLAY_FROM_STATUS_ENABLED
+//#define ADC_TO_MIDI_ENABLED
 #define ADC_MCP_CTRL_ENABLED
+//#define ADC_TO_MIDI_LOOKUP_SIZE 8
 #define ADC_INPUTS 8
 
 

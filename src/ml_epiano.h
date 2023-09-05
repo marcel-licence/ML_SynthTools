@@ -44,8 +44,7 @@
 #define EPIANO_H_
 
 
-#include <stdint.h>
-
+#include <Arduino.h>
 
 #include <ml_types.h>
 

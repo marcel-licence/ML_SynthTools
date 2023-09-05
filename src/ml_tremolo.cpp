@@ -94,10 +94,14 @@ void ML_Tremolo::process(float *left, float *right, int32_t len)
 
 void ML_Tremolo::setSpeed(float speed)
 {
-    speed *= 2 * M_PI;
+    sinM.f = (M_PI * 2.0f * speed) / 48000.0f;
+
+    speed *= 2 ;
     speed /= sample_rate;
+    speedU32 = (speed) * (4294967296 / 2);
+    speed *= M_PI;
+
     this->speed = speed;
-    speedU32 = (speed / (M_PI)) * (1 << 31);
 }
 
 void ML_Tremolo::setPhaseShift(float shift)
