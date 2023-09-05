@@ -57,15 +57,13 @@ static void OscProcessSingle(oscillatorT *osc, uint32_t len)
     {
         osc->samplePos += (uint32_t)((*osc->cfg->pitchMultiplier) * ((float)osc->addVal) * osc->cfg->pitchOctave * osc->cfg->pitch * *osc->pitchMod);
         uint32_t samplePos = osc->samplePos;
-#if 1
         float morphMod = /*(*osc->cfg->morph) * */ osc->cfg->morphWaveForm[WAVEFORM_I(osc->samplePos)];
         morphMod *= ((float)89478480);
         morphMod *= (*osc->cfg->morph) * 64;
         samplePos += morphMod;
 
-#endif
         float sig = osc->cfg->selectedWaveForm[WAVEFORM_I(samplePos)];
-#if 0
+#ifdef NOT_USED
         float sig = 0;
         if (saw == NULL)
         {
@@ -79,7 +77,7 @@ static void OscProcessSingle(oscillatorT *osc, uint32_t len)
 #endif
         sig *= osc->cfg->volume;
 
-#if 0
+#ifdef SAW_PAN_ENABLED
         osc->dest[0][n] += osc->pan_l * sig;
         osc->dest[1][n] += osc->pan_r * sig;
 #else

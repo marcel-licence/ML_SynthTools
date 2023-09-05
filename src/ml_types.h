@@ -41,11 +41,9 @@
 #define SRC_ML_TYPES_H_
 
 
-#ifdef ARDUINO
 #include <Arduino.h>
-#else
-#include <stdint.h>
-#endif
+
+
 
 /*
  * fixed point data types for signed numbers -1 .. 1
@@ -61,3 +59,4 @@ typedef union
 
 
 #endif /* SRC_ML_TYPES_H_ */
+
