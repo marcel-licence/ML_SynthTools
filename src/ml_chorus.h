@@ -69,4 +69,19 @@ void Chorus_SetLength(uint8_t unused __attribute__((unused)), float value);
 void Chorus_SetSpeed(uint8_t unused __attribute__((unused)), float value);
 
 
+void ChorusQ_Init(int16_t *buffer, uint32_t len);
+void ChorusQ_Init2(int16_t *left, int16_t *right, uint32_t len);
+void ChorusQ_Process_Buff(Q1_14 *in, Q1_14 *left, Q1_14 *right, int buffLen);
+void ChorusQ_Reset(void);
+void ChorusQ_SetDelay(uint8_t unused __attribute__((unused)), float value);
+void ChorusQ_SetDepth(uint8_t unused __attribute__((unused)), float value);
+void ChorusQ_SetInputLevel(uint8_t unused __attribute__((unused)), float value);
+void ChorusQ_SetLength(uint8_t unused __attribute__((unused)), float value);
+void ChorusQ_SetOutputLevel(uint8_t unused __attribute__((unused)), float value);
+void ChorusQ_SetPhaseShift(uint8_t unused __attribute__((unused)), float value);
+void ChorusQ_SetSpeed(uint8_t unused __attribute__((unused)), float value);
+void ChorusQ_SetThrough(uint8_t unused __attribute__((unused)), float value);
+
+
 #endif /* SRC_ML_CHORUS_H_ */
+
