@@ -43,6 +43,7 @@
 
 
 #include <ml_tremolo.h>
+#include <ml_status.h>
 
 #include <stdio.h>
 
@@ -105,11 +106,13 @@ void ML_Tremolo::setSpeed(float speed)
 void ML_Tremolo::setPhaseShift(float shift)
 {
     phase_shift = shift * 2 * M_PI;
+    Status_ValueChangedFloat("Tremolo", "PhaseShift", shift);
 }
 
 void ML_Tremolo::setDepth(float new_depth)
 {
     this->depth = new_depth;
+    Status_ValueChangedFloat("Tremolo", "Depth", new_depth);
 }
 
 #endif /* #if (!defined ARDUINO_RASPBERRY_PI_PICO) && (!defined ARDUINO_GENERIC_RP2040) */

@@ -56,6 +56,8 @@
 
 #include <ml_reverb.h>
 
+#include <ml_status.h>
+
 
 #include <Arduino.h>
 #define PRINTF(...) Serial.printf(__VA_ARGS__)
@@ -264,6 +266,7 @@ void Reverb_Setup(float *buffer)
 void Reverb_SetLevel(uint8_t not_used __attribute__((unused)), float value)
 {
     rev_level = value;
+    Status_ValueChangedFloat("Reverb", "Level", rev_level);
 }
 
 void Reverb_SetLevelInt(uint8_t not_used, uint8_t value)
