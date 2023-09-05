@@ -41,23 +41,17 @@
 #define SRC_ML_ALG_H_
 
 
-#ifdef ARDUINO
 #include <Arduino.h>
-#else
-#include <stdint.h>
-#include <math.h>
-#endif
 
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
 
 
 static int16_t mul(int16_t a, float b);
 static float mul_f(int16_t a, float b);
 
 
-static int16_t mul(int16_t a, float b)
+static inline
+int16_t mul(int16_t a, float b)
 {
     float c = a;
     c *= b;
@@ -65,7 +59,8 @@ static int16_t mul(int16_t a, float b)
 }
 
 
-static float mul_f(int16_t a, float b)
+static inline
+float mul_f(int16_t a, float b)
 {
     float c = a;
     c *= b;
@@ -73,7 +68,8 @@ static float mul_f(int16_t a, float b)
     return c;
 }
 
-static float lerpOut(int16_t *buffer, float idx, uint32_t len_max)
+static inline
+float lerpOut(int16_t *buffer, float idx, uint32_t len_max)
 {
 
     uint32_t idxFloor = round(idx);
@@ -87,7 +83,6 @@ static float lerpOut(int16_t *buffer, float idx, uint32_t len_max)
 }
 
 
-#pragma GCC diagnostic pop
 
 
 #endif /* SRC_ML_ALG_H_ */

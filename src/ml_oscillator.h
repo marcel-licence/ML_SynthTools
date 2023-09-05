@@ -44,18 +44,7 @@
 #define SRC_ML_OSCILLATOR_H_
 
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#pragma GCC diagnostic ignored "-Wpedantic"
-
-#ifdef ARDUINO
 #include <Arduino.h>
-#else
-#include <stream.h>
-#endif
-#include <stdint.h>
-
-#pragma GCC diagnostic pop
 
 
 /* controllable parameters, some of them might not work, but added in future */
@@ -112,6 +101,7 @@ private:
 
     bool active;
 };
+
 
 #endif /* SRC_ML_OSCILLATOR_H_ */
 
