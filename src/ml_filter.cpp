@@ -115,10 +115,10 @@ void Filter_Process_Buffer(float *const signal, struct filterProcT *const filter
 /*
  * calculate coefficients of the 2nd order IIR filter
  */
-void Filter_Calculate(float c, float reso, struct filterCoeffT *const filterC)
+void Filter_CalculateLowPass(float c, float reso, struct filterCoeffT *const filterC)
 {
     float Q = reso;
-    float  cosOmega, omega, sinOmega, alpha, a[3], b[3];
+    float cosOmega, omega, sinOmega, alpha, a[3], b[3];
 
     /*
      * change curve of cutoff a bit
@@ -171,7 +171,8 @@ void Filter_CalculateNotch(float c, float reso __attribute__((unused)), struct f
     float *aNorm = filterC->aNorm;
     float *bNorm = filterC->bNorm;
 
-    float  cosOmega, omega, a[3], b[3];
+    float cosOmega, omega, a[3], b[3];
+
     /*
      * change curve of cutoff a bit
      * maybe also log or exp function could be used
@@ -196,6 +197,7 @@ void Filter_CalculateNotch(float c, float reso __attribute__((unused)), struct f
      * use lookup here to get quicker results
      */
     cosOmega = sine[WAVEFORM_I((uint32_t)((float)((1ULL << 31) - 1) * omega + (float)((1ULL << 30) - 1)))];
+
     b[0] = 1;
     b[1] = -2 * cosOmega;
     b[2] = 1;
@@ -229,3 +231,4 @@ float Filter_AmplitudeFilterResponse(float c, struct filterCoeffT *const filterC
                 / (1 + (b[1] * b[1]) + (b[2] * b[2]) + 2 * b[1] * (1 + b[2]) * cosOmega + 2 * b[2] * cos2Omega)
                );
 }
+

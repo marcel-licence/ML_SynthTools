@@ -256,35 +256,6 @@ void Reverb_Setup(float *buffer)
     i += AllpassInit(buffer, i, &ap1, l_AP1);
     i += AllpassInit(buffer, i, &ap2, l_AP2);
 
-#if 0
-    cf0.buf = &buffer[i];
-    cf0.lim = (int)(rev_time * l_CB0);
-    i += l_CB0;
-
-    cf1.buf = &buffer[i];
-    cf1.lim = (int)(rev_time * l_CB1);
-    i += l_CB1;
-
-    cf2.buf = &buffer[i];
-    cf2.lim = (int)(rev_time * l_CB2);
-    i += l_CB2;
-
-    cf3.buf = &buffer[i];
-    cf3.lim = (int)(rev_time * l_CB3);
-    i += l_CB3;
-
-    ap0.buf = &buffer[i];
-    ap0.lim = (int)(rev_time * l_AP0);
-    i += l_AP0;
-
-    ap1.buf = &buffer[i];
-    ap1.lim = (int)(rev_time * l_AP1);
-    i += l_AP1;
-
-    ap2.buf = &buffer[i];
-    ap2.lim = (int)(rev_time * l_AP2);
-    i += l_AP2;
-#endif
     PRINTF("rev: %d, %d\n", i, REV_BUFF_SIZE);
     if (i != REV_BUFF_SIZE)
     {

@@ -41,11 +41,7 @@
 #define SRC_ML_DELAY_H_
 
 
-#ifdef ARDUINO
 #include <Arduino.h>
-#else
-#include <stdint.h>
-#endif
 
 
 void Delay_Init(int16_t *buffer, uint32_t len);
