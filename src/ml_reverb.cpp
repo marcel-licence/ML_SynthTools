@@ -57,6 +57,16 @@
 #include <ml_reverb.h>
 
 
+#ifdef ARDUINO
+#include <Arduino.h>
+#define PRINTF(...) Serial.printf(__VA_ARGS__)
+#else
+#include <stdio.h>
+#include <string.h>
+#define PRINTF(...) printf(__VA_ARGS__)
+#endif
+
+
 static float rev_time = 1.0f;
 static float rev_level = 0.0f;
 
@@ -228,7 +238,7 @@ void Reverb_Setup(float *buffer)
 {
     if (buffer == NULL)
     {
-        Serial.printf("No memory to initialize Reverb!\n");
+        PRINTF("No memory to initialize Reverb!\n");
         return;
     }
     else
@@ -275,14 +285,14 @@ void Reverb_Setup(float *buffer)
     ap2.lim = (int)(rev_time * l_AP2);
     i += l_AP2;
 #endif
-    Serial.printf("rev: %d, %d\n", i, REV_BUFF_SIZE);
+    PRINTF("rev: %d, %d\n", i, REV_BUFF_SIZE);
     if (i != REV_BUFF_SIZE)
     {
-        Serial.printf("Error during initialization of Reverb!\n");
+        PRINTF("Error during initialization of Reverb!\n");
     }
     else
     {
-        Serial.printf("Reverb is ready!\n");
+        PRINTF("Reverb is ready!\n");
     }
 }
 
@@ -297,3 +307,4 @@ void Reverb_SetLevelInt(uint8_t not_used, uint8_t value)
     val_f *= 1.0f / 127.0f;
     Reverb_SetLevel(not_used, val_f);
 }
+
