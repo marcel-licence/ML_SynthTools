@@ -57,14 +57,8 @@
 #include <ml_reverb.h>
 
 
-#ifdef ARDUINO
 #include <Arduino.h>
 #define PRINTF(...) Serial.printf(__VA_ARGS__)
-#else
-#include <stdio.h>
-#include <string.h>
-#define PRINTF(...) printf(__VA_ARGS__)
-#endif
 
 
 static float rev_time = 1.0f;

@@ -43,11 +43,7 @@
 #define SRC_ML_CHORUS_H_
 
 
-#ifdef ARDUINO
 #include <Arduino.h>
-#else
-#include <stdint.h>
-#endif
 
 
 #include <ml_types.h>

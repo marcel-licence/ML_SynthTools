@@ -118,10 +118,6 @@ void Audio_Setup(void)
     WiFi.mode(WIFI_OFF);
 #endif
 
-#if 0 //ndef ESP8266
-    btStop();
-    esp_wifi_deinit();
-#endif
 
 #ifdef ESP32_AUDIO_KIT
 #ifdef ES8388_ENABLED
@@ -143,13 +139,7 @@ void Audio_Setup(void)
 #endif
 
 #ifdef ESP8266
-#if 0
-    system_update_cpu_freq(160);
-    i2s_begin();
-    i2s_set_rate(SAMPLE_RATE);
-#else
     I2S_init();
-#endif
     pinMode(2, INPUT); //restore GPIOs taken by i2s
     pinMode(15, INPUT);
 #endif
@@ -237,7 +227,6 @@ void MyCallback(float **in, float **out, size_t size)
 void DaisySeed_Setup(void)
 {
     float sample_rate;
-    // Initialize for Daisy pod at 48kHz
     hw = DAISY.init(DAISY_SEED, AUDIO_SR_48K);
     num_channels = hw.num_channels;
     sample_rate = DAISY.get_samplerate();
@@ -263,10 +252,6 @@ void ProcessAudio(uint16_t *buff, size_t len)
     /* convert from u16 to u10 */
     for (size_t i = 0; i < len; i++)
     {
-#if 0
-        const int32_t preDiv = 4194304; // 2 ^ (16 + 6)
-        buff[i] = (uint16_t)(0x200 + (u32buf[i] / (preDiv)));
-#else
         int32_t var = u32buf[i];
         var >>= 16;
         union ts varU;
@@ -274,7 +259,6 @@ void ProcessAudio(uint16_t *buff, size_t len)
         varU.u16 /= 64;
         varU.u16 += 512;
         buff[i] = varU.u16;;
-#endif
     }
 }
 
@@ -415,17 +399,10 @@ void Audio_OutputMono(const int32_t *samples)
         u16int[2 * i] = samples[i];
         u16int[(2 * i) + 1] = samples[i];
     }
-#if 1
     for (int i = 0; i < SAMPLE_BUFFER_SIZE * 2; i++)
     {
         I2S.write(u16int[i]);
     }
-#else
-    /* this does not work, I do not know why :-/ */
-    static int16_t u16int_buf[2 * SAMPLE_BUFFER_SIZE];
-    memcpy(u16int_buf, u16int, sizeof(u16int));
-    I2S.write(u16int_buf, sizeof(u16int));
-#endif
 #endif /* RP2040_AUDIO_PWM */
 #endif /* ARDUINO_RASPBERRY_PI_PICO, ARDUINO_GENERIC_RP2040 */
 
@@ -524,17 +501,10 @@ void Audio_Output(const int16_t *left, const int16_t *right)
         u16int[2 * i] = samples[i];
         u16int[(2 * i) + 1] = samples[i];
     }
-#if 1
     for (int i = 0; i < SAMPLE_BUFFER_SIZE * 2; i++)
     {
         I2S.write(u16int[i]);
     }
-#else
-    /* this does not work, I do not know why :-/ */
-    static int16_t u16int_buf[2 * SAMPLE_BUFFER_SIZE];
-    memcpy(u16int_buf, u16int, sizeof(u16int));
-    I2S.write(u16int_buf, sizeof(u16int));
-#endif
 #endif /* RP2040_AUDIO_PWM */
 #endif /* ARDUINO_RASPBERRY_PI_PICO, ARDUINO_GENERIC_RP2040 */
 }
@@ -630,13 +600,6 @@ void Audio_Output(const float *left, const float *right)
     calcCycleCount();
 #endif
 
-#if 0
-    for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
-    {
-        left[i] = i * (1.0f / ((float)SAMPLE_BUFFER_SIZE));
-        right[i] = i * (1.0f / ((float)SAMPLE_BUFFER_SIZE));
-    }
-#endif
     memcpy(out_temp[0], left, sizeof(out_temp[0]));
     memcpy(out_temp[1], right, sizeof(out_temp[1]));
 

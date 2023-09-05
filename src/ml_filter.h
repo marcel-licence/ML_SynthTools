@@ -53,11 +53,7 @@
 #include <ml_types.h>
 
 
-#ifdef ARDUINO
 #include <Arduino.h>
-#else
-#include <stdint.h>
-#endif
 
 struct filterCoeffT
 {

@@ -48,9 +48,7 @@
 #define ML_ENV_H_
 
 
-#ifdef ARDUINO
 #include <Arduino.h>
-#endif
 
 
 struct adsrT

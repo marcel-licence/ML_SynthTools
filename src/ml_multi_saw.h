@@ -43,11 +43,7 @@
 #define SYNTH_SUPER_SAW_H_
 
 
-#ifdef ARDUINO
 #include <Arduino.h>
-#else
-#include <stdint.h>
-#endif
 
 #include <ml_types.h>
 
