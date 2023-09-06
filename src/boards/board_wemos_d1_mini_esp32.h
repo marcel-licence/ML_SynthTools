@@ -107,3 +107,4 @@
 #define TXD2 17
 
 #endif /* BOARDS_BOARD_WEMOS_D1_MINI_ESP32_H_ */
+
