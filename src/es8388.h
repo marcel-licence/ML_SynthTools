@@ -389,11 +389,18 @@ void ES8388_SetOUT2VOL(uint8_t unused, float vol)
 
 void ES8388_Setup()
 {
-    Serial.printf("Connect to ES8388 codec... ");
+    const uint32_t i2c_freq = 400000;
 
-    while (not ES8388_begin(ES8388_PIN_SDA, ES8388_PIN_SCL, 400000))
+    Serial.printf("Connect to ES8388 codec...\n");
+    Serial.printf("  SDA: %d\n ", ES8388_PIN_SDA);
+    Serial.printf("  SCL: %d\n", ES8388_PIN_SCL);
+    Serial.printf("  freq: %d\n", i2c_freq);
+
+    while (not ES8388_begin(ES8388_PIN_SDA, ES8388_PIN_SCL, i2c_freq))
     {
         Serial.printf("Failed!\n");
+        Serial.printf("It may be possible that SCL and SDA are incorrect\n");
+        Serial.printf("In boards/board_audio_kit_es8388.h you can change the define ES8388_CFG_I2C to use another pin setting\n");
         delay(1000);
     }
 
