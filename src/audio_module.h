@@ -64,6 +64,9 @@ void DaisySeed_Setup(void);
 void Teensy_Setup();
 void SAMD21_Synth_Init();
 
+#ifdef AUDIO_PRINT_STATS
+void Audio_PrintStats();
+#endif
 
 #endif // #ifdef ML_SYNTH_INLINE_DECLARATION
 
@@ -264,6 +267,28 @@ void ProcessAudio(uint16_t *buff, size_t len)
 
 #endif
 
+#ifdef AUDIO_PRINT_STATS
+#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
+static uint32_t cc[4] = {0, 0, 0, 0};
+static uint32_t cc2[4] = {0, 0, 0, 0};
+
+void Audio_PrintStats()
+{
+    uint32_t d1 = cc2[2] - cc2[1];
+    uint32_t d2 = cc2[3] - cc2[2];
+    //Serial.printf("a: %u, %u, %u\n", cc2[1], cc2[2], cc2[3]);
+    //Serial.printf("d: %u, %u, %u\n", d1, d2, (cc2[2]-cc2[1])+(cc2[3]-cc2[2]));
+    float l1 = d1;
+    float l2 = d2;
+    float l3 = d1 + d2;
+    l1 *= (SAMPLE_RATE / SAMPLE_BUFFER_SIZE) / 125000000.0f;
+    l2 *= (SAMPLE_RATE / SAMPLE_BUFFER_SIZE) / 125000000.0f;
+    l3 *= (SAMPLE_RATE / SAMPLE_BUFFER_SIZE) / 125000000.0f;
+    Serial.printf("f: %0.3f, %0.3f, %0.3f (%" PRIu32 ")\n", l1, l2, l3, d1 + d2);
+}
+#endif
+#endif
+
 void Audio_OutputMono(const int32_t *samples)
 {
 #ifdef ESP8266
@@ -372,10 +397,20 @@ void Audio_OutputMono(const int32_t *samples)
         };
     };
 
+#ifdef AUDIO_PRINT_STATS
+    cc[1] = cc[3];
+    cc[2] = rp2040.getCycleCount();
+#endif
+
     while (!RP2040_Audio_Pwm_BufferReady())
     {
         /* block! */
     }
+
+#ifdef AUDIO_PRINT_STATS
+    cc[3] = rp2040.getCycleCount();
+    memcpy(cc2, cc, sizeof(cc2));
+#endif
 
     union sample *audioBuff = (union sample *) RP2040_Audio_Pwm_getFreeBuff();
 
@@ -470,10 +505,20 @@ void Audio_Output(const int16_t *left, const int16_t *right)
         };
     };
 
+#ifdef AUDIO_PRINT_STATS
+    cc[1] = cc[3];
+    cc[2] = rp2040.getCycleCount();
+#endif
+
     while (!RP2040_Audio_Pwm_BufferReady())
     {
         /* block! */
     }
+
+#ifdef AUDIO_PRINT_STATS
+    cc[3] = rp2040.getCycleCount();
+    memcpy(cc2, cc, sizeof(cc2));
+#endif
 
     union sample *audioBuff = (union sample *) RP2040_Audio_Pwm_getFreeBuff();
 
@@ -630,10 +675,20 @@ void Audio_Output(const float *left, const float *right)
         };
     };
 
+#ifdef AUDIO_PRINT_STATS
+    cc[1] = cc[3];
+    cc[2] = rp2040.getCycleCount();
+#endif
+
     while (!RP2040_Audio_Pwm_BufferReady())
     {
         /* block! */
     }
+
+#ifdef AUDIO_PRINT_STATS
+    cc[3] = rp2040.getCycleCount();
+    memcpy(cc2, cc, sizeof(cc2));
+#endif
 
     union sample *audioBuff = (union sample *)RP2040_Audio_Pwm_getFreeBuff();
 
