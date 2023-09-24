@@ -29,7 +29,7 @@
  */
 
 /**
- * @file midi_interface.ino
+ * @file midi_interface.h
  * @author Marcel Licence
  * @date 04.10.2021
  *
@@ -47,7 +47,6 @@
 #endif
 
 
-
 #ifdef ML_SYNTH_INLINE_DECLARATION
 
 
@@ -57,6 +56,7 @@ void Midi_Process();
 #ifdef MIDI_VIA_USB_ENABLED
 void Midi_HandleShortMsg(uint8_t *data, uint8_t cable __attribute__((unused)));
 #endif
+void Midi_HandleShortMsgEx(uint8_t *data, uint8_t cable __attribute__((unused)));
 
 #ifdef MIDI_TX2_PIN
 void Midi_SendShortMessage(uint8_t *msg);
@@ -189,6 +189,10 @@ struct midiMapping_s
     void (*programChange)(uint8_t ch, uint8_t program_number);
     void (*rttMsg)(uint8_t msg);
     void (*songPos)(uint16_t pos);
+
+#ifdef MIDI_SYSEX_ENABLED
+    void (*sysEx)(uint8_t *msg, uint8_t len);
+#endif
 
     struct midiControllerMapping *controlMapping;
     int mapSize;
@@ -378,6 +382,11 @@ inline void Midi_HandleShortMsg(uint8_t *data, uint8_t cable __attribute__((unus
         Midi_SongPositionPointer(((((uint16_t)data[1])) + ((uint16_t)data[2] << 8)));
         break;
     }
+}
+
+void Midi_HandleShortMsgEx(uint8_t *data, uint8_t cable __attribute__((unused)))
+{
+    Midi_HandleShortMsg(data, cable);
 }
 
 inline void Midi_RealTimeMessage(uint8_t msg)
@@ -580,6 +589,18 @@ void Midi_SendRaw(uint8_t *msg)
             i++;
         }
         MidiPort2.serial->write(msg, i + 1);
+    }
+    else if ((msg[0] & 0xF0) == 0xC0)
+    {
+        MidiPort2.serial->write(msg, 2);
+    }
+    else if ((msg[0] & 0xF0) == 0xD0)
+    {
+        MidiPort2.serial->write(msg, 2);
+    }
+    else if ((msg[0] & 0xF0) == 0xF0)
+    {
+        MidiPort2.serial->write(msg, 1);
     }
     else
     {
