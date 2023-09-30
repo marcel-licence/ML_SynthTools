@@ -41,7 +41,7 @@
 #define SRC_ML_TYPES_H_
 
 
-#include <Arduino.h>
+#include <inttypes.h>
 
 
 

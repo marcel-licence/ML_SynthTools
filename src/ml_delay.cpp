@@ -51,9 +51,7 @@
 #include <ml_status.h>
 
 
-#ifndef ARDUINO
 #include <stdio.h>
-#endif
 
 
 /*
@@ -423,3 +421,4 @@ void Delay_SetShift(uint8_t unused __attribute__((unused)), float value)
     delayShift = value;
     Status_ValueChangedFloat("Delay_SetShift", value);
 }
+

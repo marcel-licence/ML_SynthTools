@@ -44,7 +44,7 @@
 #define SRC_ML_PHASER_H_
 
 
-#include <Arduino.h>
+#include <inttypes.h>
 
 
 #define PHASER_AP0 150

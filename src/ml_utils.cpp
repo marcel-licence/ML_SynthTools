@@ -135,3 +135,18 @@ float log10fromU7(uint8_t value, float minExp, float maxExp)
     return pow(10, f);
 }
 
+float log(float base, float value)
+{
+    return log(value) / log(base);
+}
+
+float log10fromU7val(uint8_t value, float minVal, float maxVal)
+{
+    float f = floatFromU7(value);
+    float minV = log(10, minVal);
+    float maxV = log(10, maxVal);
+    f *= maxV - minV;
+    f += minV;
+    return pow(10, f);
+}
+

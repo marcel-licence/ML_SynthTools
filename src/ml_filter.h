@@ -53,8 +53,6 @@
 #include <ml_types.h>
 
 
-#include <Arduino.h>
-
 struct filterCoeffT
 {
     union

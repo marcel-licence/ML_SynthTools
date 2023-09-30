@@ -448,7 +448,11 @@ i2s_config_t i2s_configuration =
 #endif
     .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
 #ifdef ARDUINO_RUNNING_CORE /* tested with arduino esp32 core version 2.0.2 */
+#ifdef MAX_98357A_ENABLED
+    .communication_format = I2S_COMM_FORMAT_STAND_PCM_LONG,
+#else
     .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+#endif
 #else
     .communication_format = (i2s_comm_format_t)(I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB),
 #endif
@@ -461,6 +465,23 @@ i2s_config_t i2s_configuration =
 #else
     .use_apll = false,
 #endif
+
+#ifdef ARDUINO_RUNNING_CORE
+    .tx_desc_auto_clear = true,
+    .fixed_mclk = 0,
+    .mclk_multiple = I2S_MCLK_MULTIPLE_DEFAULT,
+#ifdef SAMPLE_SIZE_16BIT
+    .bits_per_chan = I2S_BITS_PER_CHAN_16BIT,
+#endif
+#ifdef SAMPLE_SIZE_24BIT
+    .bits_per_chan = I2S_BITS_PER_CHAN_24BIT,
+#endif
+#ifdef SAMPLE_SIZE_32BIT
+    .bits_per_chan = I2S_BITS_PER_CHAN_32BIT,
+#endif
+#endif
+
+
 };
 #endif
 
@@ -478,13 +499,16 @@ i2s_pin_config_t pins =
 #else
 i2s_pin_config_t pins =
 {
+#ifdef ARDUINO_RUNNING_CORE
+    .mck_io_num = I2S_PIN_NO_CHANGE,
+#endif
     .bck_io_num = I2S_BCLK_PIN,
     .ws_io_num = I2S_WCLK_PIN,
     .data_out_num = I2S_DOUT_PIN,
 #ifdef I2S_DIN_PIN
-    .data_in_num = I2S_DIN_PIN
+    .data_in_num = I2S_DIN_PIN,
 #else
-    .data_in_num = I2S_PIN_NO_CHANGE
+    .data_in_num = I2S_PIN_NO_CHANGE,
 #endif
 };
 #endif

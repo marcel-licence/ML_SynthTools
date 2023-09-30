@@ -40,15 +40,13 @@
 #define SRC_ML_SYSTEM_H_
 
 
-#include <Arduino.h>
-
-
 void System_PrintInfo(const char *user);
 char *System_GetInfo(void);
 
 /* no pub start */
 bool CheckLc(void);
 /* no pub end */
+
 
 #endif /* SRC_ML_SYSTEM_H_ */
 

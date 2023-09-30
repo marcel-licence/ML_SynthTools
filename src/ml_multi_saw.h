@@ -43,8 +43,6 @@
 #define SYNTH_SUPER_SAW_H_
 
 
-#include <Arduino.h>
-
 #include <ml_types.h>
 
 
@@ -62,3 +60,4 @@ void MultiSawSynth_SetCurrentCh(uint8_t value);
 
 
 #endif /* SYNTH_SUPER_SAW_H_ */
+

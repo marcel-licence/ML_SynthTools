@@ -40,11 +40,10 @@
  * @see     https://youtu.be/m12w1Xtm5Ts
  */
 
+
 #ifndef EPIANO_H_
 #define EPIANO_H_
 
-
-#include <Arduino.h>
 
 #include <ml_types.h>
 
@@ -82,3 +81,4 @@ public:
 
 
 #endif /* EPIANO_H_ */
+

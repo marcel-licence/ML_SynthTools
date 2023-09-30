@@ -48,10 +48,12 @@ float maxAbsValueFromSampleBuffer(float *samples, uint16_t sample_count);
 float maxValueFromSampleBuffer(float *samples, uint16_t sample_count);
 float minValueFromSampleBuffer(float *samples, uint16_t sample_count);
 
+
 float log16bit(float f);
 float floatFromU7(uint8_t value);
 float log2fromU7(uint8_t value, float minExp, float maxExp);
 float log10fromU7(uint8_t value, float minExp, float maxExp);
+float log10fromU7val(uint8_t value, float minVal, float maxVal);
 
 
 #include <ml_types.h>

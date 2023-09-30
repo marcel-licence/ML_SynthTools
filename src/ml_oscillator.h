@@ -44,7 +44,7 @@
 #define SRC_ML_OSCILLATOR_H_
 
 
-#include <Arduino.h>
+#include <inttypes.h>
 
 
 /* controllable parameters, some of them might not work, but added in future */
@@ -69,7 +69,7 @@ public:
     /*
      * required to setup all oscillators
      */
-    static void Setup(Stream *ser, float sample_rate);
+    static void Setup(float sample_rate);
 
     void Start(uint32_t add);
     void Start(float *left, float *right, uint32_t add); /* Start oscillator with linked output */

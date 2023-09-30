@@ -75,7 +75,6 @@ void Status_LoopMain();
 #ifdef STATUS_SIMPLE
 
 
-
 static uint32_t status_cnt = 0;
 static uint32_t status_elapsed_time = 0;
 #define STATUS_DISPLAY_TIME (5UL*240000000UL)
@@ -124,7 +123,6 @@ void Status_Loop(uint32_t elapsed_time)
 
 void Status_LoopMain()
 {
-    // Serial.printf("status_cnt: %d\n", status_cnt);
     if (status_cnt > 0)
     {
         if (status_cnt > status_elapsed_time)
@@ -148,6 +146,4 @@ void Status_LoopMain()
 #endif
 
 #endif
-
-
 

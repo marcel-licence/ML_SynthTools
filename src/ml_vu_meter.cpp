@@ -38,6 +38,11 @@
 
 
 #include <ml_vu_meter.h>
+#include <ml_utils.h>
+
+
+#include <string.h>
+#include <math.h>
 
 
 #define VU_METER_DECREASE_MULTIPLIER 0.98f /* this controls how fast the vu meter falls over time */

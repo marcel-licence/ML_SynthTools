@@ -95,7 +95,7 @@ void Audio_PrintStats();
 #include <SerialFlash.h>
 #endif
 
-#ifdef ARDUINO_DAISY_SEED
+#if (defined ARDUINO_DAISY_SEED) || (defined STM32H7xx)
 #include "DaisyDuino.h" /* requires the DaisyDuino library: https://github.com/electro-smith/DaisyDuino */
 #endif
 
@@ -205,7 +205,7 @@ void Teensy_Setup()
 
 #endif /* TEENSYDUINO */
 
-#ifdef ARDUINO_DAISY_SEED
+#if (defined ARDUINO_DAISY_SEED) || (defined STM32H7xx)
 
 static DaisyHardware hw;
 static size_t num_channels;
@@ -276,8 +276,6 @@ void Audio_PrintStats()
 {
     uint32_t d1 = cc2[2] - cc2[1];
     uint32_t d2 = cc2[3] - cc2[2];
-    //Serial.printf("a: %u, %u, %u\n", cc2[1], cc2[2], cc2[3]);
-    //Serial.printf("d: %u, %u, %u\n", d1, d2, (cc2[2]-cc2[1])+(cc2[3]-cc2[2]));
     float l1 = d1;
     float l2 = d2;
     float l3 = d1 + d2;
@@ -345,7 +343,7 @@ void Audio_OutputMono(const int32_t *samples)
     }
 #endif /* TEENSYDUINO */
 
-#ifdef ARDUINO_DAISY_SEED
+#if (defined ARDUINO_DAISY_SEED) || (defined STM32H7xx)
 
     float sig_f[SAMPLE_BUFFER_SIZE];
 
@@ -465,7 +463,7 @@ void Audio_Output(const int16_t *left, const int16_t *right)
     i2s_write_stereo_samples_i16(left, right, SAMPLE_BUFFER_SIZE);
 #endif /* ESP32 */
 
-#ifdef ARDUINO_DAISY_SEED
+#if (defined ARDUINO_DAISY_SEED) || (defined STM32H7xx)
 
     float sig_l[SAMPLE_BUFFER_SIZE];
     float sig_r[SAMPLE_BUFFER_SIZE];
@@ -632,7 +630,7 @@ void Audio_Output(const float *left, const float *right)
     }
 #endif /* TEENSYDUINO */
 
-#ifdef ARDUINO_DAISY_SEED
+#if (defined ARDUINO_DAISY_SEED) || (defined STM32H7xx)
 
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCountPre();

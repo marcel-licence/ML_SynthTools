@@ -53,6 +53,9 @@
 #include <math.h>
 
 
+#define i32_abs(x) ((x)>0?(x):-(x))
+
+
 ML_PitchShifter::ML_PitchShifter(float sample_rate)
 {
     this->sample_rate = sample_rate;
@@ -69,7 +72,7 @@ ML_PitchShifter::ML_PitchShifter(float sample_rate)
 
 uint32_t minDistance(int32_t pointerA, int32_t pointerB)
 {
-    uint32_t distance1 = abs(pointerA - pointerB);
+    uint32_t distance1 = i32_abs(pointerA - pointerB);
     uint32_t distance2 = PITCH_SHIFTER_BUFFER_SIZE - distance1;
     return (distance1 < distance2) ? distance1 : distance2;
 }

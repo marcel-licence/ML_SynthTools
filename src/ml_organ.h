@@ -44,7 +44,7 @@
 
 
 
-#include <Arduino.h>
+
 #include <inttypes.h>
 
 
@@ -83,7 +83,7 @@
 /**
  * call this first before using the module to initialize it
  */
-void Organ_Setup(Stream *ser, float sample_rate);
+void Organ_Setup(float sample_rate);
 
 /**
  * when initialized you will get your audio samples from this function
@@ -106,3 +106,4 @@ void Organ_SetDrawbar(uint8_t idx, uint8_t value);
 
 
 #endif /* SRC_ML_ORGAN_H_ */
+

@@ -72,7 +72,7 @@ void MidiStreamPlayer_PlayMidiFile_fromLittleFS(char *filename, uint8_t trackToP
 //#define MIDI_STREAM_PLAYER_DATA_DUMP /*!< optional to dump event data from midi file */
 
 
-#ifdef ARDUINO_DAISY_SEED
+#if (defined ARDUINO_DAISY_SEED) || (defined STM32H7xx)
 #include <STM32SD.h>
 
 extern Sd2Card card;

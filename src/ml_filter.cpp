@@ -48,9 +48,8 @@
 #include "ml_filter.h"
 #include "ml_waveform.h"
 
-#ifndef ARDUINO
+
 #include <math.h>
-#endif
 
 
 /* will be removed in future */

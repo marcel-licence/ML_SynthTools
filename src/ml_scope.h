@@ -46,7 +46,7 @@
 #define SRC_ML_SCOPE_H_
 
 
-#include <Arduino.h>
+#include <inttypes.h>
 
 
 void ScopeOled_Setup(void);
@@ -56,3 +56,4 @@ void ScopeOled_DrawData(const float *dispData, uint8_t idx);
 
 
 #endif /* SRC_ML_SCOPE_H_ */
+

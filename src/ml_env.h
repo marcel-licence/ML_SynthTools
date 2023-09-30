@@ -48,11 +48,9 @@
 #define ML_ENV_H_
 
 
-#include <Arduino.h>
-
-
 struct adsrT
 {
+    float sample_rate;
     float a;
     float d;
     float s;
@@ -67,6 +65,7 @@ typedef enum
 
 struct adsr_ctrl_t
 {
+    float sample_rate;
     float ctrl;
     adsr_phaseT phase;
 };
@@ -84,6 +83,8 @@ bool ADSR_Process(const struct adsrT *ctrl, struct adsr_ctrl_t *adsr);
 void ADSR_Start(const struct adsrT *ctrl, struct adsr_ctrl_t *adsr);
 bool ASRM_Process(const struct adsrT *ctrl, struct adsr_ctrl_t *asr);
 void ASRM_Start(const struct adsrT *ctrl, struct adsr_ctrl_t *asr);
+
+
 
 
 #endif /* ML_ENV_H_ */

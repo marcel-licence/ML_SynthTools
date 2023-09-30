@@ -51,12 +51,11 @@
 #include <ml_alg.h>
 #include <ml_status.h>
 
-#ifndef ARDUINO
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#endif
 
 
 /*

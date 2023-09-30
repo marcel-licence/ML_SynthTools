@@ -49,6 +49,7 @@
 #ifdef ML_SYNTH_INLINE_DECLARATION
 
 
+#ifdef MIDI_USB_ENABLED
 void Midi_Usb_Setup();
 void Midi_Usb_Loop();
 
@@ -58,6 +59,7 @@ void Midi_Usb_Loop();
 void UsbMidiSetup();
 void UsbMidiLoop();
 
+#endif
 #endif
 
 
@@ -551,3 +553,4 @@ void printBytes(const byte *data, unsigned int size)
 #endif /* #ifdef MIDI_USB_ENABLED */
 
 #endif /* ML_SYNTH_INLINE_DEFINITION */
+

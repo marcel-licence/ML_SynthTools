@@ -41,7 +41,7 @@
 #define SRC_ML_VU_METER_H_
 
 
-#include <Arduino.h>
+#include <inttypes.h>
 
 
 void VuMeter_Init(void);
@@ -51,3 +51,4 @@ float getVuMeterVal(uint8_t idx);
 
 
 #endif /* SRC_ML_VU_METER_H_ */
+
