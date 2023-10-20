@@ -14,4 +14,5 @@
 #include <samd21_audio_core.h>
 #include <ml_board_setup.h>
 #include <ml_status.h>
+#include <stm32_audio.h>
 
