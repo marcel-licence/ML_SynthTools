@@ -62,7 +62,7 @@ void STM32_AudioWrite(const float *fl_sample, const float *fr_sample);
 #define SETUP_CS43L22_CODEC
 #endif
 
-#include <I2S.h> /* ensure that library from board lib is used and not and external one */
+//#include <I2S.h> /* ensure that library from board lib is used and not and external one */
 
 #ifdef SETUP_CS43L22_CODEC
 
@@ -120,7 +120,9 @@ void register_read(uint8_t reg, uint8_t &value)
 /*
  * object to access I2S interface
  */
+#ifdef I2S_ENABLED
 I2SClass I2S(I2S_I2SN, I2S_SDIN, I2S_LRCK, I2S_SCLK, I2S_MCLK);
+#endif
 
 void STM32_AudioInit()
 {
@@ -129,13 +131,18 @@ void STM32_AudioInit()
     digitalWrite(DAC_RESET, LOW); /* turn the codec off */
 #endif
 
+#ifdef I2S_ENABLED
     I2S.begin(I2S_PHILIPS_MODE, SAMPLE_RATE, 16);
+#endif
 
 #ifdef SETUP_CS43L22_CODEC
     digitalWrite(DAC_RESET, HIGH); /* turn the codec on */
 
 
+    Wire.setSDA(PB9);
+    Wire.setSCL(PB6);
     Wire.begin();
+
 
     /* @see https://www.mouser.de/datasheet/2/76/CS43L22_F2-1142121.pdf */
     Serial.printf("Dev 0x%02x: 0x01 - 0x%02x\n", 0x1A, I2C_ReadReg(0x1A, 0x01)); /* not sure what this is - gyro? */
@@ -163,6 +170,7 @@ void STM32_AudioInit()
     codec_writeReg(0x1f, 0x0f);
     codec_writeReg(0x02, 0x9e);
 
+
     /*
      * dump all registers
      */
@@ -184,10 +192,12 @@ void STM32_AudioWriteS16(const int32_t *samples)
         u16int[2 * i] = samples[i];
         u16int[(2 * i) + 1] = samples[i];
     }
+#ifdef I2S_ENABLED
     for (int i = 0; i < SAMPLE_BUFFER_SIZE * 2; i++)
     {
         I2S.write(u16int[i]);
     }
+#endif
 }
 
 void STM32_AudioWrite(const float *fl_sample, const float *fr_sample)
@@ -202,9 +212,10 @@ void STM32_AudioWrite(const float *fl_sample, const float *fr_sample)
 
         sampleDataU.ch[0] = int16_t(fr_sample[i] * 16383.0f); /* some bits missing here */
         sampleDataU.ch[1] = int16_t(fl_sample[i] * 16383.0f);
-
+#ifdef I2S_ENABLED
         I2S.write(sampleDataU.ch[0]);
         I2S.write(sampleDataU.ch[1]);
+#endif
     }
 }
 
