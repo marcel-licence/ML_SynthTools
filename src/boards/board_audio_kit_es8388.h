@@ -43,6 +43,9 @@
  * 4 - unknown origin
  *
  * Tested configuration: I2C: 1, I2S: 4
+ *
+ * DOUT is used to send data from the ESP32 to the audio codec (connected to in of the codec)
+ * DIN is used to receive data from the audio codec (data input of the ESP32 conneced to the codecs data output)
  */
 
 
