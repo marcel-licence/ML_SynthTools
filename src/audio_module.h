@@ -68,6 +68,16 @@ void SAMD21_Synth_Init();
 void Audio_PrintStats();
 #endif
 
+
+#ifdef ARDUINO_DISCO_F407VG
+extern "C" {
+    void STM32F407_AudioInit();
+    void STM32F407G_AudioWriteS16(const int16_t *fl_sample, const int16_t *fr_sample);
+    void STM32F407G_AudioWrite(const float *fl_sample, const float *fr_sample);
+}
+#endif
+
+
 #endif // #ifdef ML_SYNTH_INLINE_DECLARATION
 
 
@@ -173,11 +183,12 @@ void Audio_Setup(void)
 #endif
 #endif
 
-#if (defined ARDUINO_GENERIC_F407VGTX) || (defined ARDUINO_DISCO_F407VG)
-
+#ifdef ARDUINO_DISCO_F407VG
+    STM32F407_AudioInit();
+#endif
+#ifdef ARDUINO_GENERIC_F407VGTX
     STM32_AudioInit();
-
-#endif /* (defined ARDUINO_GENERIC_F407VGTX) || (defined ARDUINO_DISCO_F407VG) */
+#endif
 }
 
 #ifdef TEENSYDUINO
@@ -383,6 +394,18 @@ void Audio_OutputMono(const int32_t *samples)
 #endif
 #endif /* ARDUINO_SEEED_XIAO_M0 */
 
+#ifdef ARDUINO_DISCO_F407VG
+    int16_t mono_s16[SAMPLE_BUFFER_SIZE];
+
+    for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
+    {
+        uint16_t val = samples[i] ; /* 21 with 32 bit input */
+        mono_s16[i] = val;
+    }
+
+    STM32F407G_AudioWriteS16(mono_s16, mono_s16);
+#endif /* ARDUINO_DISCO_F407VG */
+
 #if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
 #ifdef RP2040_AUDIO_PWM
     union sample
@@ -462,6 +485,10 @@ void Audio_Output(const int16_t *left, const int16_t *right)
 #ifdef ESP32
     i2s_write_stereo_samples_i16(left, right, SAMPLE_BUFFER_SIZE);
 #endif /* ESP32 */
+
+#ifdef ARDUINO_DISCO_F407VG
+    STM32F407G_AudioWriteS16(left, right);
+#endif /* ARDUINO_DISCO_F407VG */
 
 #if (defined ARDUINO_DAISY_SEED) || (defined STM32H7xx)
 
@@ -658,7 +685,7 @@ void Audio_Output(const float *left, const float *right)
 
 #ifdef ARDUINO_DISCO_F407VG
 
-    STM32_AudioWrite(left, right);
+    STM32F407G_AudioWrite(left, right);
 
 #endif /* ARDUINO_GENERIC_F407VGTX */
 
