@@ -56,7 +56,7 @@ void STM32_AudioWrite(const float *fl_sample, const float *fr_sample);
 #ifdef ML_SYNTH_INLINE_DEFINITION
 
 
-#if (defined ARDUINO_DISCO_F407VG) || (defined ARDUINO_BLACK_F407VE) || (defined ARDUINO_BLUEPILL_F103C8) || (defined ARDUINO_BLUE_F103VE)
+#if (defined ARDUINO_BLACK_F407VE) || (defined ARDUINO_BLUEPILL_F103C8) || (defined ARDUINO_BLUE_F103VE)
 
 #ifdef ARDUINO_DISCO_F407VG
 #define SETUP_CS43L22_CODEC
