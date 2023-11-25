@@ -72,6 +72,15 @@ public:
     static void Setup(float sample_rate);
 
     void Start(uint32_t add);
+    void SetSampleRate(float sample_rate)
+    {
+        this->sample_rate = sample_rate;
+    };
+    void SetFrequency(float frequency)
+    {
+        uint32_t add = (uint32_t)(frequency * ((float)(1ULL << 32ULL) / (sample_rate)));
+        this->Start(add);
+    };
     void Start(float *left, float *right, uint32_t add); /* Start oscillator with linked output */
     void Stop(void);
     void SetPitchMultiplier(float multiplier);
@@ -100,6 +109,8 @@ private:
     float *dest[2];
 
     bool active;
+
+    float sample_rate;
 };
 
 

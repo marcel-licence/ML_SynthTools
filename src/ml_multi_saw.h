@@ -39,8 +39,8 @@
  */
 
 
-#ifndef SYNTH_SUPER_SAW_H_
-#define SYNTH_SUPER_SAW_H_
+#ifndef SYNTH_MULTI_SAW_H_
+#define SYNTH_MULTI_SAW_H_
 
 
 #include <ml_types.h>
@@ -59,5 +59,5 @@ void MultiSawSynth_SetProfile(uint8_t value);
 void MultiSawSynth_SetCurrentCh(uint8_t value);
 
 
-#endif /* SYNTH_SUPER_SAW_H_ */
+#endif /* SYNTH_MULTI_SAW_H_ */
 

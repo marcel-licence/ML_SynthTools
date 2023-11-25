@@ -72,6 +72,7 @@ void Status_LoopMain();
 
 #ifdef ML_SYNTH_INLINE_DEFINITION
 
+
 #ifdef STATUS_SIMPLE
 
 
