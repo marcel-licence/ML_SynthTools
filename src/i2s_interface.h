@@ -480,8 +480,6 @@ i2s_config_t i2s_configuration =
     .bits_per_chan = I2S_BITS_PER_CHAN_32BIT,
 #endif
 #endif
-
-
 };
 #endif
 

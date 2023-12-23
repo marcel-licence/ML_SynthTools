@@ -118,7 +118,13 @@ void Status_ValueChangedInt(const char *group, const char *descr, int value)
     Serial.printf("%s - %s: %d\n", group, descr, value);
 }
 
-void Status_ValueChangedStr(const char *group, const char *descr, const char * value)
+void Status_ValueChangedStr(const char *descr, const char *value)
+{
+    status_cnt = STATUS_DISPLAY_TIME;
+    Serial.printf("%s: %s\n", descr, value);
+}
+
+void Status_ValueChangedStr(const char *group, const char *descr, const char *value)
 {
     status_cnt = STATUS_DISPLAY_TIME;
     Serial.printf("%s - %s: %s\n", group, descr, value);

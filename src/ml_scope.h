@@ -46,9 +46,14 @@
 #define SRC_ML_SCOPE_H_
 
 
+/*
+ * includes
+ */
 #include <inttypes.h>
 
-
+/*
+ * function declarations
+ */
 void ScopeOled_Setup(void);
 void ScopeOled_Process(void);
 void ScopeOled_AddSamples(float *left, float *right, uint32_t len);
