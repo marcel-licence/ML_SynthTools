@@ -106,20 +106,148 @@ struct instrLoadInfo_s
     uint32_t smplDataOffset;
 };
 
+/**
+ * @brief Structure representing a preset header
+ */
+union preset_hdr_s
+{
+    struct
+    {
+        char presetName[20]; /*!< A character array (string) representing the name of the preset. It is typically 20 characters long. */
+        uint16_t preset; /*!< An unsigned short (16-bit) value indicating the preset number. */
+        uint16_t bank; /*!< An unsigned short (16-bit) value indicating the bank number. */
+        uint16_t presetBagIndex; /*!< An unsigned short (16-bit) value representing the index of the corresponding preset bag within the preset bag list. */
+        uint32_t library; /*!< An unsigned int (32-bit) value representing a library-specific ID or index associated with the preset. */
+        uint32_t genre; /*!< An unsigned int (32-bit) value representing a genre-specific ID or index associated with the preset. */
+        uint32_t morphology; /*!< An unsigned int (32-bit) value representing a morphology-specific ID or index associated with the preset. */
+    };
+    uint8_t data[38];
+};
 
 /**
- * @brief
- *
- * @param argc
- * @param argv
- * @return int
+ * @brief Structure representing a sample header
  */
+union sf2_sample_hdr_s
+{
+    struct
+    {
+        char sampleName[20]; /*!< A character array (string) representing the name of the sample. It is typically 20 characters long. */
+        uint32_t start; /*!< An unsigned int (32-bit) value indicating the start offset of the sample data within the SF2 file. */
+        uint32_t end; /*!< An unsigned int (32-bit) value indicating the end offset of the sample data within the SF2 file. */
+        uint32_t startLoop; /*!< An unsigned int (32-bit) value indicating the start loop point offset within the sample data. */
+        uint32_t endLoop; /*!< An unsigned int (32-bit) value indicating the end loop point offset within the sample data. */
+        uint32_t sampleRate; /*!< An unsigned int (32-bit) value representing the sample rate (in Hz) of the audio sample. */
+        uint8_t originalPitch; /*!< An unsigned char (8-bit) value representing the original pitch of the audio sample. */
+        int8_t pitchCorrection; /*!< A signed char (8-bit) value representing the pitch correction value applied to the sample. */
+        uint16_t sampleLink; /*!< An unsigned short (16-bit) value representing a link to another sample (typically used for stereo samples). */
+        uint16_t sampleType; /*!< An unsigned short (16-bit) value indicating the type or purpose of the sample. */
+    };
+    uint8_t data[46];
+};
 
 /**
- * @brief
- *
- * @param filename
+ * @brief Structure representing a Preset Bag (pbag) entry.
  */
+union SF2PresetBag_u
+{
+    struct
+    {
+        uint16_t generatorIndex; /**< Index of the first generator in the bag. */
+        uint16_t modulatorIndex; /**< Index of the first modulator in the bag. */
+    };
+    uint8_t data[4];
+};
+
+/**
+ * @brief Structure representing a Preset Modulator (pmod) entry.
+ */
+union SF2PresetModulator_u
+{
+    struct
+    {
+        uint16_t sourceOperator; /**< The source modulator operator. */
+        uint16_t destinationOperator; /**< The destination modulator operator. */
+        int16_t amount; /**< The amount or value associated with the modulator. */
+        uint16_t amountSourceOperator; /**< The source operator for the amount. */
+        uint16_t transportOperator; /**< The transport operator. */
+    };
+    uint8_t data[10];
+};
+
+/**
+ * @brief Structure representing a Preset Generator (pgen) entry.
+ */
+union SF2PresetGenerator_u
+{
+    struct
+    {
+        uint16_t generatorIndex; /**< Index of the generator. */
+        int16_t amount; /**< The amount or value associated with the generator. */
+    };
+    uint8_t data[4];
+};
+
+/**
+ * @brief Structure representing an Instrument (inst) entry.
+ */
+union SF2Instrument_u
+{
+    struct
+    {
+        char name[20]; /**< The name of the instrument. */
+        uint16_t bagIndex; /**< Index of the instrument's bag. */
+    };
+    uint8_t data[22];
+};
+
+/**
+ * @brief Structure representing an Instrument Bag (ibag) entry.
+ */
+union SF2InstrumentBag_u
+{
+    struct
+    {
+        uint16_t generatorIndex; /**< Index of the first generator in the bag. */
+        uint16_t modulatorIndex; /**< Index of the first modulator in the bag. */
+    };
+    uint8_t data[4];
+};
+
+/**
+ * @brief Structure representing an Instrument Modulator (imod) entry.
+ */
+union SF2InstrumentModulator_u
+{
+    struct
+    {
+        uint16_t sourceOperator; /**< The source modulator operator. */
+        uint16_t destinationOperator; /**< The destination modulator operator. */
+        int16_t amount; /**< The amount or value associated with the modulator. */
+        uint16_t amountSourceOperator; /**< The source operator for the amount. */
+        uint16_t transportOperator; /**< The transport operator. */
+    };
+    uint8_t data[10];
+};
+
+typedef uint16_t ioperator_t;
+
+/**
+ * @brief Structure representing an Instrument Generator (igen) entry.
+ */
+union SF2InstrumentGenerator_u
+{
+    struct
+    {
+        union
+        {
+            uint16_t ioperator_value; /**< The operator or generator associated with the instrument zone. */
+            ioperator_t ioperator;
+        };
+        uint16_t amount; /**< The amount or value associated with the generator. */
+    };
+    uint8_t data[4];
+};
+
 
 /**
  * @brief
