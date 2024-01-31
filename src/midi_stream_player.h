@@ -56,6 +56,7 @@ void MidiStreamPlayer_Init();
 void MidiStreamPlayer_PausePlayback(void);
 void MidiStreamPlayer_StopPlayback(void);
 void MidiStreamPlayer_StartPlayback(void);
+bool MidiStreamPlayer_IsPlaying(void);
 void MidiStreamPlayer_PlayMidiFile_fromLittleFS(char *filename, uint8_t trackToPlay);
 
 
@@ -458,6 +459,11 @@ void MidiStreamPlayer_StartPlayback(void)
     duration = shortDuration;
     duration *= SAMPLE_RATE;
     duration *= midiStreamPlayerHandle.midi_tempo;
+}
+
+bool MidiStreamPlayer_IsPlaying(void)
+{
+    return midiPlaying;
 }
 
 void MidiStreamPlayer_Tick(uint32_t ticks)
