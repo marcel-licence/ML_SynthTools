@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Marcel Licence
+ * Copyright (c) 2024 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,6 +46,18 @@
 
 
 #ifdef ML_SYNTH_INLINE_DECLARATION
+
+
+void midi_ble_setup(void);
+void midi_ble_loop(void);
+void Ble_rawMsg(uint8_t *msg);
+void Ble_NoteOn(uint8_t ch, uint8_t note, uint8_t vel);
+void Ble_NoteOff(uint8_t ch, uint8_t note);
+void Ble_ControlChange(uint8_t ch, uint8_t number, uint8_t value);
+void Ble_PitchBend(uint8_t ch, uint16_t bend);
+void Ble_RttMsg(uint8_t msg);
+void Ble_SongPos(uint16_t pos);
+
 
 #endif /* ML_SYNTH_INLINE_DECLARATION */
 
@@ -106,7 +118,7 @@ extern struct midiMapping_s midiMapping; /* definition in z_config.ino */
  * When receiving a NoteOn, LED will go out, on NoteOff, light comes back on.
  * This is an easy and conveniant way to show that the connection is alive and working.
  * ----------------------------------------------------------------------------- */
-void midi_ble_setup()
+void midi_ble_setup(void)
 {
     MIDI.begin(MIDI_CHANNEL_OMNI);
 
@@ -237,7 +249,7 @@ void midi_ble_setup()
     Serial.printf("BLE MIDI setup done\n");
 }
 
-void midi_ble_loop()
+void midi_ble_loop(void)
 {
     MIDI.read();
 
