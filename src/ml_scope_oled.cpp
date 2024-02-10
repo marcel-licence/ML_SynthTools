@@ -72,6 +72,36 @@ static struct disp_s d[2];
 
 static void display_set_oled(Adafruit_SSD1306 *oled1, Adafruit_SSD1306 *oled2);
 
+#ifdef ESP32
+void ScopeOled_Setup(TwoWire *twi)
+{
+    if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS, twi))
+    {
+        Serial.println(F("SSD1306 allocation failed"));
+        for (;;); // Don't proceed, loop forever
+    }
+
+    if (!display2.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS2, twi))
+    {
+        Serial.println(F("SSD1306 allocation failed"));
+        for (;;); // Don't proceed, loop forever
+    }
+
+    display_set_oled(&display2, &display);
+
+    display.display();
+    delay(250);
+
+    display.clearDisplay();
+    display.display();
+
+    display2.display();
+    delay(250);
+
+    display2.clearDisplay();
+    display2.display();
+}
+#endif
 
 void ScopeOled_Setup(void)
 {
