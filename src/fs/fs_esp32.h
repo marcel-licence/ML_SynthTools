@@ -52,7 +52,7 @@
  */
 #include <fs/fs_access.h>
 #include <ml_status.h>
-#include <utils.h>
+#include <string_utils.h>
 
 
 #include <FS.h>
