@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Marcel Licence
+ * Copyright (c) 2024 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,3 +73,4 @@ void DelayQ_SetLength(uint8_t unused __attribute__((unused)), uint32_t value);
 
 
 #endif /* SRC_ML_DELAY_H_ */
+

@@ -125,6 +125,12 @@ uint32_t WavPwmDataBuff2[SAMPLE_BUFFER_SIZE];
 
 #endif
 
+
+#ifndef I2S_OVERSAMPLE
+#define I2S_OVERSAMPLE 1
+#endif
+
+
 void Audio_Setup(void)
 {
 #if (defined ESP8266) || (defined ESP32)
@@ -152,9 +158,12 @@ void Audio_Setup(void)
 #endif
 
 #ifdef ESP8266
-    I2S_init();
-    pinMode(2, INPUT); //restore GPIOs taken by i2s
-    pinMode(15, INPUT);
+    if (!I2S.begin(I2S_PHILIPS_MODE, SAMPLE_RATE * 2, 16))
+    {
+        Serial.println("Failed to initialize I2S!");
+        while (1)
+            ; // do nothing
+    }
 #endif
 
 
@@ -290,9 +299,9 @@ void Audio_PrintStats()
     float l1 = d1;
     float l2 = d2;
     float l3 = d1 + d2;
-    l1 *= (SAMPLE_RATE / SAMPLE_BUFFER_SIZE) / 125000000.0f;
-    l2 *= (SAMPLE_RATE / SAMPLE_BUFFER_SIZE) / 125000000.0f;
-    l3 *= (SAMPLE_RATE / SAMPLE_BUFFER_SIZE) / 125000000.0f;
+    l1 *= (SAMPLE_RATE / SAMPLE_BUFFER_SIZE) / ((float)F_CPU);
+    l2 *= (SAMPLE_RATE / SAMPLE_BUFFER_SIZE) / ((float)F_CPU);
+    l3 *= (SAMPLE_RATE / SAMPLE_BUFFER_SIZE) / ((float)F_CPU);
     Serial.printf("f: %0.3f, %0.3f, %0.3f (%" PRIu32 ")\n", l1, l2, l3, d1 + d2);
 }
 #endif
@@ -307,11 +316,7 @@ void Audio_OutputMono(const int32_t *samples)
         static uint16_t sig16 = 0;
         sig *= 4;
         sig16 = sig;
-        while (!I2S_isNotFull())
-        {
-            /* wait for buffer is not full */
-        }
-        writeDAC(0x8000 + sig16);
+        I2S.write(0x8000 + sig16);
     }
 #endif
 
@@ -490,8 +495,43 @@ void Audio_Output(const Q1_14 *left, const Q1_14 *right)
 #ifndef ARDUINO_SEEED_XIAO_M0
 void Audio_Output(const int16_t *left, const int16_t *right)
 {
+
+
 #ifdef ESP32
+#ifdef I2S_DIRECT_OUT
+    for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
+    {
+        static uint16_t s16 = 0xAAAA;
+        static int16_t err = 0;
+        int16_t inSample = left[i];
+        inSample >>= 5;
+
+        for (int k = 0; k < I2S_OVERSAMPLE; k++)
+        {
+            for (int n = 0; n < 16; n++)
+            {
+                if (err > 0)
+                {
+                    s16 >>= 1;
+                    s16 += 0x8000;
+                    err += inSample - 0x100;
+                }
+                else
+                {
+                    s16 >>= 1;
+                    s16 += 0x0000;
+                    err += inSample + 0x100;
+                }
+            }
+            i2s_write_stereo_samples_i16((const int16_t *)&s16, (const int16_t *)&s16, 1);
+
+
+        }
+    }
+
+#else
     i2s_write_stereo_samples_i16(left, right, SAMPLE_BUFFER_SIZE);
+#endif
 #endif /* ESP32 */
 
 #ifdef ARDUINO_DISCO_F407VG

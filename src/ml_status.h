@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Marcel Licence
+ * Copyright (c) 2024 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,9 +41,6 @@
 #define SRC_ML_STATUS_H_
 
 
-#ifndef ML_SYNTH_INLINE_DEFINITION
-
-
 #include <inttypes.h>
 
 
@@ -65,99 +62,4 @@ void Status_LoopMain();
 #endif
 
 
-#endif /* ML_SYNTH_INLINE_DECLARATION */
-
-
 #endif /* SRC_ML_STATUS_H_ */
-
-
-#ifdef ML_SYNTH_INLINE_DEFINITION
-
-
-#ifdef STATUS_SIMPLE
-
-
-static uint32_t status_cnt = 0;
-static uint32_t status_elapsed_time = 0;
-#define STATUS_DISPLAY_TIME (5UL*240000000UL)
-
-
-/**
- * @brief
- *
- * @param descr
- * @param value
- */
-void Status_ValueChangedFloat(const char *descr, float value)
-{
-    status_cnt = STATUS_DISPLAY_TIME;
-    Serial.printf("%s: %0.3f\n", descr, value);
-}
-
-void Status_ValueChangedFloat(const char *group, const char *descr, float value)
-{
-    status_cnt = STATUS_DISPLAY_TIME;
-    Serial.printf("%s - %s: %0.3f\n", group, descr, value);
-}
-
-/**
- * @brief
- *
- * @param descr
- * @param value
- */
-void Status_ValueChangedInt(const char *descr, int value)
-{
-    status_cnt = STATUS_DISPLAY_TIME;
-    Serial.printf("%s: %d\n", descr, value);
-}
-
-void Status_ValueChangedInt(const char *group, const char *descr, int value)
-{
-    status_cnt = STATUS_DISPLAY_TIME;
-    Serial.printf("%s - %s: %d\n", group, descr, value);
-}
-
-void Status_ValueChangedStr(const char *descr, const char *value)
-{
-    status_cnt = STATUS_DISPLAY_TIME;
-    Serial.printf("%s: %s\n", descr, value);
-}
-
-void Status_ValueChangedStr(const char *group, const char *descr, const char *value)
-{
-    status_cnt = STATUS_DISPLAY_TIME;
-    Serial.printf("%s - %s: %s\n", group, descr, value);
-}
-
-void Status_Loop(uint32_t elapsed_time)
-{
-    status_elapsed_time += elapsed_time;
-}
-
-void Status_LoopMain()
-{
-    if (status_cnt > 0)
-    {
-        if (status_cnt > status_elapsed_time)
-        {
-            status_cnt -= status_elapsed_time;
-        }
-        else
-        {
-            status_cnt = 0;
-        }
-        status_elapsed_time = 0;
-
-        if (status_cnt == 0)
-        {
-            Serial.printf("\n");
-        }
-    }
-}
-
-
-#endif
-
-#endif
-

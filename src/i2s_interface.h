@@ -92,6 +92,11 @@ float sampleDataFSawTest[SAMPLE_BUFFER_SIZE];
 #endif
 
 
+#ifndef I2S_OVERSAMPLE
+#define I2S_OVERSAMPLE  1
+#endif
+
+
 #ifdef SAMPLE_SIZE_32BIT
 union sampleTUNT
 {
@@ -427,7 +432,7 @@ i2s_config_t i2s_configuration =
 #else
     .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX),
 #endif
-    .sample_rate = SAMPLE_RATE,
+    .sample_rate = SAMPLE_RATE * I2S_OVERSAMPLE,
 #ifdef I2S_NODAC
     .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT,
     .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
