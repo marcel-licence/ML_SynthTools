@@ -495,7 +495,36 @@ void Audio_Output(const Q1_14 *left, const Q1_14 *right)
 #ifndef ARDUINO_SEEED_XIAO_M0
 void Audio_Output(const int16_t *left, const int16_t *right)
 {
+#ifdef ESP8266
+    for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
+    {
+        static uint16_t s16 = 0xAAAA;
+        static int16_t err = 0;
+        int16_t inSample = left[i];
+        inSample >>= 5;
 
+        for (int k = 0; k < 2 * 2; k++)
+        {
+            for (int n = 0; n < 16; n++)
+            {
+                if (err > 0)
+                {
+                    s16 >>= 1;
+                    s16 += 0x8000;
+                    err += inSample - 0x100;
+                }
+                else
+                {
+                    s16 >>= 1;
+                    s16 += 0x0000;
+                    err += inSample + 0x100;
+                }
+            }
+
+            I2S.write(s16);
+        }
+    }
+#endif
 
 #ifdef ESP32
 #ifdef I2S_DIRECT_OUT
@@ -528,7 +557,6 @@ void Audio_Output(const int16_t *left, const int16_t *right)
 
         }
     }
-
 #else
     i2s_write_stereo_samples_i16(left, right, SAMPLE_BUFFER_SIZE);
 #endif
