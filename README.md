@@ -56,6 +56,7 @@ The library contains the following modules:
 - vu meter (helper) <a href="extras/ml_vu_meter.md">more details</a>
 - oled scope <a href="extras/ml_scope.md">more details</a>
 - midi file stream player <a href="extras/ml_midi_file_stream.md">more details</a>
+- mod tracker module <a href="extras/ml_mod_tracker.md">more details</a>
 
 
 # Board definitions
