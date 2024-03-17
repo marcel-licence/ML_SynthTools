@@ -70,12 +70,12 @@ required to set up your board, codec etc.
 # Examples
 
 There are some "multi-platform" examples available (click the link for more details):
-- <a href="https://github.com/marcel-licence/ml_epiano_example">ml_epiano_example</a><br> is a full-polyphone e-Piano like sounding synth<br>>
-- <a href="https://github.com/marcel-licence/ml_synth_basic_example">ml_synth_basic_example</a><br>>
-- <a href="https://github.com/marcel-licence/ml_synth_multi_saw_example">ml_synth_multi_saw_example</a><br>creates stereo multi saw (like supersaw etc.) sounds<br>>
-- <a href="https://github.com/marcel-licence/ml_synth_organ_example">ml_synth_organ_example</a><br>is a full-polyphone organ implementation trying to work like a real tonewheel organ<br>>
-- <a href="https://github.com/marcel-licence/ml_synth_pwm_osc_example">ml_synth_pwm_osc_examples</a><br>A synthesizer module sounding a bit like the Alpha Juno.<br>It's strength is the pulse sound with a modulated pulse-width.<br>>
-- <a href="https://github.com/marcel-licence/ml_mod_tracker">ml_mod_tracker</a><br>A MOD file player. It is a tracker implementation reminding of the Amiga game music. It plays back music of some DOS games too.<br>>
+- <a href="https://github.com/marcel-licence/ml_epiano_example">ml_epiano_example</a><br> is a full-polyphone e-Piano like sounding synth<br>
+- <a href="https://github.com/marcel-licence/ml_synth_basic_example">ml_synth_basic_example</a><br>
+- <a href="https://github.com/marcel-licence/ml_synth_multi_saw_example">ml_synth_multi_saw_example</a><br>creates stereo multi saw (like supersaw etc.) sounds<br>
+- <a href="https://github.com/marcel-licence/ml_synth_organ_example">ml_synth_organ_example</a><br>is a full-polyphone organ implementation trying to work like a real tonewheel organ<br>
+- <a href="https://github.com/marcel-licence/ml_synth_pwm_osc_example">ml_synth_pwm_osc_examples</a><br>A synthesizer module sounding a bit like the Alpha Juno.<br>It's strength is the pulse sound with a modulated pulse-width.<br>
+- <a href="https://github.com/marcel-licence/ml_mod_tracker">ml_mod_tracker</a><br>A MOD file player. It is a tracker implementation reminding of the Amiga game music. It plays back music of some DOS games too.<br>
 
 
 # Compiling note
