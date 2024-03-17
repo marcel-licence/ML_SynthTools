@@ -101,6 +101,12 @@ void Status_ValueChangedStr(const char *group, const char *descr, const char *va
     Serial.printf("%s - %s: %s\n", group, descr, value);
 }
 
+void Status_LogMessage(const char *msg)
+{
+    status_cnt = STATUS_DISPLAY_TIME;
+    Serial.printf("%s\n", msg);
+}
+
 void Status_Loop(uint32_t elapsed_time)
 {
     status_elapsed_time += elapsed_time;
