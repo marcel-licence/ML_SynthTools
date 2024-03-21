@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Marcel Licence
+ * Copyright (c) 2024 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -123,6 +123,7 @@
 #define ES8388_ENABLED
 #define I2S_USE_APLL
 
+#define SD_MMC_ENABLED
 
 #ifdef ADC_TO_MIDI_ENABLED
 #define ADC_INPUTS  8

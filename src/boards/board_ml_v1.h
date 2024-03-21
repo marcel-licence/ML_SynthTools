@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Marcel Licence
+ * Copyright (c) 2024 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,6 +54,11 @@
 #define MIDI_PORT1_ACTIVE
 #define MIDI_RX1_PIN 34 /* only available on header */
 #endif
+
+/*
+ * SD/MMC
+ */
+#define SD_MMC_ENABLED
 
 /*
  * I2S Audio In/Out
