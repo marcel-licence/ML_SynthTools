@@ -37,7 +37,7 @@
  */
 
 
-#if (!defined ARDUINO_RASPBERRY_PI_PICO) && (!defined ARDUINO_GENERIC_RP2040) && (!defined ARDUINO_SAMD_ZERO)
+#if (!defined ARDUINO_RASPBERRY_PI_PICO) && (!defined ARDUINO_GENERIC_RP2040) && (!defined ARDUINO_SAMD_ZERO) && (!defined ESP8266)
 
 
 #include <ml_scope.h>
