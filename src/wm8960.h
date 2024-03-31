@@ -29,32 +29,39 @@
  */
 
 /**
- * @file ml_inline.h
+ * @file wm8960.h
  * @author Marcel Licence
- * @data 02.04.2023
+ * @date 30.03.2024
  *
- * @brief   This file includes all required header for inline build
+ * @brief This module is used to initialize the WM8960 codec
  */
 
-#include <audio_module.h>
-#include <blink.h>
-#include <es8388.h>
-#include <esp32_audio_kit_module.h>
-#include <fs\fs_access.h>
-#include <fs\fs_common.h>
-#include <fs\fs_esp32.h>
-#include <fs\fs_esp8266.h>
-#include <fs\fs_rp2040.h>
-#include <i2s_interface.h>
-#include <i2s_module.h>
-#include <midi_interface.h>
-#include <midi_stream_player.h>
-#include <midi_via_ble.h>
-#include <midi_via_usb.h>
-#include <ml_board_setup.h>
-#include <ml_status.h>
-#include <ml_status_inline.h>
-#include <samd21_audio_core.h>
-#include <usbMidiHost.h>
-#include <wm8960.h>
-#include <wm8978.h>
+
+#ifdef __CDT_PARSER__
+#include <cdt.h>
+#endif
+
+
+#ifdef ML_SYNTH_INLINE_DECLARATION
+#ifdef WM8960_ENABLED
+
+
+void WM8960_Setup(void);
+
+
+#endif // WM8960_ENABLED
+#endif // ML_SYNTH_INLINE_DECLARATION
+
+
+#ifdef ML_SYNTH_INLINE_DEFINITION
+#ifdef WM8960_ENABLED
+
+
+void WM8960_Setup(void)
+{
+    /* implementation coming soon... */
+}
+
+
+#endif // WM8960_ENABLED
+#endif // ML_SYNTH_INLINE_DEFINITION
