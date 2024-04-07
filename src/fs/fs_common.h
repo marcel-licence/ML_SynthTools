@@ -119,6 +119,21 @@ bool FS_OpenFile(fs_id_t id, const char *filename)
     return FS_OpenFile(FsFromId(id), filename);
 }
 
+static bool FS_OpenFile(FST &fs, const char *filename, const char *mode)
+{
+    f = fs.open(filename, mode);
+    if (f)
+    {
+        g_file = &f;
+        return true;
+    }
+    else
+    {
+        Serial.printf("Error opening file: %s\n", filename);
+        return false;
+    }
+}
+
 static bool FS_OpenFile(FST &fs, const char *filename)
 {
 #ifdef ESP32
@@ -165,6 +180,11 @@ void FS_UseTempFile(void)
 uint32_t readBytes(uint8_t *buffer, uint32_t len)
 {
     return g_file->read(buffer, len);
+}
+
+uint32_t writeBytes(uint8_t *buffer, uint32_t len)
+{
+    return g_file->write(buffer, len);
 }
 
 uint32_t availableBytes(void)
