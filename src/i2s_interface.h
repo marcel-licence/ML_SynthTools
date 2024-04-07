@@ -530,7 +530,9 @@ void setup_i2s()
     i2s_start(i2s_port_number);
 #ifdef ES8388_ENABLED
     REG_WRITE(PIN_CTRL, 0xFFFFFFF0);
+	#ifdef FUNC_GPIO0_CLK_OUT1
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
+	#endif
 #endif
 #ifndef I2S_NODAC
     Serial.printf("I2S configured using following pins:\n");
