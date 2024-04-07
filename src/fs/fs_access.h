@@ -65,11 +65,13 @@ typedef int fs_id_t;
  * function declarations
  */
 void FS_Setup(void);
+bool FS_OpenFile(fs_id_t id, const char *filename, const char *mode);
 bool FS_OpenFile(fs_id_t id, const char *filename);
 void FS_CloseFile(void);
 void FS_UseTempFile(void);
 
 uint32_t readBytes(uint8_t *buffer, uint32_t len);
+uint32_t writeBytes(uint8_t *buffer, uint32_t len);
 uint32_t availableBytes(void);
 void fileSeekTo(uint32_t pos);
 uint32_t getStaticPos(void);

@@ -77,6 +77,7 @@
 /*
  * function declarations
  */
+static bool FS_OpenFile(FST &fs, const char *filename, const char *mode);
 static bool FS_OpenFile(FST &fs, const char *filename);
 
 /*
@@ -106,6 +107,11 @@ static FST &FsFromId(fs_id_t id)
         Serial.printf("Error: Unknown FS!\n");
     }
     return LittleFS;
+}
+
+bool FS_OpenFile(fs_id_t id, const char *filename, const char *mode)
+{
+    return FS_OpenFile(FsFromId(id), filename, mode);
 }
 
 bool FS_OpenFile(fs_id_t id, const char *filename)
@@ -168,8 +174,8 @@ uint32_t availableBytes(void)
 
 void fileSeekTo(uint32_t pos)
 {
-    g_file->seek(0, SeekSet);
-    g_file->seek(pos, SeekSet);
+    g_file->seek(0, fs::SeekSet);
+    g_file->seek(pos, fs::SeekSet);
 }
 
 uint32_t getStaticPos(void)
