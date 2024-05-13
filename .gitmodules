@@ -13,3 +13,9 @@
 [submodule "examples/ml_synth_pwm_osc_example"]
 	path = examples/ml_synth_pwm_osc_example
 	url = https://github.com/marcel-licence/ml_synth_pwm_osc_example.git
+[submodule "examples/ml_mod_tracker"]
+	path = examples/ml_mod_tracker
+	url = https://github.com/marcel-licence/ml_mod_tracker
+[submodule "examples/ml_synth_sampler_example"]
+	path = examples/ml_synth_sampler_example
+	url = https://github.com/marcel-licence/ml_synth_sampler_example
