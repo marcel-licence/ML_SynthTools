@@ -130,6 +130,51 @@ static void printDirectory(File dir, int numTabs)
 /*
  * extern function definitions
  */
+void WavToKeyboard(fs_id_t id, const char *dirname, void(*fileInd)(const char *filename, int offset, uint8_t note), int depth, int max_depth, uint8_t note)
+{
+#ifdef ESP32
+    File root = FsFromId(id).open(dirname);
+#else
+    File root = FsFromId(id).open(dirname, "r");
+#endif
+    if (!root)
+    {
+        Serial.println("- failed to open directory");
+        return;
+    }
+    if (!root.isDirectory())
+    {
+        Serial.println(" - not a directory");
+        return;
+    }
+
+    Serial.printf("WavToKeyboard root:%s\n", root.name());
+
+    File file = root.openNextFile();
+    if (!file)
+    {
+        Serial.printf("no files in root!\n");
+    }
+    while (file)
+    {
+        if (file.isDirectory())
+        {
+            Serial.printf("Dir Found: %s (ignoreD)\n", file.name());
+            if (max_depth != 0)
+            {
+                // PatchManager_GetFileList(fs, file.name(), fileInd, depth + 1, max_depth - 1);
+            }
+        }
+        else
+        {
+            Serial.printf("File Found: %s\n", file.name());
+            t_file = & file;
+            fileInd(file.name(), depth, note++);
+        }
+        file = root.openNextFile();
+    }
+}
+
 uint32_t getFileFromIdx(File dir, int numTabs, uint32_t idx, char *filename, char *filter)
 {
     while (true)
@@ -178,7 +223,11 @@ bool getFileFromIdx(uint32_t idx, char *filename, char *filter)
 static bool FS_SdCardInit(void)
 {
 #ifdef ESP32
+#ifdef SD_MMC_1BIT_MODE
+    if (!SD_MMC.begin("/sdcard", true))
+#else
     if (!SD_MMC.begin("/sdcard", false))
+#endif
 #else
     if (!card.init(SD_DETECT_NONE))
 #endif
