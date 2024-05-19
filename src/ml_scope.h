@@ -49,12 +49,18 @@
 /*
  * includes
  */
-#include <inttypes.h>
+#include <stdint.h>
+#include <Wire.h>
+
+#define ML_SCOPE_OLED
 
 /*
  * function declarations
  */
 void ScopeOled_Setup(void);
+#ifdef ESP32
+void ScopeOled_Setup(TwoWire *twi);
+#endif
 void ScopeOled_Process(void);
 void ScopeOled_AddSamples(float *left, float *right, uint32_t len);
 void ScopeOled_DrawData(const float *dispData, uint8_t idx);
