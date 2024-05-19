@@ -37,8 +37,8 @@
  */
 
 
-#if (!defined ARDUINO_RASPBERRY_PI_PICO) && (!defined ARDUINO_GENERIC_RP2040) && (!defined ARDUINO_SAMD_ZERO) && (!defined ESP8266)
-
+#ifdef ML_SYNTH_INLINE_DEFINITION
+#ifdef ML_SCOPE_OLED
 
 #include <ml_scope.h>
 
@@ -72,7 +72,7 @@ static struct disp_s d[2];
 
 static void display_set_oled(Adafruit_SSD1306 *oled1, Adafruit_SSD1306 *oled2);
 
-#ifdef ESP32
+#if  (!defined ESP8266)
 void ScopeOled_Setup(TwoWire *twi)
 {
     if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS, twi))
@@ -90,13 +90,13 @@ void ScopeOled_Setup(TwoWire *twi)
     display_set_oled(&display2, &display);
 
     display.display();
-    delay(250);
+    delay(250); // Pause for 2 seconds
 
     display.clearDisplay();
     display.display();
 
     display2.display();
-    delay(250);
+    delay(250); // Pause for 2 seconds
 
     display2.clearDisplay();
     display2.display();
@@ -185,5 +185,5 @@ void ScopeOled_DrawData(const float *dispData, uint8_t idx)
     d[idx].oled->display();
 }
 
-#endif
-
+#endif /* #ifdef ML_SCOPE_OLED */
+#endif /* ML_SYNTH_INLINE_DEFINITION */

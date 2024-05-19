@@ -52,6 +52,7 @@
 #include <midi_via_ble.h>
 #include <midi_via_usb.h>
 #include <ml_board_setup.h>
+#include <ml_scope_oled_inline.h>
 #include <ml_status.h>
 #include <ml_status_inline.h>
 #include <samd21_audio_core.h>
