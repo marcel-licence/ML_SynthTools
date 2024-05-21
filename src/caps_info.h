@@ -72,9 +72,9 @@ void CapsPrintInfo(void)
 #endif
 }
 
-void PrintMemoryInfo()
+void PrintMemoryInfo(void)
 {
-	#ifdef ESP32
+#ifdef ESP32
     Serial.printf("ESP.getFreeHeap() %d\n", ESP.getFreeHeap());
     Serial.printf("ESP.getMinFreeHeap() %d\n", ESP.getMinFreeHeap());
     Serial.printf("ESP.getHeapSize() %d\n", ESP.getHeapSize());
@@ -82,5 +82,5 @@ void PrintMemoryInfo()
 
     Serial.printf("Total PSRAM: %d\n", ESP.getPsramSize());
     Serial.printf("Free PSRAM: %d\n", ESP.getFreePsram());
-	#endif
+#endif
 }

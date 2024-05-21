@@ -37,6 +37,9 @@
  */
 
 
+#if (defined ARDUINO_ARCH_RP2040) || (defined ESP8266) || (defined ESP32)
+
+
 #ifdef __CDT_PARSER__
 #include <cdt.h>
 #endif
@@ -804,7 +807,7 @@ int16_t TrackerProcessChannelPlayer(struct channel_player_s *ch)
     return newSample;
 }
 
-void TrackerProcessSamples(Q1_14 *chL, Q1_14 *chrR, uint64_t count)
+void TrackerProcessSamples(Q1_14 *chL, Q1_14 *chR, uint64_t count)
 {
     for (uint64_t n = 0; n < count; n++)
     {
@@ -827,7 +830,7 @@ void TrackerProcessSamples(Q1_14 *chL, Q1_14 *chrR, uint64_t count)
         }
 
         chL[n].s16 += sample.s16;
-        chrR[n].s16 += sample.s16;
+        chR[n].s16 += sample.s16;
     }
 }
 
@@ -977,3 +980,6 @@ bool Tracker_HasTrackFinished(void)
         return false;
     }
 }
+
+
+#endif /* #if (defined ARDUINO_ARCH_RP2040) || (defined ESP8266) || (defined ESP32)  */

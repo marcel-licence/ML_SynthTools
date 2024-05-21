@@ -399,7 +399,7 @@ void Audio_OutputMono(const int32_t *samples)
 #endif
 #endif /* ARDUINO_SEEED_XIAO_M0 */
 
-#ifdef ARDUINO_DISCO_F407VG
+#ifdef ARDUINO_DISCO_F407VGxx
     int16_t mono_s16[SAMPLE_BUFFER_SIZE];
 
     for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
@@ -409,7 +409,7 @@ void Audio_OutputMono(const int32_t *samples)
     }
 
     STM32F407G_AudioWriteS16(mono_s16, mono_s16);
-#endif /* ARDUINO_DISCO_F407VG */
+#endif /* ARDUINO_DISCO_F407VGxx */
 
 #if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
 #ifdef RP2040_AUDIO_PWM

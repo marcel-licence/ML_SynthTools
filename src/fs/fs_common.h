@@ -168,10 +168,6 @@ void FS_CloseFile(void)
     g_file = NULL;
 }
 
-#ifdef ESP32
-#else
-#endif
-
 void FS_UseTempFile(void)
 {
     g_file = t_file;
@@ -213,10 +209,6 @@ uint32_t readBytesFromAddr(uint8_t *buffer, uint32_t addr, uint32_t len)
     fileSeekTo(addr);
     return readBytes(buffer, len);
 }
-
-#ifdef ESP32
-#else
-#endif
 
 
 #endif /* #ifdef ML_SYNTH_INLINE_DEFINITION */
