@@ -60,6 +60,11 @@ void Midi_HandleShortMsgEx(uint8_t *data, uint8_t cable __attribute__((unused)))
 
 #ifdef MIDI_TX2_PIN
 void Midi_SendShortMessage(uint8_t *msg);
+#ifndef ARDUINO_SEEED_XIAO_M0
+#ifndef SWAP_SERIAL
+void Midi_SendRaw(uint8_t *msg);
+#endif
+#endif
 #endif
 
 
