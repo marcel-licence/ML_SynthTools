@@ -474,7 +474,9 @@ i2s_config_t i2s_configuration =
 #ifdef ARDUINO_RUNNING_CORE
     .tx_desc_auto_clear = true,
     .fixed_mclk = 0,
+#ifdef I2S_MCLK_MULTIPLE_DEFAULT
     .mclk_multiple = I2S_MCLK_MULTIPLE_DEFAULT,
+#endif
 #ifdef SAMPLE_SIZE_16BIT
     .bits_per_chan = I2S_BITS_PER_CHAN_16BIT,
 #endif
@@ -530,9 +532,9 @@ void setup_i2s()
     i2s_start(i2s_port_number);
 #ifdef ES8388_ENABLED
     REG_WRITE(PIN_CTRL, 0xFFFFFFF0);
-	#ifdef FUNC_GPIO0_CLK_OUT1
+#ifdef FUNC_GPIO0_CLK_OUT1
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
-	#endif
+#endif
 #endif
 #ifndef I2S_NODAC
     Serial.printf("I2S configured using following pins:\n");
