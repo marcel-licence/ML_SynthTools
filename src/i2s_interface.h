@@ -476,6 +476,8 @@ i2s_config_t i2s_configuration =
     .fixed_mclk = 0,
 #ifdef I2S_MCLK_MULTIPLE_DEFAULT
     .mclk_multiple = I2S_MCLK_MULTIPLE_DEFAULT,
+#else
+    .mclk_multiple = I2S_MCLK_MULTIPLE_256, /* is that the right default? */
 #endif
 #ifdef SAMPLE_SIZE_16BIT
     .bits_per_chan = I2S_BITS_PER_CHAN_16BIT,
@@ -505,7 +507,11 @@ i2s_pin_config_t pins =
 i2s_pin_config_t pins =
 {
 #ifdef ARDUINO_RUNNING_CORE
+#ifdef I2S_MCLK_PIN
+    .mck_io_num = I2S_MCLK_PIN,
+#else
     .mck_io_num = I2S_PIN_NO_CHANGE,
+#endif
 #endif
     .bck_io_num = I2S_BCLK_PIN,
     .ws_io_num = I2S_WCLK_PIN,
@@ -531,7 +537,9 @@ void setup_i2s()
     i2s_set_sample_rates(i2s_port_number, SAMPLE_RATE);
     i2s_start(i2s_port_number);
 #ifdef ES8388_ENABLED
+#ifdef PIN_CTRL
     REG_WRITE(PIN_CTRL, 0xFFFFFFF0);
+#endif
 #ifdef FUNC_GPIO0_CLK_OUT1
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
 #endif
