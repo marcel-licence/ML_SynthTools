@@ -61,11 +61,38 @@ void CapsPrintInfo(void)
 #ifdef SOC_I2S_NUM
     Serial.printf("I2S num: %d\n", SOC_I2S_NUM);
 #endif
+#ifdef SOC_ADC_SUPPORTED
+    Serial.printf("ADC supported\n");
+#endif
+#ifdef SOC_DAC_SUPPORTED
+    Serial.printf("DAC supported\n");
+#endif
+#ifdef SOC_I2S_SUPPORTED
+    Serial.printf("I2S supported\n");
+#endif
 #ifdef SOC_I2S_SUPPORTS_ADC
     Serial.printf("I2S supports ADC\n");
 #endif
 #ifdef SOC_I2S_SUPPORTS_DAC
     Serial.printf("I2S supports DAC\n");
+#endif
+#ifdef SOC_I2S_SUPPORTS_PDM_TX
+    Serial.printf("I2S supports PDM Tx\n");
+#endif
+#ifdef SOC_I2S_SUPPORTS_PDM_RX
+    Serial.printf("I2S supports PDM Rx\n");
+#endif
+#ifdef SOC_I2S_SUPPORTS_TDM
+    Serial.printf("I2S supports TDM\n");
+#endif
+#ifdef SOC_SDMMC_HOST_SUPPORTED
+    Serial.printf("SDMMC HOST supported\n");
+#endif
+#ifdef SOC_TOUCH_SENSOR_SUPPORTED
+    Serial.printf("touch sensor supported\n");
+#endif
+#ifdef SOC_USB_OTG_SUPPORTED
+    Serial.printf("USB OTG supported\n");
 #endif
 #ifdef SOC_CPU_HAS_FPU
     Serial.printf("Cpu has FPU\n");
