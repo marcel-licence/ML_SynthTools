@@ -71,6 +71,15 @@ void Status_ValueChangedFloat(const char *group, const char *descr, float value)
     Serial.printf("%s - %s: %0.3f\n", group, descr, value);
 }
 
+/*
+ * update top line message including a float value
+ */
+void Status_ValueChangedFloatArr(const char *descr, float value, int index)
+{
+    status_cnt = STATUS_DISPLAY_TIME;
+    Serial.printf("%s[%d]: %0.3f", descr, index, value);
+}
+
 /**
  * @brief
  *
