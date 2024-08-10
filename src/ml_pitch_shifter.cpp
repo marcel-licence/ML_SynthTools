@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Marcel Licence
+ * Copyright (c) 2024 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,14 +69,12 @@ ML_PitchShifter::ML_PitchShifter(float sample_rate)
     feedback = 0.125f;
 }
 
-
 uint32_t minDistance(int32_t pointerA, int32_t pointerB)
 {
     uint32_t distance1 = i32_abs(pointerA - pointerB);
     uint32_t distance2 = PITCH_SHIFTER_BUFFER_SIZE - distance1;
     return (distance1 < distance2) ? distance1 : distance2;
 }
-
 
 void ML_PitchShifter::ProcessHQ(const float *in, float *out, uint32_t count)
 {

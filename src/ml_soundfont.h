@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Marcel Licence
+ * Copyright (c) 2024 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,7 +76,6 @@ union range_u
     };
     uint16_t u16_value;
 };
-
 
 /**
  * @brief Structure is used to provide required information to load a sample into another module
@@ -248,7 +247,6 @@ union SF2InstrumentGenerator_u
     uint8_t data[4];
 };
 
-
 /**
  * @brief
  *
@@ -264,7 +262,6 @@ bool ML_SF2_GetInstrumentInfo(uint32_t idx, struct instrLoadInfo_s *infoPtr);
  * @param cb
  */
 bool ML_SF2_LoadPresetMultiBag(uint32_t idx, void(*cb)(struct instrLoadInfo_s *infoPtr));
-
 
 /**
  * @brief

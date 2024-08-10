@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Marcel Licence
+ * Copyright (c) 2024 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,7 +80,6 @@ static struct allpass_s ap0 =
     (int)(0)
 };
 
-
 static uint32_t AllpassInit(float *buffer, int i, struct allpass_s *ap, int len)
 {
     ap->buf = &buffer[i];
@@ -89,8 +88,6 @@ static uint32_t AllpassInit(float *buffer, int i, struct allpass_s *ap, int len)
     ap->lim = len;
     return len;
 }
-
-
 
 static inline void Do_AllpassPhase(struct allpass_s *ap, const float *inSample, const float *len, float *outSample, int buffLen)
 {
@@ -112,7 +109,6 @@ static inline void Do_AllpassPhase(struct allpass_s *ap, const float *inSample, 
     }
     memcpy(ap, &ap2, sizeof(ap2));
 }
-
 
 void Phaser_Init(float *buffer, uint32_t len)
 {
@@ -137,7 +133,6 @@ void Phaser_Init(float *buffer, uint32_t len)
 
 }
 
-
 void Phaser_Reset(void)
 {
     for (uint32_t i = 0; i < phaserLenMax; i++)
@@ -152,7 +147,6 @@ void Phaser_Reset(void)
         }
     }
 }
-
 
 void Phaser_Process(const float *in, const float *lfo_in, float *out, int buffLen)
 {

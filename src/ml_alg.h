@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Marcel Licence
+ * Copyright (c) 2024 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,11 +44,8 @@
 #include <math.h>
 
 
-
-
 static int16_t mul(int16_t a, float b);
 static float mul_f(int16_t a, float b);
-
 
 
 static inline
@@ -58,7 +55,6 @@ int16_t mul(int16_t a, float b)
     c *= b;
     return (int16_t)c;
 }
-
 
 static inline
 float mul_f(int16_t a, float b)
@@ -81,10 +77,6 @@ float lerpOut(int16_t *buffer, float idx, uint32_t len_max)
 
     return buffer[idxFloor];
 }
-
-
-
-
 
 
 #endif /* SRC_ML_ALG_H_ */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Marcel Licence
+ * Copyright (c) 2024 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,8 +83,6 @@ bool ADSR_Process(const struct adsrT *ctrl, struct adsr_ctrl_t *adsr);
 void ADSR_Start(const struct adsrT *ctrl, struct adsr_ctrl_t *adsr);
 bool ASRM_Process(const struct adsrT *ctrl, struct adsr_ctrl_t *asr);
 void ASRM_Start(const struct adsrT *ctrl, struct adsr_ctrl_t *asr);
-
-
 
 
 #endif /* ML_ENV_H_ */

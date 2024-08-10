@@ -87,7 +87,6 @@ static File f;
 static File *g_file = NULL;
 static File *t_file = NULL;
 
-
 /*
  * static function definitions
  */
