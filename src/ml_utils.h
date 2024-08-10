@@ -60,6 +60,15 @@ float log10fromU7val(uint8_t value, float minVal, float maxVal);
 
 
 static inline
+float floatFromU32(uint32_t value)
+{
+    value >>= 1;
+    float f = value;
+    f *= (1.0f / 2147483648.0f);
+    return f;
+}
+
+static inline
 void mul(const float *in, float gain, float *out, uint32_t len)
 {
     for (uint32_t n = 0; n < len; n++)
