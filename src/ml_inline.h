@@ -41,11 +41,11 @@
 #include <es8388.h>
 #include <esp32_audio_kit_module.h>
 #if (defined ESP32) || (defined ESP8266) || (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
-#include <fs\fs_access.h>
-#include <fs\fs_common.h>
-#include <fs\fs_esp32.h>
-#include <fs\fs_esp8266.h>
-#include <fs\fs_rp2040.h>
+#include <fs/fs_access.h>
+#include <fs/fs_common.h>
+#include <fs/fs_esp32.h>
+#include <fs/fs_esp8266.h>
+#include <fs/fs_rp2040.h>
 #endif
 #include <i2s_interface.h>
 #include <i2s_module.h>
