@@ -77,6 +77,9 @@ There are some "multi-platform" examples available (click the link for more deta
 - <a href="https://github.com/marcel-licence/ml_synth_pwm_osc_example">ml_synth_pwm_osc_examples</a><br>A synthesizer module sounding a bit like the Alpha Juno.<br>It's strength is the pulse sound with a modulated pulse-width.<br>
 - <a href="https://github.com/marcel-licence/ml_mod_tracker">ml_mod_tracker</a><br>A MOD file player. It is a tracker implementation reminding of the Amiga game music. It plays back music of some DOS games too.<br>
 
+# PlatformIO integration
+
+please see <a href="extras/platformIO_integration.md">PlatformIO integration readme</a>
 
 # Compiling note
 
