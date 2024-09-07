@@ -49,11 +49,7 @@
 
 
 void Audio_Setup(void);
-#ifdef OUTPUT_SAW_TEST
-void Audio_Output(float *left, float *right);
-#else
 void Audio_Output(const float *left, const float *right);
-#endif
 void Audio_OutputMono(const int32_t *samples);
 void Audio_Output(const int16_t *left, const int16_t *right);
 void Audio_Output(const Q1_14 *left, const Q1_14 *right);
@@ -126,15 +122,56 @@ uint32_t WavPwmDataBuff2[SAMPLE_BUFFER_SIZE];
 #endif
 
 
+#ifdef PICO_AUDIO_I2S
+#include <I2S.h>
+// Create the I2S port using a PIO state machine
+I2S i2s(OUTPUT);
+#endif
+
 #ifndef I2S_OVERSAMPLE
 #define I2S_OVERSAMPLE 1
 #endif
 
+#ifdef OUTPUT_SAW_TEST
+static float saw_left[SAMPLE_BUFFER_SIZE];
+static float saw_right[SAMPLE_BUFFER_SIZE];
+#endif
+#ifdef OUTPUT_SINE_TEST
+static float sin_left[SAMPLE_BUFFER_SIZE];
+static float sin_right[SAMPLE_BUFFER_SIZE];
+#endif
 
 void Audio_Setup(void)
 {
 #if (defined ESP8266) || (defined ESP32)
     WiFi.mode(WIFI_OFF);
+#endif
+
+#ifdef OUTPUT_SAW_TEST
+    /*
+     * base frequency: SAMPLE_FREQ / SAMPLE_BUFFER_SIZE
+     * for example: Fs : 44100Hz, Lsb = 48 -> Freq: 918.75 Hz
+     */
+    for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
+    {
+        saw_left[i] = ((float)i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
+        saw_right[i] = ((float)i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
+        saw_left[i] -= 1.0f;
+        saw_right[i] -= 1.0f;
+    }
+#endif
+#ifdef OUTPUT_SINE_TEST
+    /*
+     * create sinewave with f and 2*f
+     */
+    for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
+    {
+        float w = i;
+        w *= 1.0f / ((float)SAMPLE_BUFFER_SIZE);
+        w *= 2.0f * M_PI;
+        sin_left[i] = sin(w);
+        sin_right[i] = sin(w * 2.0f);
+    }
 #endif
 
 
@@ -152,6 +189,9 @@ void Audio_Setup(void)
     WM8978_Setup();
 #endif
 
+#ifdef WM8960_ENABLED
+    WM8960_Setup();
+#endif
 
 #ifdef ESP32
     setup_i2s();
@@ -163,6 +203,19 @@ void Audio_Setup(void)
         Serial.println("Failed to initialize I2S!");
         while (1)
             ; // do nothing
+    }
+#endif
+
+#ifdef PICO_AUDIO_I2S
+    i2s.setBCLK(PICO_AUDIO_I2S_CLOCK_PIN_BASE);
+    i2s.setDATA(PICO_AUDIO_I2S_DATA_PIN);
+    i2s.setBitsPerSample(16);
+
+    // start I2S at the sample rate with 16-bits per sample
+    if (!i2s.begin(SAMPLE_RATE))
+    {
+        Serial.println("Failed to initialize I2S!");
+        while (1); // do nothing
     }
 #endif
 
@@ -317,6 +370,17 @@ void Audio_OutputMono(const int32_t *samples)
         sig *= 4;
         sig16 = sig;
         I2S.write(0x8000 + sig16);
+    }
+#endif
+
+#ifdef PICO_AUDIO_I2S
+    for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
+    {
+        int32_t sig = samples[i];
+        static uint16_t sig16 = 0;
+        sig >>= 2;
+        sig16 = sig;
+        i2s.write(sig16);
     }
 #endif
 
@@ -656,7 +720,7 @@ void Audio_Output(const int16_t *left, const int16_t *right)
 }
 #endif
 
-#if (defined ESP32) || (defined TEENSYDUINO) || (defined ARDUINO_DAISY_SEED) || (defined ARDUINO_GENERIC_F407VGTX) || (defined ARDUINO_DISCO_F407VG) || (defined ARDUINO_BLACK_F407VE) || (((defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)) && (defined RP2040_AUDIO_PWM))
+#if (defined ESP32) || (defined TEENSYDUINO) || (defined ARDUINO_DAISY_SEED) || (defined ARDUINO_GENERIC_F407VGTX) || (defined ARDUINO_DISCO_F407VG) || (defined ARDUINO_BLACK_F407VE) || (defined ARDUINO_ARCH_RP2040) || (((defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)) && (defined RP2040_AUDIO_PWM))
 #ifdef ESP32
 void Audio_Input(float *left, float *right)
 {
@@ -679,30 +743,42 @@ void Audio_Input(float *left __attribute__((__unused__)), float *right __attribu
 }
 #endif /* ESP32 */
 
-
-#ifdef OUTPUT_SAW_TEST
-void Audio_Output(float *left, float *right)
-#else
 void Audio_Output(const float *left, const float *right)
-#endif
 {
 #ifdef OUTPUT_SAW_TEST
-    /*
-     * base frequency: SAMPLE_FREQ / SAMPLE_BUFFER_SIZE
-     * for example: Fs : 44100Hz, Lsb = 48 -> Freq: 918.75 Hz
-     */
-    for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
-    {
-        left[i] = ((float)i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
-        right[i] = ((float)i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
-        left[i] -= 1.0f;
-        right[i] -= 1.0f;
-    }
+    left = saw_left;
+    right = saw_right;
+#endif
+#ifdef OUTPUT_SINE_TEST
+    left = sin_left;
+    right = sin_right;
 #endif
 
 #ifdef ESP32
     i2s_write_stereo_samples_buff(left, right, SAMPLE_BUFFER_SIZE);
 #endif /* ESP32 */
+
+#ifdef PICO_AUDIO_I2S
+    while (i2s.availableForWrite() == false)
+    {
+
+    }
+    union
+    {
+        uint32_t u32;
+        struct
+        {
+            int16_t l;
+            int16_t r;
+        };
+    } bf[SAMPLE_BUFFER_SIZE];
+    for (int n = 0; n < SAMPLE_BUFFER_SIZE; n++)
+    {
+        bf[n].l = (int16_t)(left[n] * INT16_MAX);
+        bf[n].r = (int16_t)(right[n] * INT16_MAX);
+    }
+    i2s.write((const uint8_t *)bf, SAMPLE_BUFFER_SIZE * 4);
+#endif
 
 #ifdef TEENSYDUINO
     {
