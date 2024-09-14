@@ -469,6 +469,7 @@ void Midi_Setup()
 
 #ifdef MIDI_PORT1_ACTIVE
 
+#ifndef ARDUINO_ARCH_RP2040
 #ifdef MIDI_RX1_PIN
 #ifdef MIDI_TX1_PIN
     Serial.printf("Setup Serial1 with %d baud with rx: %s%d and tx %s%d\n", MIDI_SERIAL1_BAUDRATE, PIN_CAPTION, MIDI_RX1_PIN, PIN_CAPTION, MIDI_TX1_PIN);
@@ -483,6 +484,13 @@ void Midi_Setup()
     Serial1.begin(MIDI_SERIAL1_BAUDRATE);
 #endif
 
+#else
+    Serial.printf("Setup Serial1 with %d baud with rx: %s%d and tx %s%d\n", MIDI_SERIAL1_BAUDRATE, PIN_CAPTION, MIDI_RX1_PIN, PIN_CAPTION, MIDI_TX1_PIN);
+    Serial1.setTX(MIDI_TX1_PIN);
+    Serial1.setRX(MIDI_RX1_PIN);
+    Serial1.begin(MIDI_SERIAL1_BAUDRATE);
+#endif
+
 #ifdef ARDUINO_SEEED_XIAO_M0
     pinMode(PIN_SERIAL1_RX, INPUT_PULLUP);
 #endif
@@ -494,11 +502,13 @@ void Midi_Setup()
 
 #ifdef MIDI_PORT2_ACTIVE
 
+#ifndef ARDUINO_ARCH_RP2040
+
 #ifdef MIDI_RX2_PIN
 #ifdef MIDI_TX2_PIN
     Serial.printf("Setup Serial2 with %d baud with rx: %s%d and tx %s%d\n", MIDI_SERIAL2_BAUDRATE, PIN_CAPTION, MIDI_RX2_PIN, PIN_CAPTION, MIDI_TX2_PIN);
     Serial2.begin(MIDI_SERIAL2_BAUDRATE, SERIAL_8N1, MIDI_RX2_PIN, MIDI_TX2_PIN);
-#else
+#else /* MIDI_TX2_PIN */
     Serial.printf("Setup Serial2 with %d baud with rx: %s%d only\n", MIDI_SERIAL2_BAUDRATE, PIN_CAPTION, MIDI_RX2_PIN);
 #if (!defined ARDUINO_RASPBERRY_PI_PICO) && (!defined ARDUINO_GENERIC_RP2040)
     Serial2.begin(MIDI_SERIAL2_BAUDRATE, SERIAL_8N1, MIDI_RX2_PIN);
@@ -506,14 +516,25 @@ void Midi_Setup()
     Serial2.setRX(MIDI_RX2_PIN);
     Serial2.begin(MIDI_SERIAL2_BAUDRATE);
 #endif
-#endif
+#endif  /* MIDI_TX2_PIN */
 #if (!defined ARDUINO_RASPBERRY_PI_PICO) && (!defined ARDUINO_GENERIC_RP2040)
     pinMode(MIDI_RX2_PIN, INPUT_PULLUP); /* can be connected to open collector output */
 #endif
-#else
+#else /* MIDI_TX2_PIN */
     Serial.printf("Setup Serial2 with %d baud with rx: RX2 pin\n", MIDI_SERIAL2_BAUDRATE);
     Serial2.begin(MIDI_SERIAL2_BAUDRATE);
-#endif
+#endif /* MIDI_TX2_PIN */
+
+#else /* MIDI_RX2_PIN */
+#ifdef MIDI_TX2_PIN
+    Serial.printf("Setup Serial2 with %d baud with rx: %s%d and tx %s%d\n", MIDI_SERIAL2_BAUDRATE, PIN_CAPTION, MIDI_RX2_PIN, PIN_CAPTION, MIDI_TX2_PIN);
+    Serial2.setTX(MIDI_TX2_PIN);
+#else /* MIDI_TX2_PIN */
+    Serial.printf("Setup Serial2 with %d baud with rx: %s%d\n", MIDI_SERIAL2_BAUDRATE, PIN_CAPTION, MIDI_RX2_PIN);
+#endif /* MIDI_TX2_PIN */
+    Serial2.setRX(MIDI_RX2_PIN);
+    Serial2.begin(MIDI_SERIAL2_BAUDRATE);
+#endif /* MIDI_RX2_PIN */
 
     MidiPort2.serial = &Serial2;
     Midi_PortSetup(&MidiPort2);

@@ -37,9 +37,6 @@
  */
 
 
-#if (defined ARDUINO_ARCH_RP2040) || (defined ESP8266) || (defined ESP32)
-
-
 #ifdef __CDT_PARSER__
 #include <cdt.h>
 #endif
@@ -53,12 +50,12 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <ml_utils.h>
 #include <ml_status.h>
 
 #include <Arduino.h>
-
 
 /*
  * defines (private)
@@ -440,7 +437,6 @@ bool TrackerLoadFile(void)
 
         printf("SongName: %s\n", trk->songname);
 
-
         uint64_t samplLen = 0;
         for (int n = 0; n < SAMPLE_COUNT; n++)
         {
@@ -666,7 +662,6 @@ void TrackerProcess(uint64_t passed)
             }
             procTime += tply.rate;
 
-
             tply.currentRow ++;
             if (tply.currentRow >= 64)
             {
@@ -764,7 +759,6 @@ void TrackerSetup(uint32_t sample_rate)
     tply.rate = sample_rate;
 }
 
-
 //#define FUNNY_SOUND
 
 int16_t TrackerProcessChannelPlayer(struct channel_player_s *ch)
@@ -812,31 +806,32 @@ int16_t TrackerProcessChannelPlayer(struct channel_player_s *ch)
     return newSample;
 }
 
-void TrackerProcessSamples(Q1_14 *chL, Q1_14 *chR, uint64_t count)
+void TrackerProcessSamples(Q1_14 *ch1, Q1_14 *ch2, Q1_14 *ch3, Q1_14 *ch4, uint64_t count)
 {
+    Q1_14 *ch[4] = {ch1, ch2, ch3, ch4};
     for (uint64_t n = 0; n < count; n++)
     {
         TrackerProcess(1);
-
-        Q1_14 sample;
-        sample.s16 = 0;
 
         for (uint8_t chIdx = 0; chIdx < CHANNEL_COUNT; chIdx ++)
         {
             if (chActive[chIdx])
             {
-                sample.s16 += TrackerProcessChannelPlayer(&tply.channel[chIdx]);
+                ch[chIdx][n].s16 += TrackerProcessChannelPlayer(&tply.channel[chIdx]);
             }
         }
 
         for (uint8_t chIdx = 0; chIdx < 16; chIdx ++)
         {
-            sample.s16 += TrackerProcessChannelPlayer(&tply.channelMIDI[chIdx]);
+            ch[chIdx % 4][n].s16 += TrackerProcessChannelPlayer(&tply.channelMIDI[chIdx]);
         }
-
-        chL[n].s16 += sample.s16;
-        chR[n].s16 += sample.s16;
     }
+}
+
+void TrackerProcessSamples(Q1_14 *chL, Q1_14 *chR, uint64_t count)
+{
+    TrackerProcessSamples(chL, chL, chL, chL, count);
+    memcpy(chR, chL, count * sizeof(Q1_14));
 }
 
 void TrackerProcessOutput(void)
@@ -985,5 +980,3 @@ bool Tracker_HasTrackFinished(void)
         return false;
     }
 }
-
-#endif /* #if (defined ARDUINO_ARCH_RP2040) || (defined ESP8266) || (defined ESP32)  */

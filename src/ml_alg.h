@@ -41,6 +41,7 @@
 #define SRC_ML_ALG_H_
 
 
+#include <stdint.h>
 #include <math.h>
 
 
