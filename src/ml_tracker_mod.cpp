@@ -76,8 +76,13 @@
 #define PATTERNLEN      128
 
 #ifdef ARDUINO_ARCH_RP2040
+#ifdef __ARM_FEATURE_DSP
+#define PATTERNCOUNT    32
+#define SAMPLEDATALEN     (256*1024)
+#else
 #define PATTERNCOUNT    15
 #define SAMPLEDATALEN     (128*1024)
+#endif
 #endif
 #ifdef ESP8266
 #define PATTERNCOUNT    12
@@ -980,6 +985,5 @@ bool Tracker_HasTrackFinished(void)
         return false;
     }
 }
-
 
 #endif /* #if (defined ARDUINO_ARCH_RP2040) || (defined ESP8266) || (defined ESP32)  */
