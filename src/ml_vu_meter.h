@@ -41,7 +41,7 @@
 #define SRC_ML_VU_METER_H_
 
 
-#include <inttypes.h>
+#include <stdint.h>
 
 
 void VuMeter_Init(void);

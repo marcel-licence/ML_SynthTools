@@ -43,6 +43,7 @@
 #define SYNTH_MULTI_SAW_H_
 
 
+#include <stdint.h>
 #include <ml_types.h>
 
 

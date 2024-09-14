@@ -48,7 +48,7 @@
 #define ML_OSC_H_
 
 
-#include <inttypes.h>
+#include <stdint.h>
 
 
 struct synth_osc_cfg_s

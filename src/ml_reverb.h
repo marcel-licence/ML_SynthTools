@@ -41,7 +41,7 @@
 #define SRC_ML_REVERB_H_
 
 
-#include <inttypes.h>
+#include <stdint.h>
 
 
 #ifdef REVERB_DIV

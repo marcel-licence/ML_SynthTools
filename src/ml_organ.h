@@ -45,7 +45,7 @@
 
 
 
-#include <inttypes.h>
+#include <stdint.h>
 
 
 
@@ -70,6 +70,7 @@
 #endif
 
 #ifdef ARDUINO_ARCH_RP2040
+#ifndef __ARM_FEATURE_DSP
 #define Organ_Setup(...)    OrganRP2040_Setup(__VA_ARGS__)
 #define Organ_Process(...)    OrganRP2040_Process(__VA_ARGS__)
 #define Organ_Process_Buf(...)    OrganRP2040_Process_Buf(__VA_ARGS__)
@@ -78,6 +79,16 @@
 #define Organ_PercussionSet(...)    OrganRP2040_PercussionSet(__VA_ARGS__)
 #define Organ_SetLeslCtrl(...)    OrganRP2040_SetLeslCtrl(__VA_ARGS__)
 #define Organ_SetDrawbar(...)    OrganRP2040_SetDrawbar(__VA_ARGS__)
+#else
+#define Organ_Setup(...)    OrganRP2350_Setup(__VA_ARGS__)
+#define Organ_Process(...)    OrganRP2350_Process(__VA_ARGS__)
+#define Organ_Process_Buf(...)    OrganRP2350_Process_Buf(__VA_ARGS__)
+#define Organ_NoteOn    OrganRP2350_NoteOn
+#define Organ_NoteOff    OrganRP2350_NoteOff
+#define Organ_PercussionSet(...)    OrganRP2350_PercussionSet(__VA_ARGS__)
+#define Organ_SetLeslCtrl(...)    OrganRP2350_SetLeslCtrl(__VA_ARGS__)
+#define Organ_SetDrawbar(...)    OrganRP2350_SetDrawbar(__VA_ARGS__)
+#endif
 #endif
 
 /**

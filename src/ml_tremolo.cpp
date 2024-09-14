@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Marcel Licence
+ * Copyright (c) 2024 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,6 +67,15 @@ ML_Tremolo::ML_Tremolo(float sample_rate)
     speedU32 = var;
 }
 
+void ML_Tremolo::Process(const float *in_l, const float *in_r, const float mod_in, float *out_l, float *out_r, uint32_t count)
+{
+    for (uint32_t n = 0; n < count; n++)
+    {
+        out_l[n] = (in_l[n] * depthInv) + (in_l[n] * (1.0f - mod_in) * 0.5f * depth);
+        out_r[n] = (in_r[n] * depthInv) + (in_l[n] * (1.0f + mod_in) * 0.5f * depth);
+    }
+}
+
 void ML_Tremolo::Process(const float *in_l, const float *in_r, const float *mod_in, float *out_l, float *out_r, uint32_t count)
 {
     for (uint32_t n = 0; n < count; n++)
@@ -112,6 +121,7 @@ void ML_Tremolo::setPhaseShift(float shift)
 void ML_Tremolo::setDepth(float new_depth)
 {
     this->depth = new_depth;
+    this->depthInv = 1.0f - new_depth;
     Status_ValueChangedFloat("Tremolo", "Depth", new_depth);
 }
 

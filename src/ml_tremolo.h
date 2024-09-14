@@ -48,7 +48,7 @@
 
 
 #include <ml_types.h>
-#include <inttypes.h>
+#include <stdint.h>
 
 
 class ML_Tremolo
@@ -82,7 +82,7 @@ public:
     ML_TremoloQ() {};
     ~ML_TremoloQ() {};
     void init(float sample_rate);
-    void process(Q1_14 *left, Q1_14 *right, uint32_t len);
+    void process(Q1_14 *left, Q1_14 *right, uint32_t len) __attribute__((deprecated));
     void setSpeed(float speed);
     void setPhaseShift(float shift);
     void updatePhaseShift();
