@@ -112,6 +112,7 @@ void ML_Tremolo::setPhaseShift(float shift)
 void ML_Tremolo::setDepth(float new_depth)
 {
     this->depth = new_depth;
+    this->depthInv = 1.0f - new_depth;
     Status_ValueChangedFloat("Tremolo", "Depth", new_depth);
 }
 

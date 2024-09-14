@@ -41,7 +41,7 @@
 #define SRC_ML_TYPES_H_
 
 
-#include <inttypes.h>
+#include <stdint.h>
 
 
 /*

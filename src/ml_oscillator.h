@@ -44,7 +44,7 @@
 #define SRC_ML_OSCILLATOR_H_
 
 
-#include <inttypes.h>
+#include <stdint.h>
 
 
 /* controllable parameters, some of them might not work, but added in future */

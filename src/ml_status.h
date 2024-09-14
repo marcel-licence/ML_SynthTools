@@ -41,7 +41,7 @@
 #define SRC_ML_STATUS_H_
 
 
-#include <inttypes.h>
+#include <stdint.h>
 
 
 void Status_Init(uint32_t sample_rate);

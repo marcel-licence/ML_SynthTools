@@ -43,6 +43,7 @@
 #define SRC_ML_CHORUS_H_
 
 
+#include <stdint.h>
 #include <ml_types.h>
 
 

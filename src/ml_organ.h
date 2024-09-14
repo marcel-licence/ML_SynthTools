@@ -43,10 +43,7 @@
 #define SRC_ML_ORGAN_H_
 
 
-
-
-#include <inttypes.h>
-
+#include <stdint.h>
 
 
 #define CTRL_PERC_SWITCH    0

@@ -42,7 +42,7 @@
 #define SRC_ML_MIDI_CTRL_H_
 
 
-#include <inttypes.h>
+#include <stdint.h>
 
 
 void MidiCtrl_NoteOn(uint8_t ch, uint8_t note, float vel);

@@ -397,7 +397,7 @@ void Delay_SetOutputLevel(uint8_t unused __attribute__((unused)), uint8_t value)
     float value_f = value;
     value_f /= 127.0;
     delayToMix = value_f;
-    Status_ValueChangedFloat("Delay_SetOutputLevel", value);
+    Status_ValueChangedFloat("Delay_SetOutputLevel", value_f);
 }
 
 void Delay_SetLength(uint8_t unused __attribute__((unused)), float value)
