@@ -45,6 +45,7 @@
 #define EPIANO_H_
 
 
+#include <stdint.h>
 #include <ml_types.h>
 
 

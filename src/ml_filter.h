@@ -50,6 +50,7 @@
 #define ML_FILTER_H_
 
 
+#include <stdint.h>
 #include <ml_types.h>
 
 
@@ -103,6 +104,7 @@ void Filter_Proc_Init(struct filterProcT *const filterP);
 void Filter_Reset(struct filterProcT *filter);
 
 void Filter_CalculateLowPass(float c, float reso, struct filterCoeffT *const filterC);
+void Filter_CalculateHighPass(float c, float reso, struct filterCoeffT *const filterC);
 void Filter_CalculateLowPassSlow(float c, float reso, struct filterCoeffT *const filterC);
 void Filter_CalculateNone(struct filterCoeffT *const filterC);
 void Filter_CalculateNotch(float c, float reso, struct filterCoeffT *const filterC);

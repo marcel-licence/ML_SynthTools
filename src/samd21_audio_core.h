@@ -49,7 +49,7 @@
 
 
 bool SAMD21_Synth_Process(void(*proc)(uint16_t *buff, size_t len));
-void SAMD21_Synth_Init();
+void SAMD21_Synth_Init(void);
 
 
 #endif  /* ML_SYNTH_INLINE_DECLARATION */
@@ -180,7 +180,7 @@ void SAMD21_Synth_DACInit()
     while (1 == DAC->STATUS.bit.SYNCBUSY);
 }
 
-void SAMD21_Synth_Init()
+void SAMD21_Synth_Init(void)
 {
     PM->APBBMASK.reg |= PM_APBBMASK_NVMCTRL;
 

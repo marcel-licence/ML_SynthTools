@@ -92,12 +92,12 @@ void RP2040_Audio_Pwm_Init(uint8_t gpio_pin_number, float sample_rate, uint32_t 
 }
 
 
-bool RP2040_Audio_Pwm_BufferReady()
+bool RP2040_Audio_Pwm_BufferReady(void)
 {
     return bufferReady;
 }
 
-uint32_t *RP2040_Audio_Pwm_getFreeBuff()
+uint32_t *RP2040_Audio_Pwm_getFreeBuff(void)
 {
     bufferReady = false;
     return lastRead2;

@@ -46,9 +46,7 @@
 
 
 #include "ml_env.h"
-
-
-#include <inttypes.h>
+#include <stdint.h>
 
 
 /*

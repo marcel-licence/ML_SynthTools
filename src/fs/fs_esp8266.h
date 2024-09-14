@@ -110,7 +110,7 @@ bool getFileFromIdx(uint32_t idx, char *filename, char *filter)
 }
 
 
-void FS_Setup()
+void FS_Setup(void)
 {
 
     if (!LittleFS.begin())

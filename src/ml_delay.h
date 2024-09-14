@@ -41,7 +41,7 @@
 #define SRC_ML_DELAY_H_
 
 
-#include <inttypes.h>
+#include <stdint.h>
 
 
 void Delay_Init(int16_t *buffer, uint32_t len);
