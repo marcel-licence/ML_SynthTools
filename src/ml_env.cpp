@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Marcel Licence
+ * Copyright (c) 2024 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +48,11 @@
 #include "ml_env.h"
 #include <stdint.h>
 
+struct
+{
+    float sample_rate;
+}
+envCfg;
 
 /*
  * very bad and simple implementation of ADSR
@@ -82,6 +87,10 @@ bool ADSR_Process(const struct adsrT *ctrl, struct adsr_ctrl_t *adsr)
             adsr->ctrl = 0.0f;
             return false;
         }
+        break;
+    case idle:
+        adsr->ctrl = 0;
+        return false;
     }
     return true;
 }
@@ -126,9 +135,26 @@ bool ASRM_Process(const struct adsrT *ctrl, struct adsr_ctrl_t *asr)
         if (asr->ctrl < 0.0f)
         {
             asr->ctrl = 0.0f;
+            asr->phase = idle;
             return false;
         }
+        break;
+    case idle:
+        return false;
     }
     return true;
+}
+
+void ADSR_SetSamplerate(float sample_rate)
+{
+    envCfg.sample_rate = sample_rate;
+}
+
+void ASDR_Init(struct adsrT *ctrl, float a, float d, float s, float r)
+{
+    ctrl->a = a;
+    ctrl->d = d;
+    ctrl->s = s;
+    ctrl->r = r;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Marcel Licence
+ * Copyright (c) 2023 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,6 @@
 
 struct adsrT
 {
-    float sample_rate;
     float a;
     float d;
     float s;
@@ -60,7 +59,7 @@ struct adsrT
 
 typedef enum
 {
-    attack, decay, sustain, release
+    idle, attack, decay, sustain, release
 } adsr_phaseT;
 
 struct adsr_ctrl_t
@@ -79,6 +78,8 @@ struct asmT
 };
 
 
+void ADSR_SetSamplerate(float sample_rate);
+void ASDR_Init(struct adsrT *ctrl, float a, float d, float s, float r);
 bool ADSR_Process(const struct adsrT *ctrl, struct adsr_ctrl_t *adsr);
 void ADSR_Start(const struct adsrT *ctrl, struct adsr_ctrl_t *adsr);
 bool ASRM_Process(const struct adsrT *ctrl, struct adsr_ctrl_t *asr);
