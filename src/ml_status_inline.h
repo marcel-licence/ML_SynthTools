@@ -54,6 +54,30 @@ static uint32_t status_elapsed_time = 0;
 
 
 /**
+ * @brief This function is a stuf for easy replacement for another status module
+ */
+void Status_Setup(void)
+{
+    /* nothing to do */
+}
+
+/**
+ * @brief This function is a stuf for easy replacement for another status module
+ */
+void Status_Process(void)
+{
+    /* nothing to do */
+}
+
+/**
+ * @brief This function is a stuf for easy replacement for another status module
+ */
+void Status_Process_Sample(uint32_t count __attribute__((unused)))
+{
+    /* nothing to do */
+}
+
+/**
  * @brief
  *
  * @param descr

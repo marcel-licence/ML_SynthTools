@@ -44,7 +44,10 @@
 #include <stdint.h>
 
 
+void Status_Setup(void);
 void Status_Init(uint32_t sample_rate);
+void Status_Process(void);
+void Status_Process_Sample(uint32_t count __attribute__((unused)));
 void Status_ValueChangedFloat(const char *group, const char *descr, float value);
 void Status_ValueChangedFloat(const char *descr, float value);
 void Status_ValueChangedFloatArr(const char *descr, float value, int index);
