@@ -1635,12 +1635,12 @@ void FmSynth_ChannelSettingDump(uint8_t ch __attribute__((unused)), float value)
         Serial.printf("setting->fmFeedback =  %0.6f;\n", currentChSetting->fmFeedback);
         for (int i = 0; i < 4; i++)
         {
-            Serial.printf("setting->op_prop[%d].ar = %d;\n", i, currentChSetting->op_prop[i].ar);
-            Serial.printf("setting->op_prop[%d].d1r = %d;\n", i, currentChSetting->op_prop[i].d1r);
+            Serial.printf("setting->op_prop[%d].ar = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].ar);
+            Serial.printf("setting->op_prop[%d].d1r = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].d1r);
             Serial.printf("setting->op_prop[%d].d2l = %0.6f;\n", i, currentChSetting->op_prop[i].d2l);
-            Serial.printf("setting->op_prop[%d].d2r = %d;\n", i, currentChSetting->op_prop[i].d2r);
-            Serial.printf("setting->op_prop[%d].rr = %d;\n", i, currentChSetting->op_prop[i].rr);
-            Serial.printf("setting->op_prop[%d].rs = %d;\n", i, currentChSetting->op_prop[i].rs);
+            Serial.printf("setting->op_prop[%d].d2r = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].d2r);
+            Serial.printf("setting->op_prop[%d].rr = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].rr);
+            Serial.printf("setting->op_prop[%d].rs = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].rs);
             Serial.printf("setting->op_prop[%d].tl = %0.6f;\n", i, currentChSetting->op_prop[i].tl);
             Serial.printf("setting->op_prop[%d].mul = %0.6f;\n", i, currentChSetting->op_prop[i].mul);
             Serial.printf("setting->op_prop[%d].vel_to_tl = %0.6f;\n", i, currentChSetting->op_prop[i].vel_to_tl);
