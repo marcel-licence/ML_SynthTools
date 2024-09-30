@@ -90,6 +90,12 @@
 #define SAMPLEDATALEN     (600*1024)
 #endif
 
+/* all other, may be defined in future */
+#ifndef PATTERNCOUNT
+#define PATTERNCOUNT    15
+#define SAMPLEDATALEN     (128*1024)
+#endif
+
 #define printf(...) Serial.printf(__VA_ARGS__)
 
 /*
@@ -392,6 +398,7 @@ void TrackerLoadData(const uint8_t *data)
 
 bool TrackerLoadFile(void)
 {
+
     for (uint16_t n = 0; n < 12 * 3; n++)
     {
         notePeriod[n].period = 856 * pow(2, - n / 12.0f);
@@ -499,6 +506,7 @@ void PrintRowPattern(uint8_t patternIdx, uint8_t currentRow)
     }
     printf("\n");
 }
+
 
 void TrackerBreakPattern(void)
 {
@@ -687,6 +695,7 @@ void TrackerProcess(uint64_t passed)
         }
 
         uint16_t samplCnt = 0;
+
 
         while ((tply.timeOver2 > tply.rate) && (procTime > 0))
         {
@@ -944,7 +953,7 @@ void Tracker_SetTempo(uint8_t param __attribute__((unused)), uint8_t value)
     tply.tempoMultiplier = multiplier;
 }
 
-void Tracker_SetPitch(uint8_t param, uint8_t value)
+void Tracker_SetPitch(uint8_t param __attribute__((unused)), uint8_t value)
 {
     Status_ValueChangedInt("Tracker", "Pitch", value);
     float multiplier = log2fromU7(value, 2, -2);
