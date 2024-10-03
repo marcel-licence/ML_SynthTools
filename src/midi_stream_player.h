@@ -46,78 +46,29 @@
 #endif
 
 
+#ifdef MIDI_STREAM_PLAYER_ENABLED
+
 #ifdef ML_SYNTH_INLINE_DECLARATION
 
-
-void MidiStreamPlayer_Init();
+void MidiStreamPlayer_Init(void);
 void MidiStreamPlayer_PlayFile(char *midi_filename);
 void MidiStreamPlayer_Tick(uint32_t ticks);
-void MidiStreamPlayer_Init();
+void MidiStreamPlayer_Init(void);
 void MidiStreamPlayer_PausePlayback(void);
 void MidiStreamPlayer_StopPlayback(void);
 void MidiStreamPlayer_StartPlayback(void);
 bool MidiStreamPlayer_IsPlaying(void);
 void MidiStreamPlayer_PlayMidiFile_fromLittleFS(char *filename, uint8_t trackToPlay);
 
-
-#endif
+#endif /* ML_SYNTH_INLINE_DECLARATION */
 
 
 #ifdef ML_SYNTH_INLINE_DEFINITION
 
 
-#ifdef MIDI_STREAM_PLAYER_ENABLED
-
-//#define MIDI_STREAM_PLAYER_SD_MMC_ENABLED
-
-//#define MIDI_STREAM_PLAYER_DATA_DUMP /*!< optional to dump event data from midi file */
-
-
-#if (defined ARDUINO_DAISY_SEED) || (defined STM32H7xx)
-#include <STM32SD.h>
-
-extern Sd2Card card;
-extern SdFatFs fatFs;
-
-#define SD_MMC  SD
-
-#define FST SDClass
-#else
-#define FST fs::FS
-#endif
-
-#ifdef ESP32
-
-#include <FS.h>
-#ifdef ARDUINO_RUNNING_CORE /* tested with arduino esp32 core version 2.0.2 */
-#include <LittleFS.h> /* Using library LittleFS at version 2.0.0 from https://github.com/espressif/arduino-esp32 */
-#else
-#include <LITTLEFS.h> /* Using library LittleFS_esp32 at version 1.0.6 from https://github.com/lorol/LITTLEFS */
-#define LittleFS LITTLEFS
-#endif
-#include <SD_MMC.h>
-
-#define MIDI_FS_LITTLE_FS   0
-#ifdef MIDI_STREAM_PLAYER_SD_MMC_ENABLED
-#define MIDI_FS_SD_MMC  1
-#endif
-
-#endif
-
-#ifdef ESP8266
-#include <FS.h>
-#include <LittleFS.h> /* Using library LittleFS at version 2.0.0 from https://github.com/espressif/arduino-esp32 */
-#define MIDI_FS_LITTLE_FS   0
-#endif
-
-
-#ifdef ESP8266_DEPRECATED /* used to try using deprecated SPIFFS */
-#include <SPIFFS.h>
-#define MIDI_FS_SPIFFS   2
-#endif
-
-
-#define FORMAT_LITTLEFS_IF_FAILED true
+#undef ML_SYNTH_INLINE_DEFINITION
+#include <fs/fs_access.h>
+#define ML_SYNTH_INLINE_DEFINITION
 
 
 #include <ml_midi_file_stream.h>
@@ -133,9 +84,6 @@ extern SdFatFs fatFs;
 static uint64_t tickCnt = 0;
 bool midiAutoLoop = false;
 
-
-static void listDir(FST &fs, const char *dirname, uint8_t levels);
-static void MidiStreamPlayer_ListFiles(uint8_t filesystem);
 
 static uint8_t MIDI_open(const char *path, const char *mode);
 static int MIDI_read(void *buf, uint8_t unused, size_t size, struct file_access_f *ff);
@@ -160,38 +108,18 @@ struct file_access_f mdiCallbacks =
     MIDI_seek,
 };
 
-fs::File midiFile;
+fs_id_t midi_fs = 0;
 
 static uint8_t MIDI_open(const char *path, const char *mode)
 {
-    if (!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED))
-    {
-        Serial.println("LITTLEFS Mount Failed");
-        return 0;
-    }
-    midiFile = LittleFS.open(path, "r");
-    if (!midiFile)
-    {
-        Serial.println("- failed to open file");
-        return 0;
-    }
-    else
-    {
-        Serial.printf("File opened: %s\n", path);
-    }
-
-    return 1;
+    return FS_OpenFile(midi_fs, path, "r");
 }
 
 int MIDI_read(void *buf, uint8_t unused, size_t size, struct file_access_f *ff)
 {
-    File *file = &midiFile;//ff->file;
-    for (size_t i = 0; i < size; i++)
-    {
-        ((uint8_t *)buf)[i] = file->read();
-        ff->file ++;
-    }
-    return size;
+    uint32_t bytes_read = readBytes((uint8_t *)buf, size);
+    ff->file += bytes_read;
+    return bytes_read;
 }
 
 int MIDI_write(void *buf, uint8_t unused, size_t size, struct file_access_f *ff)
@@ -201,14 +129,14 @@ int MIDI_write(void *buf, uint8_t unused, size_t size, struct file_access_f *ff)
 
 void MIDI_close(struct file_access_f *ff)
 {
-    File *file = &midiFile;//ff->file;
-    file->close();
+    FS_CloseFile();
 }
 
 char MIDI_getc(struct file_access_f *ff)
 {
-    File file = midiFile;//ff->file;
-    return file.read();
+    char c;
+    MIDI_read(&c, 1, 1, ff);
+    return c;
 }
 
 char MIDI_putc(char c, struct file_access_f *ff)
@@ -218,20 +146,20 @@ char MIDI_putc(char c, struct file_access_f *ff)
 
 int MIDI_tell(struct file_access_f *ff)
 {
-    return ff->file - 1;
+    return getStaticPos();
 }
 
 char MIDI_seek(struct file_access_f *ff, int pos, uint8_t mode)
 {
-    File *file = &midiFile;//ff->file;
     if (mode == SEEK_SET)
     {
-        file->seek(pos, SeekSet);
+        fileSeekTo(pos);
         ff->file = pos + 1;
     }
     else
     {
-        file->seek(pos, SeekCur);
+        /* not supported at the moment, but seems working without the implementation */
+        // file->seek(pos, SeekCur);
         ff->file += pos;
     }
     return 0;
@@ -239,59 +167,18 @@ char MIDI_seek(struct file_access_f *ff, int pos, uint8_t mode)
 
 void MidiStreamPlayer_Init()
 {
-#ifdef MIDI_FS_SPIFFS
-    MidiStreamPlayer_ListFiles(MIDI_FS_SPIFFS);
-#endif
+    FS_Setup();
 #ifdef MIDI_FS_LITTLE_FS
-    MidiStreamPlayer_ListFiles(MIDI_FS_LITTLE_FS);
+    midi_fs = FS_ID_LITTLEFS;
 #endif
 #ifdef MIDI_FS_SD_MMC
-    MidiStreamPlayer_ListFiles(MIDI_FS_SD_MMC);
+    midi_fs = FS_ID_SD_MMC;
 #endif
 }
 
 void MidiStreamPlayer_PlayFile(char *midi_filename)
 {
     MidiStreamPlayer_PlayMidiFile_fromLittleFS(midi_filename, 0);
-}
-
-static void listDir(FST &fs, const char *dirname, uint8_t levels)
-{
-    Serial.printf("Listing directory: %s\n", dirname);
-
-    File root = fs.open(dirname, "r");
-    if (!root)
-    {
-        Serial.println("Failed to open directory");
-        return;
-    }
-    if (!root.isDirectory())
-    {
-        Serial.println("Not a directory");
-        return;
-    }
-
-    File file = root.openNextFile();
-    while (file)
-    {
-        if (file.isDirectory())
-        {
-            Serial.print("  DIR : ");
-            Serial.println(file.name());
-            if (levels)
-            {
-                listDir(fs, file.name(), levels - 1);
-            }
-        }
-        else
-        {
-            Serial.print("  FILE: ");
-            Serial.print(file.name());
-            Serial.print("  SIZE: ");
-            Serial.println(file.size());
-        }
-        file = root.openNextFile();
-    }
 }
 
 static bool midiPlaying = false;
@@ -308,7 +195,7 @@ void MidiDataCallback(uint8_t *data, uint8_t data_len)
 }
 #endif
 
-uint64_t duration = 0;
+static uint64_t duration = 0;
 struct midi_proc_s midiStreamPlayerHandle;
 
 void MidiStreamPlayer_NoteOn(uint8_t ch, uint8_t note, uint8_t vel)
@@ -353,7 +240,7 @@ void MidiStreamPlayer_PlayMidiFile_fromLittleFS(char *filename, uint8_t trackToP
         MidiStreamParseTrack(&midiStreamPlayerHandle);
 
         float temp_f = (60000000.0 / midiStreamPlayerHandle.midi_tempo);
-        printf("midi_tempo: %d\n", midiStreamPlayerHandle.midi_tempo);
+        printf("midi_tempo: %" PRIu32 "\n", midiStreamPlayerHandle.midi_tempo);
         printf("tempo: %0.3f\n", temp_f);
 
         for (uint8_t n = 1; n < trackToPlay; n++)
@@ -509,89 +396,8 @@ void MidiStreamPlayer_Tick(uint32_t ticks)
     }
 }
 
-void MidiStreamPlayer_ListFiles(uint8_t filesystem)
-{
-    switch (filesystem)
-    {
-#ifdef MIDI_FS_SPIFFS
-    case MIDI_FS_SPIFFS:
-        {
-            if (!SPIFFS.begin(FORMAT_LITTLEFS_IF_FAILED))
-            {
-                Serial.println("SPIFFS Mount Failed");
-                return;
-            }
-            else
-            {
-                Serial.println("SPIFFS opened");
-            }
-            listDir(SPIFFS, "/", 3);
-        }
-        break;
-#endif /* MIDI_FS_SPIFFS */
-#ifdef MIDI_FS_LITTLE_FS
-    case MIDI_FS_LITTLE_FS:
-        {
-            if (!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED))
-            {
-                Serial.println("LittleFS Mount Failed");
-                return;
-            }
-            else
-            {
-                Serial.println("LittleFS opened");
-            }
-            listDir(LittleFS, "/", 3);
-        }
-        break;
-#endif /* MIDI_FS_LITTLE_FS */
-#ifdef MIDI_FS_SD_MMC
-    case MIDI_FS_SD_MMC:
-        {
-            if (!SD_MMC.begin())
-            {
-                Serial.println("Card Mount Failed");
-                return;
-            }
-            uint8_t cardType = SD_MMC.cardType();
-
-            if (cardType == CARD_NONE)
-            {
-                Serial.println("No SD_MMC card attached");
-                return;
-            }
-
-            Serial.println("SD_MMC opened");
-
-            Serial.print("SD_MMC Card Type: ");
-            if (cardType == CARD_MMC)
-            {
-                Serial.println("MMC");
-            }
-            else if (cardType == CARD_SD)
-            {
-                Serial.println("SDSC");
-            }
-            else if (cardType == CARD_SDHC)
-            {
-                Serial.println("SDHC");
-            }
-            else
-            {
-                Serial.println("UNKNOWN");
-            }
-
-            uint64_t cardSize = SD_MMC.cardSize() / (1024 * 1024);
-            Serial.printf("SD_MMC Card Size: %lluMB\n", cardSize);
-
-            listDir(SD_MMC, "/", 0);
-        }
-        break;
-#endif /* MIDI_FS_SD_MMC */
-    }
-}
-
-#endif
 
 #endif /* ML_SYNTH_INLINE_DEFINITION */
+
+#endif /* MIDI_STREAM_PLAYER_ENABLED */
 
