@@ -41,6 +41,7 @@
 #include <cdt.h>
 #endif
 
+#define RP2350_USE_I2S_ML_LIB
 
 #ifdef ML_SYNTH_INLINE_DECLARATION
 
@@ -123,9 +124,13 @@ uint32_t WavPwmDataBuff2[SAMPLE_BUFFER_SIZE];
 
 
 #ifdef PICO_AUDIO_I2S
+#ifdef RP2350_USE_I2S_ML_LIB
+#include <librp2350_i2s_audio.h>
+#else
 #include <I2S.h>
 // Create the I2S port using a PIO state machine
 I2S i2s(OUTPUT);
+#endif /* #endif RP2350_USE_I2S_ML_LIB */
 #endif
 
 #ifndef I2S_OVERSAMPLE
@@ -207,6 +212,7 @@ void Audio_Setup(void)
 #endif
 
 #ifdef PICO_AUDIO_I2S
+#ifndef RP2350_USE_I2S_ML_LIB
     i2s.setBCLK(PICO_AUDIO_I2S_CLOCK_PIN_BASE);
     i2s.setDATA(PICO_AUDIO_I2S_DATA_PIN);
     i2s.setBitsPerSample(16);
@@ -217,6 +223,9 @@ void Audio_Setup(void)
         Serial.println("Failed to initialize I2S!");
         while (1); // do nothing
     }
+#else /* #ifndef RP2350_USE_I2S_ML_LIB */
+    rp2350_i2s_init(26, 27);
+#endif /* #endif RP2350_USE_I2S_ML_LIB */
 #endif
 
 
@@ -273,9 +282,9 @@ static int16_t *queueTransmitBuffer2;
 
 void Teensy_Setup()
 {
-	#ifdef LED_PIN
+#ifdef LED_PIN
     pinMode(ledPin, OUTPUT);
-	#endif
+#endif
     Midi_Setup();
 }
 
@@ -377,6 +386,7 @@ void Audio_OutputMono(const int32_t *samples)
 #endif
 
 #ifdef PICO_AUDIO_I2S
+#ifndef RP2350_USE_I2S_ML_LIB
     for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
     {
         int32_t sig = samples[i];
@@ -385,6 +395,14 @@ void Audio_OutputMono(const int32_t *samples)
         sig16 = sig;
         i2s.write(sig16);
     }
+#else /* #ifndef RP2350_USE_I2S_ML_LIB */
+    int16_t mono_u16[SAMPLE_BUFFER_SIZE];
+    for (int n = 0; n < SAMPLE_BUFFER_SIZE; n++)
+    {
+        mono_u16[n] = samples[n] >> 8;
+    }
+    rp2350_i2s_write_stereo_samples_buff(mono_u16, mono_u16, SAMPLE_BUFFER_SIZE);
+#endif /* #endif RP2350_USE_I2S_ML_LIB */
 #endif
 
 #ifdef ESP32
@@ -720,6 +738,10 @@ void Audio_Output(const int16_t *left, const int16_t *right)
     }
 #endif /* RP2040_AUDIO_PWM */
 #endif /* ARDUINO_RASPBERRY_PI_PICO, ARDUINO_GENERIC_RP2040 */
+
+#ifdef PICO_AUDIO_I2S
+    rp2350_i2s_write_stereo_samples_buff(left, right, SAMPLE_BUFFER_SIZE);
+#endif /* PICO_AUDIO_I2S */
 }
 #endif
 
@@ -762,6 +784,7 @@ void Audio_Output(const float *left, const float *right)
 #endif /* ESP32 */
 
 #ifdef PICO_AUDIO_I2S
+#ifndef RP2350_USE_I2S_ML_LIB
     while (i2s.availableForWrite() == false)
     {
 
@@ -781,7 +804,10 @@ void Audio_Output(const float *left, const float *right)
         bf[n].r = (int16_t)(right[n] * INT16_MAX);
     }
     i2s.write((const uint8_t *)bf, SAMPLE_BUFFER_SIZE * 4);
-#endif
+#else /* #ifndef RP2350_USE_I2S_ML_LIB */
+    rp2350_i2s_write_stereo_samples_buff(left, right, SAMPLE_BUFFER_SIZE);
+#endif /* #ifndef,else RP2350_USE_I2S_ML_LIB */
+#endif /* PICO_AUDIO_I2S */
 
 #ifdef TEENSYDUINO
     {
