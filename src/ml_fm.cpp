@@ -51,18 +51,17 @@
 #include "cdt.h"
 #endif
 
-#ifdef ARDUINO
-#include <Arduino.h>
-#endif
-
 
 #include <ml_utils.h>
 #include <ml_status.h>
 
 
+#include <stdio.h>
 #include <stdint.h>
 #include <math.h>
-
+#ifndef GLOBAL_SINE
+#include <stdlib.h>
+#endif
 
 static float sample_rate = 0;
 
@@ -97,13 +96,13 @@ static void Sine_Init(void)
 }
 #endif
 
-float SineNorm(float alpha_div2pi)
+static float SineNorm(float alpha_div2pi)
 {
     uint32_t index = ((uint32_t)(alpha_div2pi * ((float)SINE_CNT))) % SINE_CNT;
     return sine[index];
 }
 
-float SineNormU32(uint32_t pos)
+static float SineNormU32(uint32_t pos)
 {
     return sine[SINE_I(pos)];
 }
@@ -241,6 +240,8 @@ struct channelSettingParam_s
     uint8_t notes[16];
     uint8_t noteStackCnt;
 };
+
+static uint32_t milliCnt = 0;
 
 static float modulationDepth = 0.0f;
 static float modulationSpeed = 5.0f;
@@ -1456,11 +1457,13 @@ inline
 float FmSynth_GetModulationPitchMultiplier(void)
 {
     float modSpeed = modulationSpeed;
-    return modulationDepth * modulationPitch * (SineNorm((modSpeed * ((float)millis()) / 1000.0f)));
+    return modulationDepth * modulationPitch * (SineNorm((modSpeed * ((float)milliCnt) / 1000.0f)));
 }
 
 void FmSynth_Process(const float *in __attribute__((unused)), float *out, int bufLen)
 {
+    milliCnt += (bufLen * 1000) / sample_rate;
+
     float pitchVar = pitchBendValue + FmSynth_GetModulationPitchMultiplier();
     pitchMultiplier = pow(2.0f, pitchVar / 12.0f);
 
@@ -1631,22 +1634,22 @@ void FmSynth_ChannelSettingDump(uint8_t ch __attribute__((unused)), float value)
 {
     if (value > 0)
     {
-        Serial.printf("setting->algo = %d;\n", currentChSetting->algo);
-        Serial.printf("setting->fmFeedback =  %0.6f;\n", currentChSetting->fmFeedback);
+        printf("setting->algo = %d;\n", currentChSetting->algo);
+        printf("setting->fmFeedback =  %0.6f;\n", currentChSetting->fmFeedback);
         for (int i = 0; i < 4; i++)
         {
-            Serial.printf("setting->op_prop[%d].ar = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].ar);
-            Serial.printf("setting->op_prop[%d].d1r = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].d1r);
-            Serial.printf("setting->op_prop[%d].d2l = %0.6f;\n", i, currentChSetting->op_prop[i].d2l);
-            Serial.printf("setting->op_prop[%d].d2r = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].d2r);
-            Serial.printf("setting->op_prop[%d].rr = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].rr);
-            Serial.printf("setting->op_prop[%d].rs = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].rs);
-            Serial.printf("setting->op_prop[%d].tl = %0.6f;\n", i, currentChSetting->op_prop[i].tl);
-            Serial.printf("setting->op_prop[%d].mul = %0.6f;\n", i, currentChSetting->op_prop[i].mul);
-            Serial.printf("setting->op_prop[%d].vel_to_tl = %0.6f;\n", i, currentChSetting->op_prop[i].vel_to_tl);
-            Serial.printf("setting->op_prop[%d].am = %0.6f;\n", i, currentChSetting->op_prop[i].am);
-            Serial.printf("setting->op_prop[%d].mw = %0.6f;\n", i, currentChSetting->op_prop[i].mw);
-            Serial.printf("setting->op_prop[%d].vel = %0.6f;\n", i, currentChSetting->op_prop[i].vel);
+            printf("setting->op_prop[%d].ar = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].ar);
+            printf("setting->op_prop[%d].d1r = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].d1r);
+            printf("setting->op_prop[%d].d2l = %0.6f;\n", i, currentChSetting->op_prop[i].d2l);
+            printf("setting->op_prop[%d].d2r = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].d2r);
+            printf("setting->op_prop[%d].rr = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].rr);
+            printf("setting->op_prop[%d].rs = %" PRIu32 ";\n", i, currentChSetting->op_prop[i].rs);
+            printf("setting->op_prop[%d].tl = %0.6f;\n", i, currentChSetting->op_prop[i].tl);
+            printf("setting->op_prop[%d].mul = %0.6f;\n", i, currentChSetting->op_prop[i].mul);
+            printf("setting->op_prop[%d].vel_to_tl = %0.6f;\n", i, currentChSetting->op_prop[i].vel_to_tl);
+            printf("setting->op_prop[%d].am = %0.6f;\n", i, currentChSetting->op_prop[i].am);
+            printf("setting->op_prop[%d].mw = %0.6f;\n", i, currentChSetting->op_prop[i].mw);
+            printf("setting->op_prop[%d].vel = %0.6f;\n", i, currentChSetting->op_prop[i].vel);
         }
     }
 }

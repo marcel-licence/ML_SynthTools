@@ -186,8 +186,6 @@ void ac101_setup()
     ac.SetVolumeHeadphone(99);
 
     ac.SetLineSource();
-
-
 }
 #endif /* #ifdef AC101_ENABLED */
 

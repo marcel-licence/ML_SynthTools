@@ -91,6 +91,28 @@ float sampleDataFSawTest[SAMPLE_BUFFER_SIZE];
 #define SAMPLE_DATA_TYPE    int32_t
 #endif
 
+#if 0
+#ifndef I2S_BCLK_PIN
+#define I2S_BCLK_PIN -1
+#endif
+
+#ifndef I2S_WCLK_PIN
+#define I2S_WCLK_PIN -1
+#endif
+
+#ifndef I2S_DOUT_PIN
+#define I2S_DOUT_PIN -1
+#endif
+#endif
+
+#ifndef I2S_MCLK_PIN
+#define I2S_MCLK_PIN I2S_PIN_NO_CHANGE
+#endif
+
+#ifndef I2S_DIN_PIN
+#define I2S_DIN_PIN I2S_PIN_NO_CHANGE
+#endif
+
 
 #ifndef I2S_OVERSAMPLE
 #define I2S_OVERSAMPLE  1
@@ -504,26 +526,22 @@ i2s_pin_config_t pins =
 };
 #endif
 #else
+#if (defined I2S_BCLK_PIN) && (defined I2S_WCLK_PIN) && (defined I2S_DOUT_PIN)
 i2s_pin_config_t pins =
 {
 #ifdef ARDUINO_RUNNING_CORE
-#ifdef I2S_MCLK_PIN
     .mck_io_num = I2S_MCLK_PIN,
-#else
-    .mck_io_num = I2S_PIN_NO_CHANGE,
-#endif
 #endif
     .bck_io_num = I2S_BCLK_PIN,
     .ws_io_num = I2S_WCLK_PIN,
     .data_out_num = I2S_DOUT_PIN,
-#ifdef I2S_DIN_PIN
     .data_in_num = I2S_DIN_PIN,
-#else
-    .data_in_num = I2S_PIN_NO_CHANGE,
-#endif
 };
+#endif /* (defined I2S_BCLK_PIN) && (defined I2S_WCLK_PIN) && (defined I2S_DOUT_PIN) */
+
 #endif
 
+#if (defined I2S_BCLK_PIN) && (defined I2S_WCLK_PIN) && (defined I2S_DOUT_PIN)
 void setup_i2s()
 {
     i2s_driver_install(i2s_port_number, &i2s_configuration, 0, NULL);
@@ -569,6 +587,7 @@ void setup_i2s()
     }
 #endif
 }
+#endif /* (defined I2S_BCLK_PIN) && (defined I2S_WCLK_PIN) && (defined I2S_DOUT_PIN) */
 
 #endif /* ESP32 */
 

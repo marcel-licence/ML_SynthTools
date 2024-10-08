@@ -330,7 +330,7 @@ void FS_Setup(void)
 
     if (!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED))
     {
-        Serial.printf("LittleFS Mount Failed");
+        Serial.printf("Error: LittleFS Mount Failed\n");
         return ;
     }
 
@@ -342,8 +342,6 @@ void FS_Setup(void)
         printDirectory(dir, 0);
         dir.close();
     }
-#ifdef SD_MMC
-#endif
 }
 
 

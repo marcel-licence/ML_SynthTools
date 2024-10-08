@@ -398,7 +398,6 @@ void TrackerLoadData(const uint8_t *data)
 
 bool TrackerLoadFile(void)
 {
-
     for (uint16_t n = 0; n < 12 * 3; n++)
     {
         notePeriod[n].period = 856 * pow(2, - n / 12.0f);
@@ -506,7 +505,6 @@ void PrintRowPattern(uint8_t patternIdx, uint8_t currentRow)
     }
     printf("\n");
 }
-
 
 void TrackerBreakPattern(void)
 {
@@ -695,7 +693,6 @@ void TrackerProcess(uint64_t passed)
         }
 
         uint16_t samplCnt = 0;
-
 
         while ((tply.timeOver2 > tply.rate) && (procTime > 0))
         {

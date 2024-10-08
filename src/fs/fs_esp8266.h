@@ -55,9 +55,6 @@
 
 
 #include <FS.h>
-#if (defined ARDUINO_RUNNING_CORE) /* tested with arduino esp32 core version 2.0.2 */
-#else
-#endif
 
 #include <LittleFS.h>
 
@@ -109,13 +106,12 @@ bool getFileFromIdx(uint32_t idx, char *filename, char *filter)
     return result;
 }
 
-
 void FS_Setup(void)
 {
 
     if (!LittleFS.begin())
     {
-        Serial.printf("LittleFS Mount Failed");
+        Serial.printf("Error: LittleFS Mount Failed\n");
         return ;
     }
 

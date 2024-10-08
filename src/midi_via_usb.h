@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Marcel Licence
+ * Copyright (c) 2023 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,7 +71,9 @@ void UsbMidiLoop();
 #ifdef MIDI_USB_ENABLED
 
 #include <Arduino.h>
+#ifndef TEENSYDUINO
 #include <Adafruit_TinyUSB.h> /* Using library Adafruit TinyUSB Library at version 1.14.4 from https://github.com/adafruit/Adafruit_TinyUSB_Arduino */
+#endif
 #include <MIDI.h> /* Using library MIDI Library at version 5.0.2 from https://github.com/FortySevenEffects/arduino_midi_library */
 
 Adafruit_USBD_MIDI usb_midi; /* create instance */
