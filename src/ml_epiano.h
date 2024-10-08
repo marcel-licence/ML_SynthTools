@@ -48,6 +48,17 @@
 #include <stdint.h>
 #include <ml_types.h>
 
+#ifdef ARDUINO_ARCH_RP2040
+#ifndef __ARM_FEATURE_DSP
+#define ML_EPiano ML_EPiano_RP2040
+#endif
+#endif
+
+#ifdef ARDUINO_ARCH_RP2040
+#ifdef __ARM_FEATURE_DSP
+#define ML_EPiano ML_EPiano_RP2350
+#endif
+#endif
 
 class ML_EPiano
 {
