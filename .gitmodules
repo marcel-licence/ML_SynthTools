@@ -19,3 +19,6 @@
 [submodule "examples/ml_synth_sampler_example"]
 	path = examples/ml_synth_sampler_example
 	url = https://github.com/marcel-licence/ml_synth_sampler_example
+[submodule "examples/ml_synth_fm_example"]
+	path = examples/ml_synth_fm_example
+	url = https://github.com/marcel-licence/ml_synth_fm_example.git
