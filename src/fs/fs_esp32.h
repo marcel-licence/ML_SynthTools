@@ -162,7 +162,6 @@ void WavToKeyboard(fs_id_t id, const char *dirname, void(*fileInd)(const char *f
             Serial.printf("Dir Found: %s (ignoreD)\n", file.name());
             if (max_depth != 0)
             {
-                // PatchManager_GetFileList(fs, file.name(), fileInd, depth + 1, max_depth - 1);
             }
         }
         else
@@ -330,7 +329,7 @@ void FS_Setup(void)
 
     if (!LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED))
     {
-        Serial.printf("Error: LittleFS Mount Failed\n");
+        Serial.printf("LittleFS Mount Failed");
         return ;
     }
 

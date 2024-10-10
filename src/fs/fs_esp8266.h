@@ -58,7 +58,6 @@
 
 #include <LittleFS.h>
 
-
 /*
  * extern function definitions
  */
@@ -106,12 +105,12 @@ bool getFileFromIdx(uint32_t idx, char *filename, char *filter)
     return result;
 }
 
-void FS_Setup(void)
+void FS_Setup()
 {
 
     if (!LittleFS.begin())
     {
-        Serial.printf("Error: LittleFS Mount Failed\n");
+        Serial.printf("LittleFS Mount Failed");
         return ;
     }
 

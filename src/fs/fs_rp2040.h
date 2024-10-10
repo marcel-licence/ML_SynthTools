@@ -199,7 +199,7 @@ void FS_Setup(void)
 {
     if (!LittleFS.begin())
     {
-        Serial.printf("Error: LittleFS Mount Failed\n");
+        Serial.printf("LittleFS Mount Failed");
         return ;
     }
 

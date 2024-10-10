@@ -170,7 +170,6 @@ void STM32_AudioInit()
     codec_writeReg(0x1f, 0x0f);
     codec_writeReg(0x02, 0x9e);
 
-
     /*
      * dump all registers
      */

@@ -84,7 +84,6 @@ void MidiStreamPlayer_PlayMidiFile_fromLittleFS(char *filename, uint8_t trackToP
 static uint64_t tickCnt = 0;
 bool midiAutoLoop = false;
 
-
 static uint8_t MIDI_open(const char *path, const char *mode);
 static int MIDI_read(void *buf, uint8_t unused, size_t size, struct file_access_f *ff);
 static int MIDI_write(void *buf, uint8_t unused, size_t size, struct file_access_f *ff);
@@ -159,7 +158,6 @@ char MIDI_seek(struct file_access_f *ff, int pos, uint8_t mode)
     else
     {
         /* not supported at the moment, but seems working without the implementation */
-        // file->seek(pos, SeekCur);
         ff->file += pos;
     }
     return 0;
@@ -395,7 +393,6 @@ void MidiStreamPlayer_Tick(uint32_t ticks)
         }
     }
 }
-
 
 #endif /* ML_SYNTH_INLINE_DEFINITION */
 
