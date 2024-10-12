@@ -55,6 +55,7 @@ void TrackerSetup(uint32_t sample_rate);
 void TrackerStartPlayback(void);
 void TrackerProcess(uint64_t passed);
 void TrackerProcessSamples(Q1_14 *chL, Q1_14 *chR, uint64_t count);
+void TrackerProcessSamples(Q1_14 *ch1, Q1_14 *ch2, Q1_14 *ch3, Q1_14 *ch4, uint64_t count);
 void TrackerProcessOutput(void);
 void TrackerLoadData(const uint8_t *data);
 
