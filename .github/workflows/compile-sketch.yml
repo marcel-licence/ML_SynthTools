@@ -78,8 +78,7 @@ jobs:
         with:
           fqbn: ${{ matrix.fqbn }}
           platforms: |
-            - name: esp8266
-              source-url: https://arduino.esp8266.com/stable/package_esp8266com_index.json
+            - source-url: https://arduino.esp8266.com/stable/package_esp8266com_index.json
               version: 2.0.13
           sketch-paths: |
             - examples/ml_mod_tracker
