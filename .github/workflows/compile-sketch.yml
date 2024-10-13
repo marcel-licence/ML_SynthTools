@@ -99,6 +99,49 @@ jobs:
               - source-url: https://github.com/marcel-licence/AC101.git
                 name: AC101
 
+  build_stm32:
+
+    name: build stm32
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        fqbn:
+          - teensy:avr:teensy41
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          
+      - name: Compile sketch
+        uses: arduino/compile-sketches@v1
+        with:
+          fqbn: ${{ matrix.fqbn }}
+          platforms: |
+            - name: STMicroelectronics:STM32 MCU based boards
+            - source-url: https://raw.githubusercontent.com/stm32duino/BoardManagerFiles/main/package_stmicroelectronics_index.json
+              version: 2.6.0
+          sketch-paths: |
+            - examples/ml_mod_tracker
+            - examples/ml_synth_organ_example
+          libraries: |
+              - source-url: https://github.com/marcel-licence/ML_SynthTools.git
+                name: ML_SynthTools
+              - source-url: https://github.com/adafruit/Adafruit-GFX-Library.git
+                name: Adafruit_GFX_Library
+                version: 1.10.10
+              - source-url: https://github.com/adafruit/Adafruit_SSD1306.git
+                name: Adafruit_SSD1306
+                version: 2.4.5
+              - source-url: https://github.com/adafruit/Adafruit_BusIO.git
+                name: Adafruit BusIO
+                version: 1.14.1
+              - source-url: https://github.com/marcel-licence/AC101.git
+                name: AC101
+
   build_teensy:
 
     name: build teensy
@@ -122,7 +165,7 @@ jobs:
           fqbn: ${{ matrix.fqbn }}
           platforms: |
             - name: teensy:Teensy (for Arduino IDE 2.0.4 or later)
-            - source-url: https://www.pjrc.com/teensy/package_teensy_index.json
+              source-url: https://www.pjrc.com/teensy/package_teensy_index.json
               version: 1.56.2
           sketch-paths: |
             - examples/ml_mod_tracker
