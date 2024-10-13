@@ -29,33 +29,45 @@
  */
 
 /**
- * @file ml_boards.h
+ * @file board_ml_synth_v2.h
  * @author Marcel Licence
- * @date 02.01.2021
+ * @date 23.06.2023
  *
- * @brief Board description main include file
+ * @brief Board description for my custom PCB
  */
 
 
-#ifdef BOARD_ML_V1
-#include "./boards/board_ml_v1.h"
-#elif (defined BOARD_ML_SYNTH_V2)
-#include <boards/board_ml_synth_v2.h>
-#elif (defined BOARD_ESP32_AUDIO_KIT_AC101)
-#include "./boards/board_audio_kit_ac101.h"
-#elif (defined BOARD_ESP32_AUDIO_KIT_ES8388)
-#include "./boards/board_audio_kit_es8388.h"
-#elif (defined BOARD_TTGO_T9_RGB_LED_WM8978)
-#include "./boards/board_ttgo_t9_rgb_led_wm8978.h"
-#elif (defined BOARD_ESP32_DOIT)
-#include "./boards/board_esp32_doit.h"
-#elif (defined ARDUINO_GENERIC_F407VGTX)
-#include "boards/board_stm32f407g-disc1.h"
-#elif (defined ARDUINO_DISCO_F407VG)
-#include "boards/board_stm32f407g-disc1.h"
-#elif (defined ARDUINO_GENERIC_RP2040)
-#include "boards/board_tiny2040.h"
-#else
-/* no include here */
-#endif
+#ifndef BOARDS_BOARD_ML_SYNTH_V2_H_
+#define BOARDS_BOARD_ML_SYNTH_V2_H_
+
+
+/*
+ * MIDI In/Out
+ */
+#define MIDI_PORT2_ACTIVE
+#define MIDI_RX2_PIN 34
+#define MIDI_TX2_PIN 33
+
+/*
+ * SD/MMC
+ */
+#define SD_MMC_ENABLED
+
+/*
+ * I2S Audio In/Out
+ */
+#define I2S_BCLK_PIN    32
+#define I2S_WCLK_PIN    25
+#define I2S_DOUT_PIN    26 /* connected to SDIN of audio codec */
+#define I2S_DIN_PIN     35 /* connected to SDOUT of audio codec */
+
+/*
+ * I2C
+ */
+#define I2C_ENABLED
+#define I2C_SDA 21
+#define I2C_SCL 22
+
+
+#endif /* BOARDS_BOARD_ML_SYNTH_V2_H_ */
 
