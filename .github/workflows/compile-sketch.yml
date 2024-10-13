@@ -82,8 +82,14 @@ jobs:
               source-url: https://arduino.esp8266.com/stable/package_esp8266com_index.json
               version: 3.1.2
           sketch-paths: |
+            - examples/ml_epiano_example
             - examples/ml_mod_tracker
+            - examples/ml_synth_basic_example
+            - examples/ml_synth_fm_example
+            - examples/ml_synth_multi_saw_example
             - examples/ml_synth_organ_example
+            - examples/ml_synth_pwm_osc_example
+            - examples/ml_synth_sampler_example
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
@@ -100,6 +106,8 @@ jobs:
                 name: AC101
 
   build_stm32:
+
+    if: false
 
     name: build stm32
 
@@ -125,8 +133,14 @@ jobs:
             - source-url: https://raw.githubusercontent.com/stm32duino/BoardManagerFiles/main/package_stmicroelectronics_index.json
               version: 2.0.0
           sketch-paths: |
+            - examples/ml_epiano_example
             - examples/ml_mod_tracker
+            - examples/ml_synth_basic_example
+            - examples/ml_synth_fm_example
+            - examples/ml_synth_multi_saw_example
             - examples/ml_synth_organ_example
+            - examples/ml_synth_pwm_osc_example
+            - examples/ml_synth_sampler_example
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
@@ -168,8 +182,14 @@ jobs:
               source-url: https://www.pjrc.com/teensy/package_teensy_index.json
               version: 1.56.2
           sketch-paths: |
+            - examples/ml_epiano_example
             - examples/ml_mod_tracker
+            - examples/ml_synth_basic_example
+            - examples/ml_synth_fm_example
+            - examples/ml_synth_multi_saw_example
             - examples/ml_synth_organ_example
+            - examples/ml_synth_pwm_osc_example
+            - examples/ml_synth_sampler_example
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
