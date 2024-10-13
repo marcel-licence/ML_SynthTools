@@ -47,6 +47,7 @@
 
 
 void Slicer_Process(Q1_14 *ch_l, Q1_14 *ch_r, uint32_t sample_count);
+uint32_t Slicer_GetLastMultiplier(void);
 void Slicer_SetSpeed(uint8_t unused __attribute__((unused)), uint8_t value);
 void Slicer_SetDepth(uint8_t unused __attribute__((unused)), uint8_t value);
 void Slicer_SetType(uint8_t unused __attribute__((unused)), uint8_t value);
