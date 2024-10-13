@@ -108,7 +108,7 @@ jobs:
     strategy:
       matrix:
         fqbn:
-          - teensy:avr:teensy41
+          - STMicroelectronics:stm32:GenH7
 
     steps:
       - name: Checkout repository
@@ -121,7 +121,7 @@ jobs:
         with:
           fqbn: ${{ matrix.fqbn }}
           platforms: |
-            - name: STMicroelectronics:STM32 MCU based boards
+            - name: STMicroelectronics:stm32
             - source-url: https://raw.githubusercontent.com/stm32duino/BoardManagerFiles/main/package_stmicroelectronics_index.json
               version: 2.6.0
           sketch-paths: |
@@ -164,7 +164,7 @@ jobs:
         with:
           fqbn: ${{ matrix.fqbn }}
           platforms: |
-            - name: teensy:Teensy (for Arduino IDE 2.0.4 or later)
+            - name: teensy:avr
               source-url: https://www.pjrc.com/teensy/package_teensy_index.json
               version: 1.56.2
           sketch-paths: |
