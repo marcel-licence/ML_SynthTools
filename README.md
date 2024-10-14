@@ -26,6 +26,8 @@ This library supports different platforms:
 - Teensy 4.1 (imxrt1062)
 - Daisy Seed (cortex-m7)
 - Raspberry Pi Pico (rp2040)
+- Raspberry Pi Pico 2 (rp2350/cortex-m33)
+- STM32F3* (cortex-m3)
 - STM32F407 (cortex-m4)
 
 The organ example can be found here: https://github.com/marcel-licence/ml_synth_organ_example
