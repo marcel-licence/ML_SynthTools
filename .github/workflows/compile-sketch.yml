@@ -44,6 +44,8 @@ jobs:
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
+              - source-url: https://github.com/marcel-licence/ML_SynthTools_Lib.git
+                name: ML_SynthTools_Lib
               - source-url: https://github.com/adafruit/Adafruit-GFX-Library.git
                 name: Adafruit_GFX_Library
                 version: 1.10.10
@@ -93,6 +95,8 @@ jobs:
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
+              - source-url: https://github.com/marcel-licence/ML_SynthTools_Lib.git
+                name: ML_SynthTools_Lib
               - source-url: https://github.com/adafruit/Adafruit-GFX-Library.git
                 name: Adafruit_GFX_Library
                 version: 1.10.10
@@ -144,6 +148,8 @@ jobs:
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
+              - source-url: https://github.com/marcel-licence/ML_SynthTools_Lib.git
+                name: ML_SynthTools_Lib
               - source-url: https://github.com/adafruit/Adafruit-GFX-Library.git
                 name: Adafruit_GFX_Library
                 version: 1.10.10
@@ -195,6 +201,8 @@ jobs:
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
+              - source-url: https://github.com/marcel-licence/ML_SynthTools_Lib.git
+                name: ML_SynthTools_Lib
               - source-url: https://github.com/adafruit/Adafruit-GFX-Library.git
                 name: Adafruit_GFX_Library
                 version: 1.10.10
