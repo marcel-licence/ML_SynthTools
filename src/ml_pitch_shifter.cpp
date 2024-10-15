@@ -45,6 +45,7 @@
 
 
 #include <ml_pitch_shifter.h>
+#include <ml_pitch_shifter_p.h>
 
 #include <ml_status.h>
 

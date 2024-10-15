@@ -77,8 +77,5 @@ private:
 };
 
 
-void ML_Vibrato_ProcessHQ(const float *in, const float *mod_in, float *out, uint32_t count, float mod_multiplier, int32_t &inCnt, float *buffer, float depth, float depthInv);
-
-
 #endif /* SRC_ML_VIBRATO_H_ */
 

@@ -45,6 +45,8 @@
 
 
 #include <ml_vibrato.h>
+#include <ml_vibrato_p.h>
+
 
 #include <ml_status.h>
 

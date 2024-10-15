@@ -79,8 +79,5 @@ private:
 };
 
 
-void ML_PitchShifter_ProcessHQ(const float *in, float *buffer, float *out, uint32_t count, float speed, int32_t &inCnt, float &outCnt, float wetV, float dryV, float feedback);
-
-
 #endif /* SRC_ML_PITCH_SHIFTER_H_ */
 
