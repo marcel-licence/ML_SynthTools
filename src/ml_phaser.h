@@ -74,8 +74,5 @@ void Phaser_SetDepth(uint8_t unused __attribute__((unused)), uint8_t value_u8);
 void Phaser_SetG(uint8_t unused __attribute__((unused)), uint8_t value_u8);
 
 
-void Phaser_ProcessHQ(const float *in, const float *lfo_in, float *out, int buffLen, float phaserDepth, struct allpass_s *ap0);
-
-
 #endif /* SRC_ML_PHASER_H_ */
 

@@ -48,6 +48,7 @@
 
 
 #include <ml_phaser.h>
+#include <ml_phaser_p.h>
 #include <ml_alg.h>
 #include <ml_status.h>
 
