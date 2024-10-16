@@ -111,7 +111,7 @@ jobs:
 
   build_rp2040:
 
-    if: true
+    if: false
 
     name: build rp2040
 
@@ -144,7 +144,7 @@ jobs:
 
   build_stm32:
 
-    if: true
+    if: false
 
     name: build stm32
 
