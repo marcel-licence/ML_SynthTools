@@ -16,6 +16,7 @@ In this documentation you will find:
 
 There are some references to the organ project because this was the first which supports the highest count of platforms/boards.
 
+The installation manual can be found here: <a href="extras/install.md">Installation manual</a>
 
 # Platform support
 
