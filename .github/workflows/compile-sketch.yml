@@ -164,7 +164,7 @@ jobs:
 
   build_teensy:
 
-    if: false
+    if: true
 
     name: build teensy
 
