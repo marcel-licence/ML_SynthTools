@@ -109,9 +109,42 @@ jobs:
               - source-url: https://github.com/marcel-licence/AC101.git
                 name: AC101
 
+  build_rp2040:
+
+    if: true
+
+    name: build rp2040
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        fqbn:
+          - rp2040:rp2040:rpipico
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compile sketch
+        uses: arduino/compile-sketches@v1
+        with:
+          fqbn: ${{ matrix.fqbn }}
+          platforms: |
+            - name: rp2040:rp2040
+              source-url: https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+          sketch-paths: |
+            - ./
+          libraries: |
+              - source-url: https://github.com/marcel-licence/ML_SynthTools.git
+                name: ML_SynthTools
+              - source-url: https://github.com/FortySevenEffects/arduino_midi_library.git
+                name: MIDI_Library
+                version: 5.0.2
+
   build_stm32:
 
-    if: false
+    if: true
 
     name: build stm32
 
