@@ -45,7 +45,7 @@
 
 
 #include <ml_vibrato.h>
-#include <ml_vibrato_p.h>
+#include <ml_vibrato_p.h> /* required library: ML SynthTools Libraries from https://github.com/marcel-licence/ML_SynthTools_Lib */
 
 
 #include <ml_status.h>

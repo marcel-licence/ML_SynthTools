@@ -45,7 +45,7 @@
 
 
 #include <ml_pitch_shifter.h>
-#include <ml_pitch_shifter_p.h>
+#include <ml_pitch_shifter_p.h> /* required library: ML SynthTools Libraries from https://github.com/marcel-licence/ML_SynthTools_Lib */
 
 #include <ml_status.h>
 
