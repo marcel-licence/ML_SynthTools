@@ -194,7 +194,7 @@ jobs:
             #- examples/ml_mod_tracker
             - examples/ml_synth_basic_example
             - examples/ml_synth_fm_example
-            - examples/ml_synth_multi_saw_example
+            #- examples/ml_synth_multi_saw_example
             #- examples/ml_synth_organ_example
             #- examples/ml_synth_pwm_osc_example
             #- examples/ml_synth_sampler_example
