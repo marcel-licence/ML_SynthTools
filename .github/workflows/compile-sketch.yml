@@ -188,7 +188,7 @@ jobs:
           platforms: |
             - name: teensy:avr
               source-url: https://www.pjrc.com/teensy/package_teensy_index.json
-              version: 1.56.2
+              version: 1.8.5
           sketch-paths: |
             - examples/ml_epiano_example
             - examples/ml_mod_tracker
