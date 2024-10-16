@@ -197,7 +197,7 @@ jobs:
 
   build_teensy:
 
-    if: false
+    if: true
 
     name: build teensy
 
@@ -221,16 +221,16 @@ jobs:
           platforms: |
             - name: teensy:avr
               source-url: https://www.pjrc.com/teensy/package_teensy_index.json
-              version: 1.56.2
+              version: 1.59.0
           sketch-paths: |
-            - examples/ml_epiano_example
-            - examples/ml_mod_tracker
+            #- examples/ml_epiano_example
+            #- examples/ml_mod_tracker
             - examples/ml_synth_basic_example
             - examples/ml_synth_fm_example
-            - examples/ml_synth_multi_saw_example
-            - examples/ml_synth_organ_example
-            - examples/ml_synth_pwm_osc_example
-            - examples/ml_synth_sampler_example
+            #- examples/ml_synth_multi_saw_example
+            #- examples/ml_synth_organ_example
+            #- examples/ml_synth_pwm_osc_example
+            #- examples/ml_synth_sampler_example
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
