@@ -36,10 +36,10 @@ jobs:
             - examples/ml_epiano_example
             - examples/ml_mod_tracker
             - examples/ml_synth_basic_example
-            - examples/ml_synth_fm_example
+            #- examples/ml_synth_fm_example
             - examples/ml_synth_multi_saw_example
             - examples/ml_synth_organ_example
-            - examples/ml_synth_pwm_osc_example
+            #- examples/ml_synth_pwm_osc_example
             - examples/ml_synth_sampler_example
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
@@ -109,9 +109,8 @@ jobs:
               - source-url: https://github.com/marcel-licence/AC101.git
                 name: AC101
 
-  build_rp2040:
 
-    if: false
+  build_rp2040:
 
     name: build rp2040
 
@@ -126,16 +125,44 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+        with:
+          submodules: 'true'
+          
       - name: Compile sketch
         uses: arduino/compile-sketches@v1
         with:
           fqbn: ${{ matrix.fqbn }}
+          cli-compile-flags: |
+            - --build-property
+            - "build.usbstack_flags=-DUSE_TINYUSB -I{runtime.platform.path}/libraries/Adafruit_TinyUSB_Arduino/src/arduino"
           platforms: |
             - name: rp2040:rp2040
               source-url: https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
           sketch-paths: |
-            - ./
+            - examples/ml_epiano_example
+            - examples/ml_mod_tracker
+            - examples/ml_synth_basic_example
+            #- examples/ml_synth_fm_example
+            - examples/ml_synth_multi_saw_example
+            - examples/ml_synth_organ_example
+            #- examples/ml_synth_pwm_osc_example
+            - examples/ml_synth_sampler_example
           libraries: |
+              - source-url: https://github.com/marcel-licence/ML_SynthTools.git
+                name: ML_SynthTools
+              - source-url: https://github.com/marcel-licence/ML_SynthTools_Lib.git
+                name: ML_SynthTools_Lib
+              - source-url: https://github.com/adafruit/Adafruit-GFX-Library.git
+                name: Adafruit_GFX_Library
+                version: 1.10.10
+              - source-url: https://github.com/adafruit/Adafruit_SSD1306.git
+                name: Adafruit_SSD1306
+                version: 2.4.5
+              - source-url: https://github.com/adafruit/Adafruit_BusIO.git
+                name: Adafruit BusIO
+                version: 1.14.1
+              - source-url: https://github.com/marcel-licence/AC101.git
+                name: AC101
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
               - source-url: https://github.com/FortySevenEffects/arduino_midi_library.git
