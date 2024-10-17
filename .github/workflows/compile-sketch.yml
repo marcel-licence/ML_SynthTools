@@ -112,9 +112,6 @@ jobs:
 
   build_rp2040:
 
-    if: true
-
-
     name: build rp2040
 
     runs-on: ubuntu-latest
@@ -135,14 +132,13 @@ jobs:
         uses: arduino/compile-sketches@v1
         with:
           fqbn: ${{ matrix.fqbn }}
-
-          build-properties: build.usbstack=tinyusb
-
+          cli-compile-flags: |
+            - --build-property
+            - "build.usbstack_flags=-DUSE_TINYUSB -I{runtime.platform.path}/libraries/Adafruit_TinyUSB_Arduino/src/arduino"
           platforms: |
             - name: rp2040:rp2040
               source-url: https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
           sketch-paths: |
-
             - examples/ml_epiano_example
             - examples/ml_mod_tracker
             - examples/ml_synth_basic_example
