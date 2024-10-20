@@ -29,36 +29,26 @@
  */
 
 /**
- * @file ml_inline.h
+ * @file ml_scratch.cpp
  * @author Marcel Licence
- * @data 02.04.2023
+ * @date 20.10.2024
  *
- * @brief   This file includes all required header for inline build
+ * @brief  Declarations of simple sample playback functions used for scratching
+ * @see https://www.youtube.com/watch?v=Ml6VrlV3hvk
  */
 
-#include <audio_module.h>
-#include <blink.h>
-#include <es8388.h>
-#include <esp32_audio_kit_module.h>
-#if (defined ESP32) || (defined ESP8266) || (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_ARCH_RP2040)
-#include <fs/fs_access.h>
-#include <fs/fs_common.h>
-#include <fs/fs_esp32.h>
-#include <fs/fs_esp8266.h>
-#include <fs/fs_rp2040.h>
-#endif
-#include <i2s_interface.h>
-#include <i2s_module.h>
-#include <midi_interface.h>
-#include <midi_stream_player.h>
-#include <midi_via_ble.h>
-#include <midi_via_usb.h>
-#include <ml_as5600_inline.h>
-#include <ml_board_setup.h>
-#include <ml_scope_oled_inline.h>
-#include <ml_status.h>
-#include <ml_status_inline.h>
-#include <samd21_audio_core.h>
-#include <usbMidiHost.h>
-#include <wm8960.h>
-#include <wm8978.h>
+#ifndef ML_SCRATCH_H_
+#define ML_SCRATCH_H_
+
+
+#include <stdint.h>
+#include <ml_types.h>
+
+
+void Scratch_Init(float sample_rate);
+bool Scratch_AddSampleStatic(const uint8_t *data, uint32_t size, uint8_t idx);
+void Scratch_Process(Q1_14 *samples_l, Q1_14 *samples_r, uint32_t len);
+void Scratch_SetPitchAbs(float pitch, uint8_t idx);
+
+
+#endif /* ML_SCRATCH_H_ */

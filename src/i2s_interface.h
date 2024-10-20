@@ -44,7 +44,7 @@
 #endif
 
 
-#ifdef SAMPLE_RATE
+#if ((defined SAMPLE_BUFFER_SIZE) && (defined SAMPLE_RATE))
 
 
 #ifdef ML_SYNTH_INLINE_DECLARATION
@@ -592,7 +592,7 @@ void setup_i2s()
 #endif /* ESP32 */
 
 
-#endif /* SAMPLE_RATE */
+#endif /* #if ((defined SAMPLE_BUFFER_SIZE) && (defined SAMPLE_RATE)) */
 
 
 #endif /* ML_SYNTH_INLINE_DEFINITION */

@@ -41,6 +41,10 @@
 #include <cdt.h>
 #endif
 
+
+#if (defined SAMPLE_BUFFER_SIZE)
+
+
 #define RP2350_USE_I2S_ML_LIB
 
 #ifdef ML_SYNTH_INLINE_DECLARATION
@@ -920,3 +924,4 @@ void Audio_Output(const float *left, const float *right)
 
 #endif // ML_SYNTH_INLINE_DEFINITION
 
+#endif /* #if (defined SAMPLE_BUFFER_SIZE) */
