@@ -44,7 +44,7 @@
 #define SRC_ML_PHASER_H_
 
 
-#include <inttypes.h>
+#include <stdint.h>
 
 
 #define PHASER_AP0 150

@@ -116,3 +116,13 @@ Some changes in the toolchain cause that the linker searches the lib in the cort
 ---
 
 Please feel free to share your experience and ideas. 
+
+## Support & Donations
+
+If you appreciate the work done on this project and would like to support its development, I would be more than happy to accept donations!
+
+For more information on how to donate, please send an email to:
+
+📧 **marcel.licence.o@gmail.com**
+
+Thank you for your support!
