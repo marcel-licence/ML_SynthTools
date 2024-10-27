@@ -110,9 +110,6 @@ extern "C" {
 #include "DaisyDuino.h" /* requires the DaisyDuino library: https://github.com/electro-smith/DaisyDuino */
 #endif
 
-#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
-#include <I2S.h>
-
 #ifdef RP2040_AUDIO_PWM
 #include "RP2040_AudioPwm.h"
 
@@ -124,6 +121,8 @@ uint32_t WavPwmDataBuff[SAMPLE_BUFFER_SIZE];
 uint32_t WavPwmDataBuff2[SAMPLE_BUFFER_SIZE];
 #endif
 
+#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
+#include <I2S.h>
 #endif
 
 
@@ -229,6 +228,7 @@ void Audio_Setup(void)
     }
 #else /* #ifndef RP2350_USE_I2S_ML_LIB */
     rp2350_i2s_init(26, 27);
+    Serial.printf("rp2350_i2s_init\n\tclock_pin_base: 26\n\tdata_pin: 27\n");
 #endif /* #endif RP2350_USE_I2S_ML_LIB */
 #endif
 
@@ -242,13 +242,16 @@ void Audio_Setup(void)
     pinMode(DAC0, OUTPUT);
 #endif
 
-#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
 #ifdef RP2040_AUDIO_PWM
     uint8_t pwmPinNumber = RP2040_AUDIO_PWM_PIN;
     Serial.printf("Initialize pwm audio used without DAC pin %d + pin %d:\n", pwmPinNumber, pwmPinNumber + 1);
     Serial.printf("    sample rate: %d\n", SAMPLE_RATE);
     Serial.printf("    buffer size: %d\n", SAMPLE_BUFFER_SIZE);
     RP2040_Audio_Pwm_Init(pwmPinNumber, SAMPLE_RATE, WavPwmDataBuff, WavPwmDataBuff2, SAMPLE_BUFFER_SIZE);
+#endif
+
+#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
+#ifdef RP2040_AUDIO_PWM
 #else
     if (!I2S.begin(SAMPLE_RATE))
     {
@@ -500,7 +503,6 @@ void Audio_OutputMono(const int32_t *samples)
     STM32F407G_AudioWriteS16(mono_s16, mono_s16);
 #endif /* ARDUINO_DISCO_F407VGxx */
 
-#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
 #ifdef RP2040_AUDIO_PWM
     union sample
     {
@@ -537,6 +539,10 @@ void Audio_OutputMono(const int32_t *samples)
         audioBuff[i].left = val;
         audioBuff[i].right = val;
     }
+#endif
+
+#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
+#ifdef RP2040_AUDIO_PWM
 #else /* RP2040_AUDIO_PWM */
     /*
      * @see https://arduino-pico.readthedocs.io/en/latest/i2s.html
@@ -683,7 +689,6 @@ void Audio_Output(const int16_t *left, const int16_t *right)
     dataReady = false;
 #endif /* ARDUINO_DAISY_SEED */
 
-#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
 #ifdef RP2040_AUDIO_PWM
     union sample
     {
@@ -724,6 +729,10 @@ void Audio_Output(const int16_t *left, const int16_t *right)
         val += 361;
         audioBuff[i].right = val;
     }
+#endif
+
+#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
+#ifdef RP2040_AUDIO_PWM
 #else /* RP2040_AUDIO_PWM */
     /*
      * @see https://arduino-pico.readthedocs.io/en/latest/i2s.html
@@ -744,7 +753,29 @@ void Audio_Output(const int16_t *left, const int16_t *right)
 #endif /* ARDUINO_RASPBERRY_PI_PICO, ARDUINO_GENERIC_RP2040 */
 
 #ifdef PICO_AUDIO_I2S
+#ifndef RP2350_USE_I2S_ML_LIB
+    while (i2s.availableForWrite() == false)
+    {
+
+    }
+    union
+    {
+        uint32_t u32;
+        struct
+        {
+            int16_t l;
+            int16_t r;
+        };
+    } bf[SAMPLE_BUFFER_SIZE];
+    for (int n = 0; n < SAMPLE_BUFFER_SIZE; n++)
+    {
+        bf[n].l = left[n];
+        bf[n].r = right[n];
+    }
+    i2s.write((const uint8_t *)bf, SAMPLE_BUFFER_SIZE * 4);
+#else
     rp2350_i2s_write_stereo_samples_buff(left, right, SAMPLE_BUFFER_SIZE);
+#endif
 #endif /* PICO_AUDIO_I2S */
 }
 #endif
