@@ -49,6 +49,9 @@ void Scratch_Init(float sample_rate);
 bool Scratch_AddSampleStatic(const uint8_t *data, uint32_t size, uint8_t idx);
 void Scratch_Process(Q1_14 *samples_l, Q1_14 *samples_r, uint32_t len);
 void Scratch_SetPitchAbs(float pitch, uint8_t idx);
+void Scratch_TriggerSample(uint8_t idx);
+void Scratch_SetNoLoop(uint8_t idx);
+void Scratch_SetVolume(float volume, uint8_t idx);
 
 
 #endif /* ML_SCRATCH_H_ */

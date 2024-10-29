@@ -69,9 +69,13 @@ struct scratch_sample_s
     uint32_t sample_count;
     uint8_t note;
     uint32_t pos = 0;
+    uint16_t volume;
 
     float pitch;
     float pos_f;
+
+    bool loop;
+    bool stereo;
 };
 
 struct scratch_s
@@ -147,6 +151,16 @@ bool Scratch_AddSampleStatic(const uint8_t *data, uint32_t size, uint8_t idx)
     newSample->data = wav_data;
     newSample->size = (wavHdr->nextTag.tag_data_size);
     newSample->sample_count = (wavHdr->nextTag.tag_data_size / wavHdr->bytesPerSample);
+    newSample->loop = true;
+    newSample->volume = 1 << 15;
+    if (wavHdr->numberOfChannels == 2)
+    {
+        newSample->stereo = true;
+    }
+    else
+    {
+        newSample->stereo = false;
+    }
 
     scratch.sample_count++;
 
@@ -167,15 +181,49 @@ void Scratch_ProcessSample(Q1_14 *samples_l, Q1_14 *samples_r, uint32_t len, str
 {
     for (uint32_t n = 0 ; n < len; n++)
     {
-        sample->pos = sample->pos_f;
 
-        samples_l[n].s16 += sample->samples[sample->pos] / 4;
-        samples_r[n].s16 += sample->samples[sample->pos] / 4;
+        sample->pos = sample->pos_f;
+        if (sample->stereo)
+        {
+            sample->pos -= sample->pos % 2;
+        }
+
+        int32_t s;
+
+        s = sample->samples[sample->pos] / 4;
+        s *= sample->volume;
+        s >>= 15;
+        samples_l[n].s16 += s;
+        if (sample->stereo)
+        {
+            sample->pos++;
+
+            s = sample->samples[sample->pos] / 4;
+            s *= sample->volume;
+            s >>= 15;
+        }
+
+        samples_r[n].s16 += s;
 
         sample->pos_f += sample->pitch;
-        if (sample->pos_f >= sample->sample_count)
+
+        uint32_t sample_end_count = sample->sample_count;
+        if (sample->stereo)
         {
-            sample->pos_f -= sample->sample_count;
+            sample_end_count *= 2;
+        }
+
+        if (sample->pos_f >= sample_end_count)
+        {
+            if (sample->loop)
+            {
+                sample->pos_f -= sample->sample_count;
+            }
+            else
+            {
+                sample->pos_f = 0;
+                sample->pitch = 0;
+            }
         }
         if (sample->pos_f < 0)
         {
@@ -186,8 +234,50 @@ void Scratch_ProcessSample(Q1_14 *samples_l, Q1_14 *samples_r, uint32_t len, str
 
 void Scratch_Process(Q1_14 *samples_l, Q1_14 *samples_r, uint32_t len)
 {
-    for (uint8_t n = 0; n<scratch.sample_count; n++)
+    for (uint8_t n = 0; n < scratch.sample_count; n++)
     {
-    Scratch_ProcessSample(samples_l, samples_r, len, &scratch.samples[n]);
+        Scratch_ProcessSample(samples_l, samples_r, len, &scratch.samples[n]);
+    }
+}
+
+void Scratch_TriggerSample(uint8_t idx)
+{
+    if (idx < SCRATCH_SAMPLE_COUNT)
+    {
+        struct scratch_sample_s *sample = &scratch.samples[idx];
+
+        if (sample->stereo)
+        {
+            sample->pitch = 2;
+        }
+        else
+        {
+            sample->pitch = 1;
+        }
+        sample->loop = false;
+        sample->pos_f = 0;
+    }
+}
+
+void Scratch_SetNoLoop(uint8_t idx)
+{
+    if (idx < SCRATCH_SAMPLE_COUNT)
+    {
+        struct scratch_sample_s *sample = &scratch.samples[idx];
+
+        sample->loop = false;
+    }
+}
+
+void Scratch_SetVolume(float volume, uint8_t idx)
+{
+    if (idx < SCRATCH_SAMPLE_COUNT)
+    {
+        struct scratch_sample_s *sample = &scratch.samples[idx];
+
+        uint16_t volume_max = 1 << 15;
+        volume *= volume_max;
+
+        sample->volume = volume;
     }
 }
