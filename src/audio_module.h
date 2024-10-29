@@ -112,7 +112,6 @@ extern "C" {
 
 #ifdef RP2040_AUDIO_PWM
 #include "RP2040_AudioPwm.h"
-
 #ifndef RP2040_AUDIO_PWM_PIN
 #define RP2040_AUDIO_PWM_PIN 0
 #endif
@@ -250,6 +249,7 @@ void Audio_Setup(void)
     RP2040_Audio_Pwm_Init(pwmPinNumber, SAMPLE_RATE, WavPwmDataBuff, WavPwmDataBuff2, SAMPLE_BUFFER_SIZE);
 #endif
 
+#if 0
 #if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
 #ifdef RP2040_AUDIO_PWM
 #else
@@ -258,6 +258,7 @@ void Audio_Setup(void)
         Serial.println("Failed to initialize I2S!");
         while (1); // do nothing
     }
+#endif
 #endif
 #endif
 
@@ -541,6 +542,7 @@ void Audio_OutputMono(const int32_t *samples)
     }
 #endif
 
+#if 0
 #if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
 #ifdef RP2040_AUDIO_PWM
 #else /* RP2040_AUDIO_PWM */
@@ -561,6 +563,7 @@ void Audio_OutputMono(const int32_t *samples)
     }
 #endif /* RP2040_AUDIO_PWM */
 #endif /* ARDUINO_RASPBERRY_PI_PICO, ARDUINO_GENERIC_RP2040 */
+#endif
 
 #ifdef ARDUINO_GENERIC_F407VGTX
     /*
@@ -731,6 +734,7 @@ void Audio_Output(const int16_t *left, const int16_t *right)
     }
 #endif
 
+#if 0
 #if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
 #ifdef RP2040_AUDIO_PWM
 #else /* RP2040_AUDIO_PWM */
@@ -751,6 +755,7 @@ void Audio_Output(const int16_t *left, const int16_t *right)
     }
 #endif /* RP2040_AUDIO_PWM */
 #endif /* ARDUINO_RASPBERRY_PI_PICO, ARDUINO_GENERIC_RP2040 */
+#endif
 
 #ifdef PICO_AUDIO_I2S
 #ifndef RP2350_USE_I2S_ML_LIB
