@@ -394,7 +394,7 @@ void ES8388_Setup()
     Serial.printf("Connect to ES8388 codec...\n");
     Serial.printf("  SDA: %d\n ", ES8388_PIN_SDA);
     Serial.printf("  SCL: %d\n", ES8388_PIN_SCL);
-    Serial.printf("  freq: %d\n", i2c_freq);
+    Serial.printf("  freq: %" PRIu32 "\n", i2c_freq);
 
     while (not ES8388_begin(ES8388_PIN_SDA, ES8388_PIN_SCL, i2c_freq))
     {
