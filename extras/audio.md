@@ -38,7 +38,7 @@ Example:
 Some codecs may require additional configuration:
 
 - **I2S Configuration**: Most audio codecs can be configured over I2S. Ensure that your microcontroller's I2S settings (bit depth, sample rate, etc.) are compatible with the codec's specifications.
-- **Additional Pins**: Certain codecs, such as the PCM5201a, may have additional pins like a *Mute* pin. Refer to the codec-specific documentation [PCM5102a](ml_pcm5102a) for details on these configurations.
+- **Additional Pins**: Certain codecs, such as the PCM5201a, may have additional pins like a *Mute* pin. Refer to the codec-specific documentation [PCM5102a](ml_pcm5102a.md) for details on these configurations.
 
 ### Running the Project
 
