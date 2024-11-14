@@ -290,9 +290,11 @@ static int16_t *queueTransmitBuffer2;
 
 void Teensy_Setup()
 {
-#ifdef LED_PIN
-    pinMode(ledPin, OUTPUT);
-#endif
+    Serial.printf("Teensy Setup\n");
+    Serial.printf("\tBCK: 21\n");
+    Serial.printf("\tLRCK: 20\n");
+    Serial.printf("\tSDOUT: 7\n");
+    Serial.printf("AudoBlockSamples: %d\n", AUDIO_BLOCK_SAMPLES);
     Midi_Setup();
 }
 

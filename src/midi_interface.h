@@ -50,8 +50,15 @@
 #ifdef ML_SYNTH_INLINE_DECLARATION
 
 
-void Midi_Setup();
-void Midi_Process();
+#define MIDI_CHANNEL_MASK   0x10
+#define MIDI_CHANNEL_0      0x01
+#define MIDI_CHANNEL_1      0x02
+#define MIDI_CHANNEL_2      0x04
+#define MIDI_CHANNEL_3      0x08
+
+
+void Midi_Setup(void);
+void Midi_Process(void);
 
 #ifdef MIDI_VIA_USB_ENABLED
 void Midi_HandleShortMsg(uint8_t *data, uint8_t cable __attribute__((unused)));
@@ -270,7 +277,10 @@ inline void Midi_CC_Map(uint8_t channel, uint8_t data1, uint8_t data2, struct mi
 {
     for (int i = 0; i < mapSize; i++)
     {
-        if ((controlMapping[i].channel == channel) && (controlMapping[i].data1 == data1))
+        if (
+            ((controlMapping[i].channel == channel) && (controlMapping[i].data1 == data1))
+            || (((controlMapping[i].channel & 0x10) != 0) && ((controlMapping[i].channel & (1 << channel)) != 0) && (controlMapping[i].data1 == data1))
+        )
         {
             if (controlMapping[i].callback_mid != NULL)
             {
@@ -480,7 +490,11 @@ void Midi_Setup()
 #endif
     pinMode(MIDI_RX1_PIN, INPUT_PULLUP); /* can be connected to open collector output */
 #else
+#ifdef TEENSYDUINO
+    Serial.printf("Setup Serial1 with %d baud with rx: RX1 pin (PIN 0)\n", MIDI_SERIAL1_BAUDRATE);
+#else
     Serial.printf("Setup Serial1 with %d baud with rx: RX1 pin\n", MIDI_SERIAL1_BAUDRATE);
+#endif
     Serial1.begin(MIDI_SERIAL1_BAUDRATE);
 #endif
 
