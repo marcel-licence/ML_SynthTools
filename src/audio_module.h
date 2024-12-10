@@ -142,10 +142,12 @@ I2S i2s(OUTPUT);
 #ifdef OUTPUT_SAW_TEST
 static float saw_left[SAMPLE_BUFFER_SIZE];
 static float saw_right[SAMPLE_BUFFER_SIZE];
+static int32_t saw_i32[SAMPLE_BUFFER_SIZE];
 #endif
 #ifdef OUTPUT_SINE_TEST
 static float sin_left[SAMPLE_BUFFER_SIZE];
 static float sin_right[SAMPLE_BUFFER_SIZE];
+static int32_t sine_i32[SAMPLE_BUFFER_SIZE];
 #endif
 
 void Audio_Setup(void)
@@ -161,10 +163,12 @@ void Audio_Setup(void)
      */
     for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
     {
-        saw_left[i] = ((float)i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
-        saw_right[i] = ((float)i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
-        saw_left[i] -= 1.0f;
-        saw_right[i] -= 1.0f;
+        float saw = ((float)i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
+        saw -= 1.0f;
+        saw_left[i] = saw;
+        saw_right[i] = saw;
+        saw *= 1073741824;
+        saw_i32[i] = saw;
     }
 #endif
 #ifdef OUTPUT_SINE_TEST
@@ -176,8 +180,11 @@ void Audio_Setup(void)
         float w = i;
         w *= 1.0f / ((float)SAMPLE_BUFFER_SIZE);
         w *= 2.0f * M_PI;
-        sin_left[i] = sin(w);
+        float sine = sin(w);
+        sin_left[i] = sine;
         sin_right[i] = sin(w * 2.0f);
+        sine *= 1073741824;
+        sine_i32[i] = sine;
     }
 #endif
 
@@ -226,8 +233,12 @@ void Audio_Setup(void)
         while (1); // do nothing
     }
 #else /* #ifndef RP2350_USE_I2S_ML_LIB */
-    rp2350_i2s_init(26, 27);
-    Serial.printf("rp2350_i2s_init\n\tclock_pin_base: 26\n\tdata_pin: 27\n");
+    {
+        int data_pin = 26;
+        int clock_pin_base = 27;
+        rp2350_i2s_init(data_pin, clock_pin_base);
+        Serial.printf("rp2350_i2s_init\n\tdata_pin: %d\n\tclock_pin_base: %d\n\twclk_pin: %d\n", data_pin, clock_pin_base, clock_pin_base + 1);
+    }
 #endif /* #endif RP2350_USE_I2S_ML_LIB */
 #endif
 
@@ -384,6 +395,13 @@ void Audio_PrintStats()
 
 void Audio_OutputMono(const int32_t *samples)
 {
+#ifdef OUTPUT_SAW_TEST
+    samples = saw_i32;
+#endif
+#ifdef OUTPUT_SINE_TEST
+    samples = sine_i32;
+#endif
+
 #ifdef ESP8266
     for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
     {
@@ -409,7 +427,7 @@ void Audio_OutputMono(const int32_t *samples)
     int16_t mono_u16[SAMPLE_BUFFER_SIZE];
     for (int n = 0; n < SAMPLE_BUFFER_SIZE; n++)
     {
-        mono_u16[n] = samples[n] >> 8;
+        mono_u16[n] = samples[n] >> 16;
     }
     rp2350_i2s_write_stereo_samples_buff(mono_u16, mono_u16, SAMPLE_BUFFER_SIZE);
 #endif /* #endif RP2350_USE_I2S_ML_LIB */
@@ -536,7 +554,9 @@ void Audio_OutputMono(const int32_t *samples)
 
     for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
     {
-        uint16_t val = (samples[i] + 0x8000) >> 5; /* 21 with 32 bit input */
+        int32_t val32 = samples[i];
+        val32 >>= 16;
+        uint16_t val = (val32 + 0x8000) >> 5; /* 21 with 32 bit input */
         val += 361;
 
         audioBuff[i].left = val;
