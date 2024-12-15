@@ -18,7 +18,7 @@ jobs:
       matrix:
         fqbn:
           - esp32:esp32:esp32
-        sketch-paths: |
+        sketch-paths:
           - examples/ml_epiano_example
           - examples/ml_midi_monitor
           - examples/ml_mod_tracker
