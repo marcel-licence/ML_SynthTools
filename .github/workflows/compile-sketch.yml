@@ -35,6 +35,7 @@ jobs:
               version: 2.0.13
           sketch-paths: |
             - examples/ml_epiano_example
+            - examples/ml_midi_monitor
             - examples/ml_mod_tracker
             - examples/ml_synth_basic_example
             - examples/ml_synth_fm_example
@@ -87,6 +88,7 @@ jobs:
           sketch-paths: |
             - examples/ml_epiano_example
             #- examples/ml_mod_tracker
+            - examples/ml_midi_monitor
             - examples/ml_synth_basic_example
             #- examples/ml_synth_fm_example
             #- examples/ml_synth_multi_saw_example
@@ -137,6 +139,7 @@ jobs:
               version: 3.1.2
           sketch-paths: |
             # - examples/ml_epiano_example
+            # - examples/ml_midi_monitor
             - examples/ml_mod_tracker
             # - examples/ml_synth_basic_example
             # - examples/ml_synth_fm_example
@@ -192,6 +195,7 @@ jobs:
               source-url: https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
           sketch-paths: |
             - examples/ml_epiano_example
+            - examples/ml_midi_monitor
             - examples/ml_mod_tracker
             - examples/ml_synth_basic_example
             #- examples/ml_synth_fm_example
@@ -250,6 +254,7 @@ jobs:
               version: 2.0.0
           sketch-paths: |
             - examples/ml_epiano_example
+            # - examples/ml_midi_monitor
             - examples/ml_mod_tracker
             - examples/ml_synth_basic_example
             - examples/ml_synth_fm_example
@@ -303,6 +308,7 @@ jobs:
               version: 1.59.0
           sketch-paths: |
             #- examples/ml_epiano_example
+            #- examples/ml_midi_monitor
             #- examples/ml_mod_tracker
             - examples/ml_synth_basic_example
             - examples/ml_synth_fm_example
