@@ -122,6 +122,16 @@ jobs:
       matrix:
         fqbn:
           - esp8266:esp8266:d1_mini
+        sketchpaths:
+          # - examples/ml_epiano_example
+          # - examples/ml_midi_monitor
+          - examples/ml_mod_tracker
+          # - examples/ml_synth_basic_example
+          # - examples/ml_synth_fm_example
+          # - examples/ml_synth_multi_saw_example
+          - examples/ml_synth_organ_example
+          # - examples/ml_synth_pwm_osc_example
+          # - examples/ml_synth_sampler_example
 
     steps:
       - name: Checkout repository
@@ -138,15 +148,7 @@ jobs:
               source-url: https://arduino.esp8266.com/stable/package_esp8266com_index.json
               version: 3.1.2
           sketch-paths: |
-            # - examples/ml_epiano_example
-            # - examples/ml_midi_monitor
-            - examples/ml_mod_tracker
-            # - examples/ml_synth_basic_example
-            # - examples/ml_synth_fm_example
-            # - examples/ml_synth_multi_saw_example
-            - examples/ml_synth_organ_example
-            # - examples/ml_synth_pwm_osc_example
-            # - examples/ml_synth_sampler_example
+            ${{ matrix.sketchpaths }}
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
