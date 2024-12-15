@@ -18,7 +18,16 @@ jobs:
       matrix:
         fqbn:
           - esp32:esp32:esp32
-
+        sketch-paths: |
+          - examples/ml_epiano_example
+          - examples/ml_midi_monitor
+          - examples/ml_mod_tracker
+          - examples/ml_synth_basic_example
+          - examples/ml_synth_fm_example
+          - examples/ml_synth_multi_saw_example
+          - examples/ml_synth_organ_example
+          - examples/ml_synth_pwm_osc_example
+          - examples/ml_synth_sampler_example
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -33,16 +42,7 @@ jobs:
             - name: esp32:esp32
               source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
               version: 2.0.13
-          sketch-paths: |
-            - examples/ml_epiano_example
-            - examples/ml_midi_monitor
-            - examples/ml_mod_tracker
-            - examples/ml_synth_basic_example
-            - examples/ml_synth_fm_example
-            - examples/ml_synth_multi_saw_example
-            - examples/ml_synth_organ_example
-            - examples/ml_synth_pwm_osc_example
-            - examples/ml_synth_sampler_example
+          sketch-paths: ${{ matrix.sketch-paths }}
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
@@ -123,7 +123,7 @@ jobs:
       matrix:
         fqbn:
           - esp8266:esp8266:d1_mini
-        sketchpaths:
+        sketch-paths:
           # - examples/ml_epiano_example
           # - examples/ml_midi_monitor
           - examples/ml_mod_tracker
@@ -133,13 +133,12 @@ jobs:
           - examples/ml_synth_organ_example
           # - examples/ml_synth_pwm_osc_example
           # - examples/ml_synth_sampler_example
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: 'true'
-          
+
       - name: Compile sketch
         uses: arduino/compile-sketches@v1
         with:
@@ -148,8 +147,7 @@ jobs:
             - name: esp8266:esp8266
               source-url: https://arduino.esp8266.com/stable/package_esp8266com_index.json
               version: 3.1.2
-          sketch-paths: |
-            ${{ matrix.sketchpaths }}
+          sketch-paths: ${{ matrix.sketch-paths }}
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
@@ -179,7 +177,16 @@ jobs:
         fqbn:
           - rp2040:rp2040:rpipico
           - rp2040:rp2040:rpipico2
-
+        sketch-paths:
+          - examples/ml_epiano_example
+          #- examples/ml_midi_monitor
+          - examples/ml_mod_tracker
+          - examples/ml_synth_basic_example
+          #- examples/ml_synth_fm_example
+          - examples/ml_synth_multi_saw_example
+          - examples/ml_synth_organ_example
+          #- examples/ml_synth_pwm_osc_example
+          - examples/ml_synth_sampler_example
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -197,16 +204,7 @@ jobs:
           platforms: |
             - name: rp2040:rp2040
               source-url: https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
-          sketch-paths: |
-            - examples/ml_epiano_example
-            #- examples/ml_midi_monitor
-            - examples/ml_mod_tracker
-            - examples/ml_synth_basic_example
-            #- examples/ml_synth_fm_example
-            - examples/ml_synth_multi_saw_example
-            - examples/ml_synth_organ_example
-            #- examples/ml_synth_pwm_osc_example
-            - examples/ml_synth_sampler_example
+          sketch-paths: ${{ matrix.sketch-paths }}
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
@@ -252,15 +250,16 @@ jobs:
         uses: arduino/compile-sketches@v1
         with:
           fqbn: ${{ matrix.fqbn }}
+          sketch-paths:
+            - examples/ml_midi_monitor
+
 #          cli-compile-flags: |
 #            - --build-property
 #            - "build.usbstack_flags=-DUSE_TINYUSB -I{runtime.platform.path}/libraries/Adafruit_TinyUSB_Arduino/src/arduino"
           platforms: |
             - name: rp2040:rp2040
               source-url: https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
-          sketch-paths: |
-            - examples/ml_midi_monitor
-
+          sketch-paths: ${{ matrix.sketch-paths }}
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
@@ -295,7 +294,16 @@ jobs:
       matrix:
         fqbn:
           - STMicroelectronics:stm32:GenH7
-
+        sketch-paths:
+          - examples/ml_epiano_example
+          # - examples/ml_midi_monitor
+          - examples/ml_mod_tracker
+          - examples/ml_synth_basic_example
+          - examples/ml_synth_fm_example
+          - examples/ml_synth_multi_saw_example
+          - examples/ml_synth_organ_example
+          - examples/ml_synth_pwm_osc_example
+          - examples/ml_synth_sampler_example
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -310,16 +318,7 @@ jobs:
             - name: STMicroelectronics:stm32
             - source-url: https://raw.githubusercontent.com/stm32duino/BoardManagerFiles/main/package_stmicroelectronics_index.json
               version: 2.0.0
-          sketch-paths: |
-            - examples/ml_epiano_example
-            # - examples/ml_midi_monitor
-            - examples/ml_mod_tracker
-            - examples/ml_synth_basic_example
-            - examples/ml_synth_fm_example
-            - examples/ml_synth_multi_saw_example
-            - examples/ml_synth_organ_example
-            - examples/ml_synth_pwm_osc_example
-            - examples/ml_synth_sampler_example
+          sketch-paths: ${{ matrix.sketch-paths }}
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
@@ -349,7 +348,16 @@ jobs:
       matrix:
         fqbn:
           - teensy:avr:teensy41
-
+        sketch-paths: |
+          #- examples/ml_epiano_example
+          #- examples/ml_midi_monitor
+          #- examples/ml_mod_tracker
+          - examples/ml_synth_basic_example
+          - examples/ml_synth_fm_example
+          #- examples/ml_synth_multi_saw_example
+          #- examples/ml_synth_organ_example
+          #- examples/ml_synth_pwm_osc_example
+          #- examples/ml_synth_sampler_example
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -364,16 +372,7 @@ jobs:
             - name: teensy:avr
               source-url: https://www.pjrc.com/teensy/package_teensy_index.json
               version: 1.59.0
-          sketch-paths: |
-            #- examples/ml_epiano_example
-            #- examples/ml_midi_monitor
-            #- examples/ml_mod_tracker
-            - examples/ml_synth_basic_example
-            - examples/ml_synth_fm_example
-            #- examples/ml_synth_multi_saw_example
-            #- examples/ml_synth_organ_example
-            #- examples/ml_synth_pwm_osc_example
-            #- examples/ml_synth_sampler_example
+          sketch-paths: ${{ matrix.sketch-paths }}
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
