@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         fqbn:
           - esp32:esp32:esp32
@@ -67,6 +68,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         fqbn:
           - esp32:esp32:esp32
@@ -120,6 +122,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         fqbn:
           - esp8266:esp8266:d1_mini
@@ -173,6 +176,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         fqbn:
           - rp2040:rp2040:rpipico
@@ -234,6 +238,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         fqbn:
           - rp2040:rp2040:rpipico
@@ -289,6 +294,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         fqbn:
           - STMicroelectronics:stm32:GenH7
@@ -343,6 +349,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         fqbn:
           - teensy:avr:teensy41
