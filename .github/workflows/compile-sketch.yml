@@ -187,9 +187,9 @@ jobs:
         uses: arduino/compile-sketches@v1
         with:
           fqbn: ${{ matrix.fqbn }}
-          cli-compile-flags: |
-            - --build-property
-            - "build.usbstack_flags=-DUSE_TINYUSB -I{runtime.platform.path}/libraries/Adafruit_TinyUSB_Arduino/src/arduino"
+#          cli-compile-flags: |
+#            - --build-property
+#            - "build.usbstack_flags=-DUSE_TINYUSB -I{runtime.platform.path}/libraries/Adafruit_TinyUSB_Arduino/src/arduino"
           platforms: |
             - name: rp2040:rp2040
               source-url: https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
