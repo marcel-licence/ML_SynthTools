@@ -346,7 +346,7 @@ jobs:
       matrix:
         fqbn:
           - teensy:avr:teensy41
-        sketch-paths: |
+        sketch-paths:
           #- examples/ml_epiano_example
           #- examples/ml_midi_monitor
           #- examples/ml_mod_tracker
