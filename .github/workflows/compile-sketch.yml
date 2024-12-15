@@ -238,7 +238,8 @@ jobs:
         fqbn:
           - rp2040:rp2040:rpipico
           - rp2040:rp2040:rpipico2
-
+        sketch-paths:
+          - examples/ml_midi_monitor
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -250,9 +251,6 @@ jobs:
         uses: arduino/compile-sketches@v1
         with:
           fqbn: ${{ matrix.fqbn }}
-          sketch-paths:
-            - examples/ml_midi_monitor
-
 #          cli-compile-flags: |
 #            - --build-property
 #            - "build.usbstack_flags=-DUSE_TINYUSB -I{runtime.platform.path}/libraries/Adafruit_TinyUSB_Arduino/src/arduino"
