@@ -735,7 +735,7 @@ void Midi_SendRaw(uint8_t *msg)
     }
     else if ((msg[0] & 0xF0) == 0xC0)
     {
-        MidiPort2.serial->write(msg, 2);
+        MidiPort1.serial->write(msg, 2);
     }
     else if ((msg[0] & 0xF0) == 0xD0)
     {
