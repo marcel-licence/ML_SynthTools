@@ -1,0 +1,8 @@
+fqbn;version;config
+espressif:esp32:esp32;latest;
+rp2040:rp2040:rpipico2;latest;
+rp2040:rp2040:rpipico;latest;
+#esp8266:esp8266:d1_mini;latest;
+#Seeeduino:samd:seeed_XIAO_m0;1.8.2;
+#STMicroelectronics:stm32:GenH7;2.5.0;PNUM=DAISY_SEED
+#teensy:avr:teensy41;1.8.5;TEENSY_USB=serialmidiaudio
