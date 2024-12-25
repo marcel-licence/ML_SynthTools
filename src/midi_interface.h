@@ -73,8 +73,10 @@ void Midi_HandleShortMsgEx(uint8_t *data, uint8_t cable __attribute__((unused)))
 void Midi_SendShortMessage(uint8_t *msg);
 #ifndef ARDUINO_SEEED_XIAO_M0
 #ifndef SWAP_SERIAL
+#ifdef MIDI_TX2_PIN
+void Midi_SendShortMessage(uint8_t *msg);
 void Midi_SendRaw(uint8_t *msg);
-#endif
+#endif /* MIDI_TX2_PIN */
 #endif
 #endif
 
@@ -136,7 +138,7 @@ struct midi_port_s
     uint8_t inMsgIndex ;
 };
 
-#ifdef ARDUINO_DAISY_SEED
+#if (defined ARDUINO_DAISY_SEED) || (defined STM32H7xx)
 HardwareSerial Serial2(USART1);
 #endif
 
@@ -567,7 +569,9 @@ void Midi_Setup()
     Serial2.begin(MIDI_SERIAL2_BAUDRATE);
 #endif /* MIDI_TX2_PIN */
 
-#else /* MIDI_RX2_PIN */
+#else /* ARDUINO_ARCH_RP2040 */
+
+#ifdef MIDI_RX2_PIN
 #ifdef MIDI_TX2_PIN
     Serial.printf("Setup Serial2 with %d baud with rx: %s%d and tx %s%d\n", MIDI_SERIAL2_BAUDRATE, PIN_CAPTION, MIDI_RX2_PIN, PIN_CAPTION, MIDI_TX2_PIN);
     Serial2.setTX(MIDI_TX2_PIN);
@@ -575,8 +579,11 @@ void Midi_Setup()
     Serial.printf("Setup Serial2 with %d baud with rx: %s%d\n", MIDI_SERIAL2_BAUDRATE, PIN_CAPTION, MIDI_RX2_PIN);
 #endif /* MIDI_TX2_PIN */
     Serial2.setRX(MIDI_RX2_PIN);
-    Serial2.begin(MIDI_SERIAL2_BAUDRATE);
+#else
+    Serial.printf("Setup Serial2 with %d baud with rx: Serial2.rx\n", MIDI_SERIAL2_BAUDRATE, PIN_CAPTION);
 #endif /* MIDI_RX2_PIN */
+    Serial2.begin(MIDI_SERIAL2_BAUDRATE);
+#endif /* ARDUINO_ARCH_RP2040 */
 
     MidiPort2.serial = &Serial2;
     Midi_PortSetup(&MidiPort2);

@@ -141,7 +141,7 @@ uint32_t getFileFromIdx(File dir, int numTabs, uint32_t idx, char *filename, cha
 
 bool getFileFromIdx(uint32_t idx, char *filename, char *filter)
 {
-    File dir = SD.open("/", "r");
+    File dir = SD.open("/", FILE_READ);
     char filename_clean[64];
 
     bool result = getFileFromIdx(dir, 0, idx, filename_clean, filter) == 0 ? true : false;

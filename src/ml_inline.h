@@ -36,6 +36,11 @@
  * @brief   This file includes all required header for inline build
  */
 
+#if !defined(ML_SYNTH_INLINE_DECLARATION) && !defined(ML_SYNTH_INLINE_DEFINITION)
+#define ML_SYNTH_INLINE_DECLARATION
+#define ML_SYNTH_INLINE_DEFINITION
+#endif
+
 #include <audio_module.h>
 #include <blink.h>
 #include <es8388.h>

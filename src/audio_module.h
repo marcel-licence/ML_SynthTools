@@ -188,7 +188,6 @@ void Audio_Setup(void)
     }
 #endif
 
-
 #ifdef ESP32_AUDIO_KIT
 #ifdef ES8388_ENABLED
     ES8388_Setup();
@@ -302,10 +301,11 @@ static int16_t *queueTransmitBuffer2;
 void Teensy_Setup()
 {
     Serial.printf("Teensy Setup\n");
-    Serial.printf("\tBCK: 21\n");
-    Serial.printf("\tLRCK: 20\n");
-    Serial.printf("\tSDOUT: 7\n");
-    Serial.printf("AudoBlockSamples: %d\n", AUDIO_BLOCK_SAMPLES);
+    Serial.printf("BCLK1: 21 -> connect to BCLK\n");
+    Serial.printf("LRCLK1: 20 -> connect to WCLK/LRCLK\n");
+    Serial.printf("OUT1A: 7 -> connect to DIN\n");
+    Serial.printf("IN1: 8 (optional connect to DOUT)\n");
+
     Midi_Setup();
 }
 
@@ -392,6 +392,11 @@ void Audio_PrintStats()
 }
 #endif
 #endif
+
+void Audio_Output(const Q1_14 *mono)
+{
+    Audio_Output((const int16_t *)mono, (const int16_t *)mono);
+}
 
 void Audio_OutputMono(const int32_t *samples)
 {

@@ -37,6 +37,8 @@
  *          Received short MIDI messages will be displayed and decoded
  */
 
+#define MIDI_MONITOR_ENABLED
+
 /*
  * The following configuration is for the RP2040, RP2350
  */
@@ -158,8 +160,6 @@ void setup(void)
     Serial.println("ml_midi_monitor");
 
     Midi_Setup();
-
-
 }
 
 void loop_1hz(void)
@@ -174,9 +174,7 @@ void loop_1hz(void)
 
 void loop(void)
 {
-
     uint32_t newCnt = millis();
-
 
     static uint32_t lastCnt = 0;
     static uint32_t cnt = 0;
@@ -189,6 +187,4 @@ void loop(void)
     }
 
     Midi_Process();
-
-
 }
