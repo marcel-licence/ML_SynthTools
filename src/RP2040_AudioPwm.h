@@ -49,7 +49,7 @@
 #define __WAV_PWM_AUDIO_H
 
 
-#if (defined ARDUINO_ARCH_RP2040)
+#if defined(ARDUINO_ARCH_RP2040)
 /* ignore */
 #else
 #error not supported by this platform!
@@ -64,5 +64,5 @@ bool RP2040_Audio_Pwm_BufferReady();
 uint32_t *RP2040_Audio_Pwm_getFreeBuff();
 
 
-#endif /* ARDUINO_ARCH_RP2040 */
+#endif /* __WAV_PWM_AUDIO_H */
 
