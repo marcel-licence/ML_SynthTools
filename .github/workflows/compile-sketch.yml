@@ -208,7 +208,7 @@ jobs:
           platforms: |
             - name: rp2040:rp2040
               source-url: https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
-              version: 4.2.0
+              version: 4.4.0
           sketch-paths: ${{ matrix.sketch-paths }}
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
