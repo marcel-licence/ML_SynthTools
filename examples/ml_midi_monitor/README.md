@@ -4,6 +4,11 @@
   <img src="img/midi_monitor.jpg" alt="Project Picture" width="480px" height="270px"/><br>
 </p>
 
+
+> **⚠ Important Notice:**  
+> The `Serial1` and `Serial2` functionalities do not work with the ESP32 v3.#.# board library.  
+> To ensure proper functionality, use **ESP32 board library version 2.0.17** or earlier.
+
 # Introduction
 The **ml_midi_monitor** project is designed to help you test your MIDI interface. It opens a serial port and sends a test message every second. All incoming messages are displayed in the serial monitor for easy debugging and validation.
 
