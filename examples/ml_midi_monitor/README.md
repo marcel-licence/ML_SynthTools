@@ -5,7 +5,7 @@
 </p>
 
 
-> **⚠ Important Notice:**  
+> [!WARNING]  
 > The `Serial1` and `Serial2` functionalities do not work with the ESP32 v3.#.# board library.  
 > To ensure proper functionality, use **ESP32 board library version 2.0.17** or earlier.
 
