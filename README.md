@@ -6,6 +6,10 @@
 </p>
 
 
+> **⚠ Important Notice:**  
+> The `Serial1` and `Serial2` functionalities do not work with the ESP32 v3.#.# board library.  
+> To ensure proper functionality, use **ESP32 board library version 2.0.17** or earlier.
+
 # Introduction
 
 This library is made to be used for synthesizer projects. It contains modules to create sound, to drive an audio codec and create some audio effects. 
