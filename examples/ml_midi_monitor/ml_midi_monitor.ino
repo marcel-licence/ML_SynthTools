@@ -38,6 +38,8 @@
  */
 
 #define MIDI_MONITOR_ENABLED
+//#define MIDI_DUMP_SERIAL2_TO_SERIAL /*!< use this to see raw data, incoming bytes */
+
 
 /*
  * The following configuration is for the RP2040, RP2350
@@ -166,7 +168,9 @@ void loop_1hz(void)
 {
     uint8_t msg[] = {0x90, 0x01, 0x02};
     Midi_SendRaw(msg);
-
+#if 0 /* show sent data */
+    Serial.printf("Tx: 90 01 02\n");
+#endif
 #ifdef BLINK_LED_PIN
     Blink_Process();
 #endif
@@ -187,4 +191,5 @@ void loop(void)
     }
 
     Midi_Process();
+    delayMicroseconds(100);
 }
