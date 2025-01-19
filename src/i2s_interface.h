@@ -91,19 +91,6 @@ float sampleDataFSawTest[SAMPLE_BUFFER_SIZE];
 #define SAMPLE_DATA_TYPE    int32_t
 #endif
 
-#if 0
-#ifndef I2S_BCLK_PIN
-#define I2S_BCLK_PIN -1
-#endif
-
-#ifndef I2S_WCLK_PIN
-#define I2S_WCLK_PIN -1
-#endif
-
-#ifndef I2S_DOUT_PIN
-#define I2S_DOUT_PIN -1
-#endif
-#endif
 
 #ifndef I2S_MCLK_PIN
 #define I2S_MCLK_PIN I2S_PIN_NO_CHANGE
@@ -592,7 +579,7 @@ void setup_i2s()
 #endif /* ESP32 */
 
 
-#endif /* #if ((defined SAMPLE_BUFFER_SIZE) && (defined SAMPLE_RATE)) */
+#endif /* SAMPLE_RATE */
 
 
 #endif /* ML_SYNTH_INLINE_DEFINITION */
