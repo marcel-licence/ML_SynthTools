@@ -498,6 +498,15 @@ i2s_config_t i2s_configuration =
     .bits_per_chan = I2S_BITS_PER_CHAN_32BIT,
 #endif
 #endif
+
+#if SOC_I2S_SUPPORTS_TDM
+    .chan_mask = I2S_CHANNEL_STEREO,
+    .total_chan = 0,
+    .left_align = 0,
+    .big_edin = 0,
+    .bit_order_msb = 0,
+    .skip_msk = 0,
+#endif
 };
 #endif
 
@@ -532,12 +541,31 @@ i2s_pin_config_t pins =
 void setup_i2s()
 {
     i2s_driver_install(i2s_port_number, &i2s_configuration, 0, NULL);
+    Serial.printf("i2s_configuration:\n");
+    Serial.printf("\ttx_desc_auto_clear: %d\n", i2s_configuration.tx_desc_auto_clear);
+    Serial.printf("\tfixed_mclk: %d\n", i2s_configuration.fixed_mclk);
+    Serial.printf("\tmclk_multiple: %d\n", i2s_configuration.mclk_multiple);
+    Serial.printf("\tbits_per_chan: %d\n", i2s_configuration.bits_per_chan);
+
+    Serial.printf("\tchan_mask: %d\n", i2s_configuration.chan_mask);
+    Serial.printf("\ttotal_chan: %d\n", i2s_configuration.total_chan);
+    Serial.printf("\tleft_align: %d\n", i2s_configuration.left_align);
+    Serial.printf("\tbig_edin: %d\n", i2s_configuration.big_edin);
+    Serial.printf("\tbit_order_msb: %d\n", i2s_configuration.bit_order_msb);
+    Serial.printf("\tskip_msk: %d\n", i2s_configuration.skip_msk);
 #ifdef I2S_NODAC
     i2s_set_pin(i2s_port_number, NULL);
     i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
     i2s_zero_dma_buffer(i2s_port_number);
 #else
-    i2s_set_pin(I2S_NUM_0, &pins);
+    i2s_set_pin(i2s_port_number, &pins);
+
+    Serial.printf("I2S_NUM_%d configured using following pins:\n", i2s_port_number);
+    Serial.printf("    BCLK,BCK: %d\n", pins.bck_io_num);
+    Serial.printf("    WCLK,LCK: %d\n", pins.ws_io_num);
+    Serial.printf("    DOUT: %d\n", pins.data_out_num);
+    Serial.printf("    DIN: %d\n", pins.data_in_num);
+    Serial.printf("    MCLK: %d\n", pins.mck_io_num);
 #endif
     i2s_set_sample_rates(i2s_port_number, SAMPLE_RATE);
     i2s_start(i2s_port_number);
@@ -555,6 +583,7 @@ void setup_i2s()
     Serial.printf("    WCLK,LCK: %d\n", pins.ws_io_num);
     Serial.printf("    DOUT: %d\n", pins.data_out_num);
     Serial.printf("    DIN: %d\n", pins.data_in_num);
+    Serial.printf("    MCLK: %d\n", pins.mck_io_num);
 #else
     Serial.printf("I2S configured using internal DAC (DAC_1, DAC_2 as output)\n");
 #endif
