@@ -546,13 +546,14 @@ void setup_i2s()
     Serial.printf("\tfixed_mclk: %d\n", i2s_configuration.fixed_mclk);
     Serial.printf("\tmclk_multiple: %d\n", i2s_configuration.mclk_multiple);
     Serial.printf("\tbits_per_chan: %d\n", i2s_configuration.bits_per_chan);
-
+#if 0 /* for future use */
     Serial.printf("\tchan_mask: %d\n", i2s_configuration.chan_mask);
     Serial.printf("\ttotal_chan: %d\n", i2s_configuration.total_chan);
     Serial.printf("\tleft_align: %d\n", i2s_configuration.left_align);
     Serial.printf("\tbig_edin: %d\n", i2s_configuration.big_edin);
     Serial.printf("\tbit_order_msb: %d\n", i2s_configuration.bit_order_msb);
     Serial.printf("\tskip_msk: %d\n", i2s_configuration.skip_msk);
+#endif
 #ifdef I2S_NODAC
     i2s_set_pin(i2s_port_number, NULL);
     i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
