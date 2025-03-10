@@ -146,3 +146,38 @@ The system can be configured to use either integer or float values via a define:
 ```
 
 If `MIDI_FMT_INT` is defined, the value is passed as a `uint8_t`, representing the raw MIDI value (0–127). If not defined, the value is converted to a float internally and passed as a normalized value (0.0 to 1.0).
+
+
+## Setting Up Your Own MIDI Map
+
+To set up your own MIDI map, follow these steps:
+
+1. Add the following line to your `config.c` file:
+    ```c
+    #define MIDI_MONITOR_ENABLED
+    ```
+
+2. Upload the new firmware to your device. You should now see messages when your MIDI device sends control change messages. For example:
+
+    **Knob 1:**
+    ```
+    2 | b1 5b 00 | Control Change   | Channel  1 | Number    91 | Value      0
+    ```
+
+    **Knob 2:**
+    ```
+    2 | b0 5d 11 | Control Change   | Channel  0 | Number    93 | Value     17
+    ```
+
+    **Knob 3:**
+    ```
+    2 | b0 05 02 | Control Change   | Channel  0 | Number     5 | Value      2
+    ```
+
+3. Use these messages to create your own mapping. Enter the channel (first value), the number (second value), and give it a name to connect it to a specific function. For example:
+
+    ```c
+    { 0x01, 0x5B, "Knob 1", NULL, Organ_SetDrawbarInv, 0 },
+    { 0x00, 0x5D, "Knob 2", NULL, Organ_SetDrawbarInv, 1 },
+    { 0x00, 0x05, "Knob 3", NULL, Organ_SetDrawbarInv, 2 },
+    ```
