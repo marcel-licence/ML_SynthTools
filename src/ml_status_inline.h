@@ -122,6 +122,18 @@ void Status_ValueChangedInt(const char *group, const char *descr, int value)
     Serial.printf("%s - %s: %d\n", group, descr, value);
 }
 
+void Status_ValueChangedIntArr(const char *descr, int value, int index)
+{
+    status_cnt = STATUS_DISPLAY_TIME;
+    Serial.printf("%s[%d]: %d\n", descr, index, value);
+}
+
+void Status_ValueChangedIntArr(const char *group, const char *descr, int value, int index)
+{
+    status_cnt = STATUS_DISPLAY_TIME;
+    Serial.printf("%s - %s[%d]: %d\n", group, descr, index, value);
+}
+
 void Status_ValueChangedStr(const char *descr, const char *value)
 {
     status_cnt = STATUS_DISPLAY_TIME;
@@ -145,7 +157,7 @@ void Status_Loop(uint32_t elapsed_time)
     status_elapsed_time += elapsed_time;
 }
 
-void Status_LoopMain()
+void Status_LoopMain(void)
 {
     if (status_cnt > 0)
     {
