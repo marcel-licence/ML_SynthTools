@@ -499,7 +499,9 @@ void ES8388_Setup()
     ES8388_WriteReg(0x1A, 0x00);
     ES8388_WriteReg(0x1B, 0x02);
     /* UnMute DAC */
+#ifdef KEEP_CODEC_MUTED_IN_SETUP
     ES8388_WriteReg(0x19, 0x32);
+#endif
     /*
      * Setup Mixer
      */
@@ -510,8 +512,8 @@ void ES8388_Setup()
     ES8388_WriteReg(0x2A, 0xD0);
 
     /* Set Lout/Rout Volume */
-    ES8388_SetOUT1VOL(0, 1);
-    ES8388_SetOUT2VOL(0, 1);
+    ES8388_SetOUT1VOL(1);
+    ES8388_SetOUT2VOL(1);
 
     /* Power up DEM and STM */
     ES8388_WriteReg(0x02, 0x00);
