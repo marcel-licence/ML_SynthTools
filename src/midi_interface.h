@@ -44,7 +44,6 @@
 #endif
 
 
-
 #if defined(ML_SYNTH_INLINE_DECLARATION) || defined(ML_SYNTH_INLINE_DEFINITION)
 #ifndef MIDI_INTERFACE_H
 #define MIDI_INTERFACE_H
@@ -58,7 +57,6 @@
 #ifndef MIDI_BAUDRATE
 #define MIDI_BAUDRATE 31250
 #endif
-
 
 
 /*
@@ -727,7 +725,7 @@ void Midi_SendRaw(uint8_t *msg)
         MidiPort2.serial->write(msg, 3);
     }
 }
-#endif /* MIDI_TX2_PIN */
+#else /* MIDI_TX2_PIN */
 
 #ifdef MIDI_TX1_PIN
 void Midi_SendShortMessage(uint8_t *msg)
@@ -765,6 +763,7 @@ void Midi_SendRaw(uint8_t *msg)
     }
 }
 #endif /* MIDI_TX1_PIN */
+#endif /* MIDI_TX2_PIN */
 #endif
 #endif
 
