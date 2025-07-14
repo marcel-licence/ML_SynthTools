@@ -44,8 +44,10 @@
 #endif
 
 
-#ifdef ML_SYNTH_INLINE_DECLARATION
 
+#if defined(ML_SYNTH_INLINE_DECLARATION) || defined(ML_SYNTH_INLINE_DEFINITION)
+#ifndef MIDI_INTERFACE_H
+#define MIDI_INTERFACE_H
 
 #define MIDI_CHANNEL_MASK   0x10
 #define MIDI_CHANNEL_0      0x01
@@ -56,6 +58,69 @@
 #ifndef MIDI_BAUDRATE
 #define MIDI_BAUDRATE 31250
 #endif
+
+
+
+/*
+ * structure is used to build the mapping table
+ */
+struct midiControllerMapping
+{
+    uint8_t channel;
+    uint8_t data1;
+    const char *desc;
+    void(*callback_mid)(uint8_t ch, uint8_t data1, uint8_t data2);
+#ifdef MIDI_FMT_INT
+    void(*callback_val)(uint8_t userdata, uint8_t value);
+#else
+    void(*callback_val)(uint8_t userdata, float value);
+#endif
+    uint8_t user_data;
+};
+
+#ifdef MIDI_MAP_FLEX_ENABLED
+struct midiMapLookUpEntry
+{
+    const char *desc;
+    struct midiControllerMapping *controlMap;
+    int controlMapSize;
+};
+#endif
+
+struct midiMapping_s
+{
+    void (*rawMsg)(uint8_t *msg);
+#ifdef MIDI_FMT_INT
+    void (*noteOn)(uint8_t ch, uint8_t note, uint8_t vel);
+    void (*noteOff)(uint8_t ch, uint8_t note);
+    void (*pitchBend)(uint8_t ch, uint16_t bend);
+    void (*modWheel)(uint8_t ch, uint8_t value);
+#else
+    void (*noteOn)(uint8_t ch, uint8_t note, float vel);
+    void (*noteOff)(uint8_t ch, uint8_t note);
+    void (*pitchBend)(uint8_t ch, float bend);
+    void (*modWheel)(uint8_t ch, float value);
+#endif
+    void (*programChange)(uint8_t ch, uint8_t program_number);
+#ifdef MIDI_CHANNEL_PRESSURE_ENABLED
+#ifdef MIDI_FMT_INT
+    void (*channelPressure)(uint8_t ch, uint8_t pressure);
+#else
+    void (*channelPressure)(uint8_t ch, float pressure);
+#endif
+#endif
+    void (*rttMsg)(uint8_t msg);
+    void (*songPos)(uint16_t pos);
+
+    struct midiControllerMapping *controlMapping;
+    int mapSize;
+
+#ifdef MIDI_MAP_FLEX_ENABLED
+    /* the following map can be changed  during runtime */
+    struct midiControllerMapping *controlMapping_flex;
+    int mapSize_flex;
+#endif
+};
 
 
 void Midi_Setup(void);
@@ -79,7 +144,7 @@ void Midi_SendRaw(uint8_t *msg);
 #endif
 #endif
 
-
+#endif /* #ifndef MIDI_INTERFACE_H */
 #endif /* ML_SYNTH_INLINE_DECLARATION */
 
 
@@ -157,66 +222,6 @@ struct midi_port_s MidiPort1;
 struct midi_port_s MidiPort2;
 #endif
 
-/*
- * structure is used to build the mapping table
- */
-struct midiControllerMapping
-{
-    uint8_t channel;
-    uint8_t data1;
-    const char *desc;
-    void(*callback_mid)(uint8_t ch, uint8_t data1, uint8_t data2);
-#ifdef MIDI_FMT_INT
-    void(*callback_val)(uint8_t userdata, uint8_t value);
-#else
-    void(*callback_val)(uint8_t userdata, float value);
-#endif
-    uint8_t user_data;
-};
-
-#ifdef MIDI_MAP_FLEX_ENABLED
-struct midiMapLookUpEntry
-{
-    const char *desc;
-    struct midiControllerMapping *controlMap;
-    int controlMapSize;
-};
-#endif
-
-struct midiMapping_s
-{
-    void (*rawMsg)(uint8_t *msg);
-#ifdef MIDI_FMT_INT
-    void (*noteOn)(uint8_t ch, uint8_t note, uint8_t vel);
-    void (*noteOff)(uint8_t ch, uint8_t note);
-    void (*pitchBend)(uint8_t ch, uint16_t bend);
-    void (*modWheel)(uint8_t ch, uint8_t value);
-#else
-    void (*noteOn)(uint8_t ch, uint8_t note, float vel);
-    void (*noteOff)(uint8_t ch, uint8_t note);
-    void (*pitchBend)(uint8_t ch, float bend);
-    void (*modWheel)(uint8_t ch, float value);
-#endif
-    void (*programChange)(uint8_t ch, uint8_t program_number);
-#ifdef MIDI_CHANNEL_PRESSURE_ENABLED
-#ifdef MIDI_FMT_INT
-    void (*channelPressure)(uint8_t ch, uint8_t pressure);
-#else
-    void (*channelPressure)(uint8_t ch, float pressure);
-#endif
-#endif
-    void (*rttMsg)(uint8_t msg);
-    void (*songPos)(uint16_t pos);
-
-    struct midiControllerMapping *controlMapping;
-    int mapSize;
-
-#ifdef MIDI_MAP_FLEX_ENABLED
-    /* the following map can be changed  during runtime */
-    struct midiControllerMapping *controlMapping_flex;
-    int mapSize_flex;
-#endif
-};
 
 /*
  * following variables shall be defined in z_config.ino
@@ -723,6 +728,43 @@ void Midi_SendRaw(uint8_t *msg)
     }
 }
 #endif /* MIDI_TX2_PIN */
+
+#ifdef MIDI_TX1_PIN
+void Midi_SendShortMessage(uint8_t *msg)
+{
+    MidiPort1.serial->write(msg, 3);
+}
+
+void Midi_SendRaw(uint8_t *msg)
+{
+    /* sysex */
+    if (msg[0] == 0xF0)
+    {
+        int i = 2;
+        while (msg[i] != 0xF7)
+        {
+            i++;
+        }
+        MidiPort1.serial->write(msg, i + 1);
+    }
+    else if ((msg[0] & 0xF0) == 0xC0)
+    {
+        MidiPort1.serial->write(msg, 2);
+    }
+    else if ((msg[0] & 0xF0) == 0xD0)
+    {
+        MidiPort1.serial->write(msg, 2);
+    }
+    else if ((msg[0] & 0xF0) == 0xF0)
+    {
+        MidiPort1.serial->write(msg, 1);
+    }
+    else
+    {
+        MidiPort1.serial->write(msg, 3);
+    }
+}
+#endif /* MIDI_TX1_PIN */
 #endif
 #endif
 
