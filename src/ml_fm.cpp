@@ -1306,7 +1306,7 @@ static void FmSynth_ProcessOperator(struct synthTone_s *osc)
     int32_t add = (int32_t)(pitch * multiplierPitchToAddValue);
     osc->pos += add ;
 
-#fidef FM_PHASESHIFT_ENABLED
+#ifdef FM_PHASESHIFT_ENABLED
     osc->pos += phaseShift;
     osc->sine_preoout = SineNormU32(osc->pos) ;
 #else
