@@ -56,6 +56,9 @@
 void Audio_Setup(void);
 void Audio_Output(const float *left, const float *right);
 void Audio_OutputMono(const int32_t *samples);
+void Audio_Output(const int32_t *samples);
+void Audio_Output(const int16_t *samples);
+void Audio_Output(const Q1_14 *samples);
 void Audio_Output(const int16_t *left, const int16_t *right);
 void Audio_Output(const Q1_14 *left, const Q1_14 *right);
 void Audio_Input(float *left, float *right);
@@ -403,6 +406,16 @@ void Audio_PrintStats()
 void Audio_Output(const Q1_14 *mono)
 {
     Audio_Output((const int16_t *)mono, (const int16_t *)mono);
+}
+
+void Audio_Output(const int32_t *samples)
+{
+    Audio_OutputMono(samples);
+}
+
+void Audio_Output(const int16_t *samples)
+{
+    Audio_Output((const int16_t *)samples, (const int16_t *)samples);
 }
 
 void Audio_OutputMono(const int32_t *samples)
