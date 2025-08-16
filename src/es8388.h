@@ -484,7 +484,7 @@ void ES8388_Setup(int codec_id)
     Serial.printf("  SCL: %d\n", ES8388_PIN_SCL);
     Serial.printf("  freq: %" PRIu32 "\n", i2c_freq);
 
-    while (not ES8388_begin(ES8388_PIN_SDA, ES8388_PIN_SCL, i2c_freq))
+    while (not ES8388_begin(codec_id, ES8388_PIN_SDA, ES8388_PIN_SCL, i2c_freq))
     {
         Serial.printf("Failed!\n");
         Serial.printf("It may be possible that SCL and SDA are incorrect\n");
