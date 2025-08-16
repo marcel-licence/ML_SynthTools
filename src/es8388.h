@@ -57,7 +57,9 @@ void ES8388_SetOUT1VOL(float vol);
 void ES8388_SetOUT1VOL(uint8_t unused, float vol);
 void ES8388_SetOUT2VOL(float vol);
 void ES8388_SetOUT2VOL(uint8_t unused, float vol);
-
+#ifdef DUAL_CODEC_ENABLED
+void ES8388_SelectCodec(bool select);
+#endif
 
 #endif // ES8388_ENABLED
 #endif // #ifdef ML_SYNTH_INLINE_DECLARATION
@@ -75,6 +77,7 @@ void ES8388_SetOUT2VOL(uint8_t unused, float vol);
 /* ES8388 address */
 //#define ES8388_ADDR 0x20  /*!< 0x22:CE=1;0x20:CE=0*/
 #define ES8388_ADDR 0x10  /*!< 0x22:CE=1;0x20:CE=0*/
+#define ES8388_ADDR_SECONDARY 0x11  /*!< 0x22:CE=1;0x20:CE=0*/
 
 
 /* ES8388 register */
@@ -139,15 +142,35 @@ void ES8388_SetOUT2VOL(uint8_t unused, float vol);
 #define ES8388_DACCONTROL29     0x33
 #define ES8388_DACCONTROL30     0x34
 
+bool selected_codec_id = 0;
+uint16_t codecAddress = ES8388_ADDR;
+
+void ES8388_SelectCodec(bool select)
+{
+    if (selected_codec_id != select)
+    {
+        if (select)
+        {
+            codecAddress = ES8388_ADDR_SECONDARY;
+            selected_codec_id = 1;
+        }
+        else
+        {
+            codecAddress = ES8388_ADDR;
+            selected_codec_id = 0;
+        }
+    }
+    return;
+}
 
 uint8_t ES8388_ReadReg(uint8_t reg)
 {
-    Wire.beginTransmission(ES8388_ADDR);
+    Wire.beginTransmission(codecAddress);
     Wire.write(reg);
     Wire.endTransmission(false);
 
     uint8_t val = 0u;
-    if (1 == Wire.requestFrom(uint16_t(ES8388_ADDR), uint8_t(1), true))
+    if (1 == Wire.requestFrom(uint16_t(codecAddress), uint8_t(1), true))
     {
         val = Wire.read();
     }
@@ -157,7 +180,7 @@ uint8_t ES8388_ReadReg(uint8_t reg)
 
 bool ES8388_WriteReg(uint8_t reg, uint8_t val)
 {
-    Wire.beginTransmission(ES8388_ADDR);
+    Wire.beginTransmission(codecAddress);
     Wire.write(reg);
     Wire.write(val);
     return 0 == Wire.endTransmission(true);
