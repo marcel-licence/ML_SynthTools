@@ -52,8 +52,12 @@
 void setup_i2s();
 bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen);
 bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sample, const int buffLen);
+bool i2s_write_stereo_samples_buff_dual(const float *fl_sample, const float *fr_sample, const int buffLen, uint8_t codec_num);
+bool i2s_write_stereo_samples_i16_dual(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen, uint8_t codec_num);
 void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int buffLen);
 void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const int buffLen);
+void i2s_read_stereo_samples_buff_dual(float *fl_sample, float *fr_sample, const int buffLen, uint8_t codec_num);
+void i2s_read_stereo_samples_i16_dual(int16_t *fl_sample, int16_t *fr_sample, const int buffLen, uint8_t codec_num);
 
 #endif /* ML_SYNTH_INLINE_DECLARATION */
 
@@ -138,6 +142,10 @@ union sampleTUNT
 
 
 const i2s_port_t i2s_port_number = I2S_NUM_0;
+
+#ifdef DUAL_CODEC_ENABLED
+const i2s_port_t i2s_port_number_secondary = I2S_NUM_1;
+#endif
 
 /*
  * please refer to https://www.hackster.io/janost/audio-hacking-on-the-esp8266-fa9464#toc-a-simple-909-drum-synth-0
@@ -510,6 +518,70 @@ i2s_config_t i2s_configuration =
 };
 #endif
 
+#ifdef DUAL_CODEC_ENABLED
+/* Secondary I2S configuration for dual codec setup */
+i2s_config_t i2s_configuration_secondary =
+{
+    .mode = (i2s_mode_t)(I2S_MODE_SLAVE | I2S_MODE_TX | I2S_MODE_RX),
+    .sample_rate = SAMPLE_RATE * I2S_OVERSAMPLE,
+#ifdef SAMPLE_SIZE_32BIT
+    .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT,
+#endif
+#ifdef SAMPLE_SIZE_24BIT
+    .bits_per_sample = I2S_BITS_PER_SAMPLE_24BIT,
+#endif
+#ifdef SAMPLE_SIZE_16BIT
+    .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+#endif
+    .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
+#ifdef ARDUINO_RUNNING_CORE
+#ifdef MAX_98357A_ENABLED
+    .communication_format = I2S_COMM_FORMAT_STAND_PCM_LONG,
+#else
+    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+#endif
+#else
+    .communication_format = (i2s_comm_format_t)(I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB),
+#endif
+    .intr_alloc_flags = 0,
+    .dma_buf_count = 2,
+    .dma_buf_len = SAMPLE_BUFFER_SIZE,
+#ifdef I2S_USE_APLL
+    .use_apll = true,
+#else
+    .use_apll = false,
+#endif
+
+#ifdef ARDUINO_RUNNING_CORE
+    .tx_desc_auto_clear = true,
+    .fixed_mclk = 0,
+#ifdef I2S_MCLK_MULTIPLE_DEFAULT
+    .mclk_multiple = I2S_MCLK_MULTIPLE_DEFAULT,
+#else
+    .mclk_multiple = I2S_MCLK_MULTIPLE_256,
+#endif
+#ifdef SAMPLE_SIZE_16BIT
+    .bits_per_chan = I2S_BITS_PER_CHAN_16BIT,
+#endif
+#ifdef SAMPLE_SIZE_24BIT
+    .bits_per_chan = I2S_BITS_PER_CHAN_24BIT,
+#endif
+#ifdef SAMPLE_SIZE_32BIT
+    .bits_per_chan = I2S_BITS_PER_CHAN_32BIT,
+#endif
+#endif
+
+#if SOC_I2S_SUPPORTS_TDM
+    .chan_mask = I2S_CHANNEL_STEREO,
+    .total_chan = 0,
+    .left_align = 0,
+    .big_edin = 0,
+    .bit_order_msb = 0,
+    .skip_msk = 0,
+#endif
+};
+#endif
+
 
 #ifdef I2S_NODAC
 #ifdef ESP8266
@@ -534,6 +606,40 @@ i2s_pin_config_t pins =
     .data_in_num = I2S_DIN_PIN,
 };
 #endif /* (defined I2S_BCLK_PIN) && (defined I2S_WCLK_PIN) && (defined I2S_DOUT_PIN) */
+
+#ifdef DUAL_CODEC_ENABLED
+#if  (defined I2S_DOUT_PIN_SECONDARY) || (defined I2S_DIN_PIN_SECONDARY)
+/* Secondary I2S pin configuration for dual codec setup */
+i2s_pin_config_t pins_secondary =
+{
+    #ifdef I2S_MCLK_PIN_SECONDARY
+    .mck_io_num = I2S_MCLK_PIN_SECONDARY,
+    #else
+    .mck_io_num = I2S_PIN_NO_CHANGE,
+    #endif
+    #ifdef I2S_BCLK_PIN_SECONDARY
+    .bck_io_num = I2S_BCLK_PIN_SECONDARY,
+    #else
+    .bck_io_num = I2S_PIN_NO_CHANGE,
+    #endif
+    #ifdef I2S_WCLK_PIN_SECONDARY
+    .ws_io_num = I2S_WCLK_PIN_SECONDARY,
+    #else
+    .ws_io_num = I2S_PIN_NO_CHANGE,
+    #endif
+    #ifdef I2S_DOUT_PIN_SECONDARY
+    .data_out_num = I2S_DOUT_PIN_SECONDARY,
+    #else
+    .data_out_num = I2S_PIN_NO_CHANGE,
+    #endif
+    #ifdef I2S_DIN_PIN_SECONDARY
+    .data_in_num = I2S_DIN_PIN_SECONDARY,
+    #else
+    .data_in_num = I2S_PIN_NO_CHANGE,
+    #endif
+};
+#endif /* (defined I2S_BCLK_PIN_SECONDARY) && (defined I2S_WCLK_PIN_SECONDARY) && (defined I2S_DOUT_PIN_SECONDARY) */
+#endif /* DUAL_CODEC_ENABLED */
 
 #endif
 
@@ -569,7 +675,49 @@ void setup_i2s()
     Serial.printf("    MCLK: %d\n", pins.mck_io_num);
 #endif
     i2s_set_sample_rates(i2s_port_number, SAMPLE_RATE);
+    #ifdef DUAL_CODEC_ENABLED
+#if (defined I2S_BCLK_PIN_SECONDARY) || (defined I2S_WCLK_PIN_SECONDARY) || (defined I2S_DOUT_PIN_SECONDARY) || (defined I2S_DIN_PIN_SECONDARY)
+    /* Setup secondary codec */
+    i2s_driver_install(i2s_port_number_secondary, &i2s_configuration_secondary, 0, NULL);
+    Serial.printf("Secondary i2s_configuration:\n");
+    Serial.printf("\ttx_desc_auto_clear: %d\n", i2s_configuration_secondary.tx_desc_auto_clear);
+    Serial.printf("\tfixed_mclk: %d\n", i2s_configuration_secondary.fixed_mclk);
+    Serial.printf("\tmclk_multiple: %d\n", i2s_configuration_secondary.mclk_multiple);
+    Serial.printf("\tbits_per_chan: %d\n", i2s_configuration_secondary.bits_per_chan);
+
+    i2s_set_pin(i2s_port_number_secondary, &pins_secondary);
+
+    Serial.printf("Secondary I2S_NUM_%d configured using following pins:\n", i2s_port_number_secondary);
+    Serial.printf("    BCLK,BCK: %d\n", pins_secondary.bck_io_num);
+    Serial.printf("    WCLK,LCK: %d\n", pins_secondary.ws_io_num);
+    Serial.printf("    DOUT: %d\n", pins_secondary.data_out_num);
+    Serial.printf("    DIN: %d\n", pins_secondary.data_in_num);
+    Serial.printf("    MCLK: %d\n", pins_secondary.mck_io_num);
+
+    i2s_set_sample_rates(i2s_port_number_secondary, SAMPLE_RATE);
+    
+    Serial.printf("Secondary I2S configured using following pins:\n");
+    Serial.printf("    BCLK,BCK: %d\n", pins_secondary.bck_io_num);
+    Serial.printf("    WCLK,LCK: %d\n", pins_secondary.ws_io_num);
+    Serial.printf("    DOUT: %d\n", pins_secondary.data_out_num);
+    Serial.printf("    DIN: %d\n", pins_secondary.data_in_num);
+    Serial.printf("    MCLK: %d\n", pins_secondary.mck_io_num);
+    
+    #endif /* (defined I2S_BCLK_PIN_SECONDARY) && (defined I2S_WCLK_PIN_SECONDARY) && (defined I2S_DOUT_PIN_SECONDARY) */
+    #include "esp_rom_gpio.h"
+    #include "soc/i2s_periph.h"
+    /* Connnect both BCLK signals */
+    esp_rom_gpio_connect_out_signal(I2S_BCLK_PIN_SECONDARY, i2s_periph_signal[0].m_tx_bck_sig, 0, 0);
+    esp_rom_gpio_connect_in_signal(I2S_BCLK_PIN_SECONDARY, i2s_periph_signal[1].s_rx_bck_sig, 0);
+    /* Connect both WS signals */
+    esp_rom_gpio_connect_out_signal(I2S_WCLK_PIN_SECONDARY, i2s_periph_signal[0].m_tx_ws_sig, 0, 0);
+    esp_rom_gpio_connect_in_signal(I2S_WCLK_PIN_SECONDARY, i2s_periph_signal[1].s_rx_ws_sig, 0);
     i2s_start(i2s_port_number);
+    i2s_start(i2s_port_number_secondary);
+    #else
+    i2s_start(i2s_port_number);
+    #endif /* DUAL_CODEC_ENABLED */
+    
 #ifdef ES8388_ENABLED
 #ifdef PIN_CTRL
     REG_WRITE(PIN_CTRL, 0xFFFFFFF0);
@@ -605,6 +753,116 @@ void setup_i2s()
 #endif
 }
 #endif /* (defined I2S_BCLK_PIN) && (defined I2S_WCLK_PIN) && (defined I2S_DOUT_PIN) */
+
+#ifdef DUAL_CODEC_ENABLED
+#ifdef SAMPLE_BUFFER_SIZE
+/* Dual codec write function - allows writing to specific codec */
+bool i2s_write_stereo_samples_buff_dual(const float *fl_sample, const float *fr_sample, const int buffLen, uint8_t codec_num)
+{
+    static union sampleTUNT sampleDataU[SAMPLE_BUFFER_SIZE];
+    i2s_port_t target_port = (codec_num == 0) ? i2s_port_number : i2s_port_number_secondary;
+
+    for (int n = 0; n < buffLen; n++)
+    {
+        /* Using RIGHT_LEFT format for both codecs */
+        sampleDataU[n].ch[0] = (SAMPLE_DATA_TYPE)(fr_sample[n] * MULTIPLIER_CONST);
+        sampleDataU[n].ch[1] = (SAMPLE_DATA_TYPE)(fl_sample[n] * MULTIPLIER_CONST);
+    }
+
+    static size_t bytes_written = 0;
+
+#ifdef CYCLE_MODULE_ENABLED
+    calcCycleCountPre();
+#endif
+    i2s_write(target_port, (const char *)&sampleDataU[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_written, portMAX_DELAY);
+#ifdef CYCLE_MODULE_ENABLED
+    calcCycleCount();
+#endif
+
+    if (bytes_written > 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+/* Dual codec write function for int16 - allows writing to specific codec */
+bool i2s_write_stereo_samples_i16_dual(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen, uint8_t codec_num)
+{
+    static union sampleTUNT sampleDataU[SAMPLE_BUFFER_SIZE];
+    i2s_port_t target_port = (codec_num == 0) ? i2s_port_number : i2s_port_number_secondary;
+
+    for (int n = 0; n < buffLen; n++)
+    {
+        /* Using RIGHT_LEFT format for both codecs */
+        sampleDataU[n].ch[0] = fr_sample[n];
+        sampleDataU[n].ch[1] = fl_sample[n];
+    }
+
+    static size_t bytes_written = 0;
+
+#ifdef CYCLE_MODULE_ENABLED
+    calcCycleCountPre();
+#endif
+    i2s_write(target_port, (const char *)&sampleDataU[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_written, portMAX_DELAY);
+#ifdef CYCLE_MODULE_ENABLED
+    calcCycleCount();
+#endif
+
+    if (bytes_written > 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+/* Dual codec read function - allows reading from specific codec */
+void i2s_read_stereo_samples_buff_dual(float *fl_sample, float *fr_sample, const int buffLen, uint8_t codec_num)
+{
+    i2s_port_t target_port = (codec_num == 0) ? i2s_port_number : i2s_port_number_secondary;
+    
+#ifdef I2S_DIN_PIN
+    static size_t bytes_read = 0;
+    static union sampleTUNT sampleData[SAMPLE_BUFFER_SIZE];
+
+    i2s_read(target_port, (char *)&sampleData[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_read, 0);
+
+    for (int n = 0; n < buffLen; n++)
+    {
+        /* Using RIGHT_LEFT format */
+        fr_sample[n] = ((float)sampleData[n].ch[0] * (1.0f / MULTIPLIER_CONST));
+        fl_sample[n] = ((float)sampleData[n].ch[1] * (1.0f / MULTIPLIER_CONST));
+    }
+#endif
+}
+
+/* Dual codec read function for int16 - allows reading from specific codec */
+void i2s_read_stereo_samples_i16_dual(int16_t *fl_sample, int16_t *fr_sample, const int buffLen, uint8_t codec_num)
+{
+    i2s_port_t target_port = (codec_num == 0) ? i2s_port_number : i2s_port_number_secondary;
+    
+#ifdef I2S_DIN_PIN
+    static size_t bytes_read = 0;
+    static union sampleTUNT sampleData[SAMPLE_BUFFER_SIZE];
+
+    i2s_read(target_port, (char *)&sampleData[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_read, 0);
+
+    for (int n = 0; n < buffLen; n++)
+    {
+        /* Using RIGHT_LEFT format */
+        fr_sample[n] = sampleData[n].ch[0];
+        fl_sample[n] = sampleData[n].ch[1];
+    }
+#endif
+}
+#endif /* SAMPLE_BUFFER_SIZE */
+#endif /* DUAL_CODEC_ENABLED */
 
 #endif /* ESP32 */
 
