@@ -53,6 +53,14 @@
 #include <ml_types.h>
 
 
+typedef enum
+{
+    AUDIO_PORT_0 = 0,
+    AUDIO_PORT_1 = 1,
+    // Add more outputs as needed
+} AudioPortId;
+
+
 void Audio_Setup(void);
 void Audio_Output(const float *left, const float *right);
 void Audio_OutputMono(const int32_t *samples);
@@ -60,6 +68,7 @@ void Audio_Output(const int32_t *samples);
 void Audio_Output(const int16_t *samples);
 void Audio_Output(const Q1_14 *samples);
 void Audio_Output(const int16_t *left, const int16_t *right);
+void Audio_Output(AudioPortId audio_port, const int16_t *left, const int16_t *right);
 void Audio_Output(const Q1_14 *left, const Q1_14 *right);
 void Audio_Input(float *left, float *right);
 void Audio_Input(Q1_14 *left, Q1_14 *right);
@@ -156,9 +165,8 @@ static float saw_right[SAMPLE_BUFFER_SIZE];
 static int32_t saw_i32[SAMPLE_BUFFER_SIZE];
 #endif
 #ifdef OUTPUT_SINE_TEST
-static float sin_left[SAMPLE_BUFFER_SIZE];
-static float sin_right[SAMPLE_BUFFER_SIZE];
-static int32_t sine_i32[SAMPLE_BUFFER_SIZE];
+static float sin[4][SAMPLE_BUFFER_SIZE];
+static int32_t sine_i32[4][SAMPLE_BUFFER_SIZE];
 #endif
 
 void Audio_Setup(void)
@@ -192,27 +200,28 @@ void Audio_Setup(void)
         w *= 1.0f / ((float)SAMPLE_BUFFER_SIZE);
         w *= 2.0f * M_PI;
         float sine = sin(w);
-        sin_left[i] = sine;
-        sin_right[i] = sin(w * 2.0f);
-        sine *= 1073741824;
-        sine_i32[i] = sine;
+        for (int n = 0; n < 4; n++)
+        {
+            sine = sin(n * w * 2.0f);
+            sin[n][i] = sine;
+            sine *= 1073741824;
+            sine_i32[n][i] = sine;
+        }
     }
 #endif
 
 #ifdef ESP32_AUDIO_KIT
 #ifdef ES8388_ENABLED
-    ES8388_Setup();
-    ES8388_SetIn2OoutVOL(0, 0);
+    ES8388_Setup(ES8388_ID0);
+    ES8388_SetIn2OoutVOL(ES8388_ID0, 0.0f);
 #else
     ac101_setup();
 #endif
 #endif
 
 #if defined(DUAL_CODEC_ENABLED) && defined(ES8388_ENABLED)
-    ES8388_SelectCodec(1);
-    ES8388_Setup();
-    ES8388_SetIn2OoutVOL(0, 0);
-    ES8388_SelectCodec(0);
+    ES8388_Setup(ES8388_ID1);
+    ES8388_SetIn2OoutVOL(ES8388_ID1, 0.0f);
 #endif
 
 #ifdef WM8978_ENABLED
@@ -644,7 +653,7 @@ void Audio_Output(const Q1_14 *left, const Q1_14 *right)
 }
 
 #ifndef ARDUINO_SEEED_XIAO_M0
-void Audio_Output(const int16_t *left, const int16_t *right)
+void Audio_Output(AudioPortId audio_port, const int16_t *left, const int16_t *right)
 {
 #ifdef ESP8266
     for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
@@ -709,7 +718,7 @@ void Audio_Output(const int16_t *left, const int16_t *right)
         }
     }
 #else
-    i2s_write_stereo_samples_i16(left, right, SAMPLE_BUFFER_SIZE);
+    i2s_write_stereo_samples_i16(left, right, SAMPLE_BUFFER_SIZE, audio_port);
 #endif
 #endif /* ESP32 */
 
@@ -836,6 +845,11 @@ void Audio_Output(const int16_t *left, const int16_t *right)
 #endif
 #endif /* PICO_AUDIO_I2S */
 }
+
+void Audio_Output(const int16_t *left, const int16_t *right)
+{
+    Audio_Output(AUDIO_PORT_0, left, right);
+}
 #endif
 
 #if (defined ESP32) || (defined TEENSYDUINO) || (defined ARDUINO_DAISY_SEED) || (defined ARDUINO_GENERIC_F407VGTX) || (defined ARDUINO_DISCO_F407VG) || (defined ARDUINO_BLACK_F407VE) || (defined ARDUINO_ARCH_RP2040) || (((defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)) && (defined RP2040_AUDIO_PWM))
@@ -868,8 +882,8 @@ void Audio_Output(const float *left, const float *right)
     right = saw_right;
 #endif
 #ifdef OUTPUT_SINE_TEST
-    left = sin_left;
-    right = sin_right;
+    left = sin[0];
+    right = sin[1];
 #endif
 
 #ifdef ESP32

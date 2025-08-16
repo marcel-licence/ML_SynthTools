@@ -42,6 +42,9 @@
 
 #ifdef __CDT_PARSER__
 #include <cdt.h>
+#define ES8388_ENABLED
+#define ML_SYNTH_INLINE_DECLARATION
+#define ML_SYNTH_INLINE_DEFINITION
 #endif
 
 
@@ -49,17 +52,20 @@
 #ifdef ES8388_ENABLED
 
 
+#define ES8388_ID0  (uint8_t)0
+#define ES8388_ID1  (uint8_t)1
+
 void ES8388_Setup(void);
-void ES8388_SetIn2OoutVOL(uint8_t unused, float vol);
+void ES8388_Setup(int codec_id);
+void ES8388_SetIn2OoutVOL(uint8_t codec_id, float vol);
 void ES8388_SetDACVOL(float vol);
-void ES8388_SetDACVOL(uint8_t unused, float vol);
+void ES8388_SetDACVOL(uint8_t codec_id, float vol);
 void ES8388_SetOUT1VOL(float vol);
-void ES8388_SetOUT1VOL(uint8_t unused, float vol);
+void ES8388_SetOUT1VOL(uint8_t codec_id, float vol);
 void ES8388_SetOUT2VOL(float vol);
-void ES8388_SetOUT2VOL(uint8_t unused, float vol);
-#ifdef DUAL_CODEC_ENABLED
-void ES8388_SelectCodec(bool select);
-#endif
+void ES8388_SetOUT2VOL(uint8_t codec_id, float vol);
+void ES8388_MuteOutput(uint8_t codec_id, bool mute);
+void ES8388_MuteOutput(bool mute);
 
 #endif // ES8388_ENABLED
 #endif // #ifdef ML_SYNTH_INLINE_DECLARATION
@@ -142,35 +148,16 @@ void ES8388_SelectCodec(bool select);
 #define ES8388_DACCONTROL29     0x33
 #define ES8388_DACCONTROL30     0x34
 
-bool selected_codec_id = 0;
-uint16_t codecAddress = ES8388_ADDR;
+static const uint16_t es8388_addr[] = {ES8388_ADDR, ES8388_ADDR_SECONDARY};
 
-void ES8388_SelectCodec(bool select)
+uint8_t ES8388_ReadReg(uint8_t codec_id, uint8_t reg)
 {
-    if (selected_codec_id != select)
-    {
-        if (select)
-        {
-            codecAddress = ES8388_ADDR_SECONDARY;
-            selected_codec_id = 1;
-        }
-        else
-        {
-            codecAddress = ES8388_ADDR;
-            selected_codec_id = 0;
-        }
-    }
-    return;
-}
-
-uint8_t ES8388_ReadReg(uint8_t reg)
-{
-    Wire.beginTransmission(codecAddress);
+    Wire.beginTransmission(es8388_addr[codec_id]);
     Wire.write(reg);
     Wire.endTransmission(false);
 
     uint8_t val = 0u;
-    if (1 == Wire.requestFrom(uint16_t(codecAddress), uint8_t(1), true))
+    if (1 == Wire.requestFrom(es8388_addr[codec_id], uint8_t(1), true))
     {
         val = Wire.read();
     }
@@ -178,44 +165,59 @@ uint8_t ES8388_ReadReg(uint8_t reg)
     return val;
 }
 
-bool ES8388_WriteReg(uint8_t reg, uint8_t val)
+uint8_t ES8388_ReadReg(uint8_t reg)
 {
-    Wire.beginTransmission(codecAddress);
+    return ES8388_ReadReg(ES8388_ID0, reg);
+}
+
+bool ES8388_WriteReg(uint8_t codec_id, uint8_t reg, uint8_t val)
+{
+    Wire.beginTransmission(es8388_addr[codec_id]);
     Wire.write(reg);
     Wire.write(val);
     return 0 == Wire.endTransmission(true);
 }
 
-bool ES8388_begin(int sda, int scl, uint32_t frequency)
+bool ES8388_WriteReg(uint8_t reg, uint8_t val)
+{
+    return ES8388_WriteReg(ES8388_ID0, reg, val);
+}
+
+bool ES8388_begin(uint8_t codec_id, int sda, int scl, uint32_t frequency)
 {
     bool ok = Wire.begin(sda, scl, frequency);
 
     /* Reset all registers, readback default as sanity check */
     delay(100);
 
-    Serial.printf("0x00: 0x%02x\n", ES8388_ReadReg(ES8388_CONTROL1));
-    Serial.printf("0x01: 0x%02x\n", ES8388_ReadReg(ES8388_CONTROL2));
+    Serial.printf("0x00: 0x%02x\n", ES8388_ReadReg(codec_id, ES8388_CONTROL1));
+    Serial.printf("0x01: 0x%02x\n", ES8388_ReadReg(codec_id, ES8388_CONTROL2));
 
-    ES8388_WriteReg(ES8388_CONTROL1, 1 << 7); /* do reset! */
-    ES8388_WriteReg(ES8388_CONTROL1, 0x06);
-    ES8388_WriteReg(ES8388_CONTROL2, 0x50);
+    ES8388_WriteReg(codec_id, ES8388_CONTROL1, 1 << 7); /* do reset! */
+    ES8388_WriteReg(codec_id, ES8388_CONTROL1, 0x06);
+    ES8388_WriteReg(codec_id, ES8388_CONTROL2, 0x50);
 
-    ok &= (0x06 == ES8388_ReadReg(ES8388_CONTROL1));
-    ok &= (0x50 == ES8388_ReadReg(ES8388_CONTROL2));
+    ok &= (0x06 == ES8388_ReadReg(codec_id, ES8388_CONTROL1));
+    ok &= (0x50 == ES8388_ReadReg(codec_id, ES8388_CONTROL2));
     return ok;
 }
 
-void es8388_read_all()
+bool ES8388_begin(int sda, int scl, uint32_t frequency)
+{
+    return ES8388_begin(ES8388_ID0, sda, scl, frequency);
+}
+
+void es8388_read_all(uint8_t codec_id)
 {
     for (int i = 0; i < 53; i++)
     {
         uint8_t reg = 0;
-        reg = ES8388_ReadReg(i);
+        reg = ES8388_ReadReg(codec_id, i);
         Serial.printf("Reg 0x%02x = 0x%02x\n", i, reg);
     }
 }
 
-void ES8388_SetADCVOL(uint8_t unused, float vol)
+void ES8388_SetADCVOL(uint8_t codec_id, float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("ADC Volume /db", (vol - 1) * 97 + 0.5);
@@ -231,11 +233,16 @@ void ES8388_SetADCVOL(uint8_t unused, float vol)
         volu8 = 192;
     }
 
-    ES8388_WriteReg(0x10, volu8); // LADCVOL
-    ES8388_WriteReg(0x11, volu8); // RADCVOL
+    ES8388_WriteReg(codec_id, 0x10, volu8); // LADCVOL
+    ES8388_WriteReg(codec_id, 0x11, volu8); // RADCVOL
 }
 
-void ES8388_SetDACVOL(float vol)
+void ES8388_SetADCVOL(float vol)
+{
+    ES8388_SetADCVOL(ES8388_ID0, vol);
+}
+
+void ES8388_SetDACVOL(uint8_t codec_id, float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("DAC Volume /db", (vol - 1) * 97 + 0.5);
@@ -251,16 +258,16 @@ void ES8388_SetDACVOL(float vol)
         volu8 = 192;
     }
 
-    ES8388_WriteReg(0x1A, volu8); // LDACVOL
-    ES8388_WriteReg(0x1B, volu8); // RDACVOL
+    ES8388_WriteReg(codec_id, 0x1A, volu8); // LDACVOL
+    ES8388_WriteReg(codec_id, 0x1B, volu8); // RDACVOL
 }
 
-void ES8388_SetDACVOL(uint8_t unused, float vol)
+void ES8388_SetDACVOL(float vol)
 {
-    ES8388_SetDACVOL(vol);
+    ES8388_SetDACVOL(ES8388_ID0, vol);
 }
 
-void ES8388_SetPGAGain(uint8_t unused, float vol)
+void ES8388_SetPGAGain(uint8_t codec_id, float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("PGA Gain /db", vol * 24 + 0.25);
@@ -275,10 +282,15 @@ void ES8388_SetPGAGain(uint8_t unused, float vol)
         volu8 = 8;
     }
     /* ES8388_ADCCONTROL1 */
-    ES8388_WriteReg(0x09, volu8 + (volu8 << 4)); // MicAmpL, MicAmpR
+    ES8388_WriteReg(codec_id, 0x09, volu8 + (volu8 << 4)); // MicAmpL, MicAmpR
 }
 
-void ES8388_SetInputCh(uint8_t ch, float var)
+void ES8388_SetPGAGain(float vol)
+{
+    ES8388_SetPGAGain(ES8388_ID0, vol);
+}
+
+void ES8388_SetInputCh(uint8_t codec_id, uint8_t ch, float var)
 {
     if (var > 0)
     {
@@ -300,7 +312,7 @@ void ES8388_SetInputCh(uint8_t ch, float var)
             return;
         }
         /* ES8388_ADCCONTROL2 */
-        ES8388_WriteReg(0x0A, (in << 6) + (in << 4)); // LINSEL , RINSEL , DSSEL , DSR
+        ES8388_WriteReg(codec_id, 0x0A, (in << 6) + (in << 4)); // LINSEL , RINSEL , DSSEL , DSR
 
 #ifdef STATUS_ENABLED
         Status_ValueChangedInt("ADC Ch", in);
@@ -308,7 +320,12 @@ void ES8388_SetInputCh(uint8_t ch, float var)
     }
 }
 
-void ES8388_SetMixInCh(uint8_t ch, float var)
+void ES8388_SetInputCh(uint8_t ch, float var)
+{
+    ES8388_SetInputCh(ES8388_ID0, ch, var);
+}
+
+void ES8388_SetMixInCh(uint8_t codec_id, uint8_t ch, float var)
 {
     if (var > 0)
     {
@@ -335,14 +352,19 @@ void ES8388_SetMixInCh(uint8_t ch, float var)
             return;
         }
         /* ES8388_DACCONTROL16 */
-        ES8388_WriteReg(0x26, in + (in << 3)); // LMIXSEL, RMIXSEL
+        ES8388_WriteReg(codec_id, 0x26, in + (in << 3)); // LMIXSEL, RMIXSEL
 #ifdef STATUS_ENABLED
         Status_ValueChangedInt("Mix In Ch", in);
 #endif
     }
 }
 
-void ES8388_SetIn2OoutVOL(uint8_t unused, float vol)
+void ES8388_SetMixInCh(uint8_t ch, float var)
+{
+    ES8388_SetMixInCh(ES8388_ID0, ch, var);
+}
+
+void ES8388_SetIn2OoutVOL(uint8_t codec_id, float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("In to out volume /db", (vol - 1) * 16 + 0.5);
@@ -383,7 +405,12 @@ void ES8388_SetIn2OoutVOL(uint8_t unused, float vol)
     ES8388_WriteReg(0x2A, (volu8 << 3) + var); // RD2RO, RI2RO, RI2ROVOL
 }
 
-void ES8388_SetOUT1VOL(float vol)
+void ES8388_SetIn2OoutVOL(float vol)
+{
+    ES8388_SetIn2OoutVOL(ES8388_ID0, vol);
+}
+
+void ES8388_SetOUT1VOL(uint8_t codec_id, float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("OUT1VOL /db", (vol - 1) * 31 + 0.5);
@@ -398,16 +425,33 @@ void ES8388_SetOUT1VOL(float vol)
         volu8 = 129;
     }
 
-    ES8388_WriteReg(0x2E, volu8); // LOUT1VOL
-    ES8388_WriteReg(0x2F, volu8); // ROUT1VOL
+    ES8388_WriteReg(codec_id, 0x2E, volu8); // LOUT1VOL
+    ES8388_WriteReg(codec_id, 0x2F, volu8); // ROUT1VOL
 }
 
-void ES8388_SetOUT1VOL(uint8_t unused, float vol)
+void ES8388_SetOUT1VOL(float vol)
 {
-    ES8388_SetOUT1VOL(vol);
+    ES8388_SetOUT1VOL(ES8388_ID0, vol);
 }
 
-void ES8388_SetOUT2VOL(float vol)
+void ES8388_MuteOutput(uint8_t codec_id, bool mute)
+{
+    if (mute)
+    {
+        ES8388_WriteReg(codec_id, ES8388_DACCONTROL3, 0x36); // DAC Mute
+    }
+    else
+    {
+        ES8388_WriteReg(codec_id, ES8388_DACCONTROL3, 0x32); // DAC Unmute
+    }
+}
+
+void ES8388_MuteOutput(bool mute)
+{
+    ES8388_MuteOutput(ES8388_ID0, mute);
+}
+
+void ES8388_SetOUT2VOL(uint8_t codec_id, float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("OUT2VOL /db", (vol - 1) * 31 + 0.5);
@@ -422,20 +466,20 @@ void ES8388_SetOUT2VOL(float vol)
         volu8 = 129;
     }
 
-    ES8388_WriteReg(0x30, volu8); // LOUT2VOL
-    ES8388_WriteReg(0x31, volu8); // ROUT2VOL
+    ES8388_WriteReg(codec_id, 0x30, volu8); // LOUT2VOL
+    ES8388_WriteReg(codec_id, 0x31, volu8); // ROUT2VOL
 }
 
-void ES8388_SetOUT2VOL(uint8_t unused, float vol)
+void ES8388_SetOUT2VOL(float vol)
 {
-    ES8388_SetOUT2VOL(vol);
+    ES8388_SetOUT2VOL(ES8388_ID0, vol);
 }
 
-void ES8388_Setup()
+void ES8388_Setup(int codec_id)
 {
     const uint32_t i2c_freq = 400000;
 
-    Serial.printf("Connect to ES8388 codec...\n");
+    Serial.printf("Connect to ES8388[%u] codec...\n", codec_id);
     Serial.printf("  SDA: %d\n ", ES8388_PIN_SDA);
     Serial.printf("  SCL: %d\n", ES8388_PIN_SCL);
     Serial.printf("  freq: %" PRIu32 "\n", i2c_freq);
@@ -448,11 +492,11 @@ void ES8388_Setup()
         delay(1000);
     }
 
-    ES8388_WriteReg(ES8388_CHIPPOWER, 0xFF); //reset and stop es8388
+    ES8388_WriteReg(codec_id, ES8388_CHIPPOWER, 0xFF); //reset and stop es8388
 
 
-    ES8388_WriteReg(0x00, 0x80); /* reset control port register to default */
-    ES8388_WriteReg(0x00, 0x06); /* restore default value */
+    ES8388_WriteReg(codec_id, 0x00, 0x80); /* reset control port register to default */
+    ES8388_WriteReg(codec_id, 0x00, 0x06); /* restore default value */
 
 
     /*
@@ -462,92 +506,97 @@ void ES8388_Setup()
     /*
      * 10.5 Power Down Sequence (To Standby Mode)
      */
-    ES8388_WriteReg(0x0F, 0x34); /* ADC Mute */
-    ES8388_WriteReg(0x19, 0x36); /* DAC Mute */
+    ES8388_WriteReg(codec_id, 0x0F, 0x34); /* ADC Mute */
+    ES8388_WriteReg(codec_id, 0x19, 0x36); /* DAC Mute */
 
-    ES8388_WriteReg(0x02, 0xF3); /* Power down DEM and STM */
+    ES8388_WriteReg(codec_id, 0x02, 0xF3); /* Power down DEM and STM */
 
     /*
      * 10.4 The sequence for Start up bypass mode
      */
     /* Set Chip to Slave Mode */
-    ES8388_WriteReg(0x08, 0x00);
+    ES8388_WriteReg(codec_id, 0x08, 0x00);
     /* Power down DEM and STM */
-    ES8388_WriteReg(0x02, 0x3F);
+    ES8388_WriteReg(codec_id, 0x02, 0x3F);
     /* Set same LRCK */
-    ES8388_WriteReg(0x2B, 0x80);
+    ES8388_WriteReg(codec_id, 0x2B, 0x80);
     /* Set Chip to Play&Record Mode */
-    ES8388_WriteReg(0x00, 0x05);
+    ES8388_WriteReg(codec_id, 0x00, 0x05);
     /* Power Up Analog and Ibias */
-    ES8388_WriteReg(0x01, 0x40);
-    ES8388_WriteReg(0x03, 0x3F); /* adc also on but no bias */
+    ES8388_WriteReg(codec_id, 0x01, 0x40);
+    ES8388_WriteReg(codec_id, 0x03, 0x3F); /* adc also on but no bias */
 
-    ES8388_WriteReg(0x03, 0x00); // PdnAINL, PdinAINR, PdnADCL, PdnADCR, PdnMICB, PdnADCBiasgen, flashLP, Int1LP
+    ES8388_WriteReg(codec_id, 0x03, 0x00); // PdnAINL, PdinAINR, PdnADCL, PdnADCR, PdnMICB, PdnADCBiasgen, flashLP, Int1LP
 
     /*
      * Power up DAC / Analog Output
      * for Record
      */
-    ES8388_WriteReg(0x04, 0x3C);
+    ES8388_WriteReg(codec_id, 0x04, 0x3C);
 
 
     /*
      * Select Analog input channel for ADC
      */
-    ES8388_WriteReg(0x0A, 0x80); // LINSEL , RINSEL , DSSEL , DSR
+    ES8388_WriteReg(codec_id, 0x0A, 0x80); // LINSEL , RINSEL , DSSEL , DSR
 
     /* Select PGA Gain for ADC analog input */
-    ES8388_WriteReg(0x09, 0x00); // PGA gain?
+    ES8388_WriteReg(codec_id, 0x09, 0x00); // PGA gain?
 
-    ES8388_WriteReg(0x0C, 0x0C); // DATSEL, ADCLRP, ADCWL, ADCFORMAT
-    ES8388_WriteReg(0x0D, 0x02); // ADCFsMode , ADCFsRatio
+    ES8388_WriteReg(codec_id, 0x0C, 0x0C); // DATSEL, ADCLRP, ADCWL, ADCFORMAT
+    ES8388_WriteReg(codec_id, 0x0D, 0x02); // ADCFsMode , ADCFsRatio
 
     /*
      * Set ADC Digital Volume
      */
-    ES8388_SetADCVOL(0, 1.0f);
+    ES8388_SetADCVOL(codec_id, 1.0f);
 
     /* UnMute ADC */
-    ES8388_WriteReg(0x0F, 0x30); //
+    ES8388_WriteReg(codec_id, 0x0F, 0x30); //
 
-    ES8388_WriteReg(0x12, 0x16);
+    ES8388_WriteReg(codec_id, 0x12, 0x16);
 
-    ES8388_WriteReg(0x17, 0x18); // DACLRSWAP, DACLRP, DACWL, DACFORMAT
-    ES8388_WriteReg(0x18, 0x02); // DACFsMode , DACFsRatio
+    ES8388_WriteReg(codec_id, 0x17, 0x18); // DACLRSWAP, DACLRP, DACWL, DACFORMAT
+    ES8388_WriteReg(codec_id, 0x18, 0x02); // DACFsMode , DACFsRatio
 
 
     /*
      * Set ADC Digital Volume
      */
-    ES8388_WriteReg(0x1A, 0x00);
-    ES8388_WriteReg(0x1B, 0x02);
+    ES8388_WriteReg(codec_id, 0x1A, 0x00);
+    ES8388_WriteReg(codec_id, 0x1B, 0x02);
     /* UnMute DAC */
 #ifdef KEEP_CODEC_MUTED_IN_SETUP
-    ES8388_WriteReg(0x19, 0x32);
+    ES8388_WriteReg(codec_id, 0x19, 0x32);
 #endif
     /*
      * Setup Mixer
      */
-    ES8388_WriteReg(0x26, 0x09); // ES8388_WriteReg(0x26, 0x00);
-    ES8388_WriteReg(0x27, 0xD0); // ES8388_DACCONTROL17
-    ES8388_WriteReg(0x28, 0x38);
-    ES8388_WriteReg(0x29, 0x38);
-    ES8388_WriteReg(0x2A, 0xD0);
+    ES8388_WriteReg(codec_id, 0x26, 0x09); // ES8388_WriteReg(codec_id, 0x26, 0x00);
+    ES8388_WriteReg(codec_id, 0x27, 0xD0); // ES8388_DACCONTROL17
+    ES8388_WriteReg(codec_id, 0x28, 0x38);
+    ES8388_WriteReg(codec_id, 0x29, 0x38);
+    ES8388_WriteReg(codec_id, 0x2A, 0xD0);
 
     /* Set Lout/Rout Volume */
-    ES8388_SetOUT1VOL(1);
-    ES8388_SetOUT2VOL(1);
+    ES8388_SetOUT1VOL(codec_id, 1);
+    ES8388_SetOUT2VOL(codec_id, 1);
 
     /* Power up DEM and STM */
-    ES8388_WriteReg(0x02, 0x00);
+    ES8388_WriteReg(codec_id, 0x02, 0x00);
 
-    ES8388_SetInputCh(1, 1);
-    ES8388_SetMixInCh(2, 1);
-    ES8388_SetPGAGain(0, 1);
-    ES8388_SetIn2OoutVOL(0, 0);
+    ES8388_SetInputCh(codec_id, 1, 1);
+    ES8388_SetMixInCh(codec_id, 2, 1);
+    ES8388_SetPGAGain(codec_id, 1);
+    ES8388_SetIn2OoutVOL(codec_id, 0);
 
     Serial.printf("ES8388 setup finished!\n");
-    es8388_read_all();
+    es8388_read_all(codec_id);
+}
+
+void ES8388_Setup(void)
+{
+    ES8388_Setup(ES8388_ID0);
 }
 
 #endif
