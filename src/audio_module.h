@@ -864,9 +864,14 @@ void Audio_Input(Q1_14 *left, Q1_14 *right)
     i2s_read_stereo_samples_buff((int16_t *)left, (int16_t *)right, SAMPLE_BUFFER_SIZE);
 }
 
+void Audio_Input(AudioPortId audio_port, int16_t *left, int16_t *right)
+{
+    i2s_read_stereo_samples_buff((uint8_t)audio_port, left, right, SAMPLE_BUFFER_SIZE);
+}
+
 void Audio_Input(int16_t *left, int16_t *right)
 {
-    i2s_read_stereo_samples_buff(left, right, SAMPLE_BUFFER_SIZE);
+    Audio_Input(AUDIO_PORT_0, left, right);
 }
 #else
 void Audio_Input(float *left __attribute__((__unused__)), float *right __attribute__((__unused__)))

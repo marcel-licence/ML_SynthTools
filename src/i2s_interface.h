@@ -57,13 +57,13 @@
 
 void setup_i2s(void);
 bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sample, const int buffLen);
-bool i2s_write_stereo_samples_buff(uint8_t stream_id, const float *fl_sample, const float *fr_sample, const int buffLen, uint8_t codec_num);
+bool i2s_write_stereo_samples_buff(uint8_t stream_id, const float *fl_sample, const float *fr_sample, const int buffLen);
 bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen);
 bool i2s_write_stereo_samples_i16(uint8_t stream_id, const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen);
 void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int buffLen);
 void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const int buffLen);
 void i2s_read_stereo_samples_buff(uint8_t stream_id, float *fl_sample, float *fr_sample, const int buffLen);
-void i2s_read_stereo_samples_i16(uint8_t stream_id, int16_t *fl_sample, int16_t *fr_sample, const int buffLen);
+void i2s_read_stereo_samples_buff(uint8_t stream_id, int16_t *fl_sample, int16_t *fr_sample, const int buffLen);
 
 #endif /* ML_SYNTH_INLINE_DECLARATION */
 
@@ -147,7 +147,7 @@ union sampleTUNT
 //#define I2S_NODAC
 
 
-const i2s_port_t i2s_port_number[] =
+i2s_port_t i2s_port_number[] =
 {
     I2S_NUM_0,
 #ifdef DUAL_CODEC_ENABLED
@@ -263,7 +263,6 @@ bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sa
 bool i2s_write_stereo_samples_i16(uint8_t stream_id, const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen)
 {
     size_t bytes_written = 0;
-    i2s_port_t target_port = i2s_port_number[stream_id];
     static union sampleTUNT sampleDataU[SAMPLE_BUFFER_SIZE];
 
 #ifdef OUTPUT_SAW_TEST
@@ -283,7 +282,7 @@ bool i2s_write_stereo_samples_i16(uint8_t stream_id, const int16_t *fl_sample, c
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCountPre();
 #endif
-    i2s_write(target_port, (const char *)&sampleDataU[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_written, portMAX_DELAY);
+    i2s_write(i2s_port_number[stream_id], (const char *)&sampleDataU[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_written, portMAX_DELAY);
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCount();
 #endif
