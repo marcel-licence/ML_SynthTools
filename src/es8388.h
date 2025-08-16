@@ -55,8 +55,8 @@
 #define ES8388_ID0  (uint8_t)0
 #define ES8388_ID1  (uint8_t)1
 
-void ES8388_Setup(void);
-void ES8388_Setup(int codec_id);
+bool ES8388_Setup(void);
+bool ES8388_Setup(int codec_id);
 void ES8388_SetIn2OoutVOL(uint8_t codec_id, float vol);
 void ES8388_SetDACVOL(float vol);
 void ES8388_SetDACVOL(uint8_t codec_id, float vol);
@@ -185,7 +185,15 @@ bool ES8388_WriteReg(uint8_t reg, uint8_t val)
 
 bool ES8388_begin(uint8_t codec_id, int sda, int scl, uint32_t frequency)
 {
-    bool ok = Wire.begin(sda, scl, frequency);
+    static bool wireInitReq = true;
+
+    bool ok = true;
+
+    if (wireInitReq)
+    {
+        ok = Wire.begin(sda, scl, frequency);
+        wireInitReq = false;
+    }
 
     /* Reset all registers, readback default as sanity check */
     delay(100);
@@ -475,7 +483,7 @@ void ES8388_SetOUT2VOL(float vol)
     ES8388_SetOUT2VOL(ES8388_ID0, vol);
 }
 
-void ES8388_Setup(int codec_id)
+bool ES8388_Setup(int codec_id)
 {
     const uint32_t i2c_freq = 400000;
 
@@ -484,12 +492,20 @@ void ES8388_Setup(int codec_id)
     Serial.printf("  SCL: %d\n", ES8388_PIN_SCL);
     Serial.printf("  freq: %" PRIu32 "\n", i2c_freq);
 
-    while (not ES8388_begin(codec_id, ES8388_PIN_SDA, ES8388_PIN_SCL, i2c_freq))
+    uint8_t retries = 10;
+
+    while (not ES8388_begin(codec_id, ES8388_PIN_SDA, ES8388_PIN_SCL, i2c_freq) && (retries > 10))
     {
         Serial.printf("Failed!\n");
         Serial.printf("It may be possible that SCL and SDA are incorrect\n");
         Serial.printf("In boards/board_audio_kit_es8388.h you can change the define ES8388_CFG_I2C to use another pin setting\n");
         delay(1000);
+        retries--;
+        if (retries == 0)
+        {
+            Serial.printf("give up!!!!\n");
+            return false;
+        }
     }
 
     ES8388_WriteReg(codec_id, ES8388_CHIPPOWER, 0xFF); //reset and stop es8388
@@ -592,11 +608,13 @@ void ES8388_Setup(int codec_id)
 
     Serial.printf("ES8388 setup finished!\n");
     es8388_read_all(codec_id);
+
+    return true;
 }
 
-void ES8388_Setup(void)
+bool ES8388_Setup(void)
 {
-    ES8388_Setup(ES8388_ID0);
+    return ES8388_Setup(ES8388_ID0);
 }
 
 #endif

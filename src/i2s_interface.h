@@ -56,13 +56,14 @@
 #ifdef ML_SYNTH_INLINE_DECLARATION
 
 void setup_i2s(void);
-bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen);
-bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen, uint8_t stream_id);
 bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sample, const int buffLen);
-bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sample, const int buffLen, uint8_t stream_id);
+bool i2s_write_stereo_samples_buff(uint8_t stream_id, const float *fl_sample, const float *fr_sample, const int buffLen, uint8_t codec_num);
+bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen);
+bool i2s_write_stereo_samples_i16(uint8_t stream_id, const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen);
 void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int buffLen);
 void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const int buffLen);
-void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const int buffLen, uint8_t stream_id);
+void i2s_read_stereo_samples_buff(uint8_t stream_id, float *fl_sample, float *fr_sample, const int buffLen);
+void i2s_read_stereo_samples_i16(uint8_t stream_id, int16_t *fl_sample, int16_t *fr_sample, const int buffLen);
 
 #endif /* ML_SYNTH_INLINE_DECLARATION */
 
@@ -146,11 +147,13 @@ union sampleTUNT
 //#define I2S_NODAC
 
 
-#ifndef DUAL_CODEC_ENABLED
-const i2s_port_t i2s_port_number[] = {I2S_NUM_0};
-#else
-const i2s_port_t i2s_port_number[] = {I2S_NUM_0, I2S_NUM_1};
+const i2s_port_t i2s_port_number[] =
+{
+    I2S_NUM_0,
+#ifdef DUAL_CODEC_ENABLED
+    I2S_NUM_1,
 #endif
+};
 
 /*
  * please refer to https://www.hackster.io/janost/audio-hacking-on-the-esp8266-fa9464#toc-a-simple-909-drum-synth-0
@@ -195,7 +198,7 @@ bool i2s_write_sample_24ch2(uint8_t *sample)
 
 #endif
 
-bool i2s_write_stereo_samples(const float *fl_sample, const float *fr_sample, uint8_t stream_id)
+bool i2s_write_stereo_samples(uint8_t stream_id, const float *fl_sample, const float *fr_sample)
 {
     static union sampleTUNT sampleDataU;
 
@@ -221,11 +224,11 @@ bool i2s_write_stereo_samples(const float *fl_sample, const float *fr_sample, ui
 
 bool i2s_write_stereo_samples(const float *fl_sample, const float *fr_sample)
 {
-    return i2s_write_stereo_samples(fl_sample, fr_sample, 0);
+    return i2s_write_stereo_samples(0, fl_sample, fr_sample);
 };
 
 #ifdef SAMPLE_SIZE_16BIT
-bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, uint8_t stream_id)
+bool i2s_write_stereo_samples_i16(uint8_t stream_id, const int16_t *fl_sample, const int16_t *fr_sample)
 {
     size_t bytes_written = 0;
 
@@ -252,15 +255,15 @@ bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sa
 
 bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample)
 {
-    return i2s_write_stereo_samples_i16(fl_sample, fr_sample, 0);
+    return i2s_write_stereo_samples_i16(0, fl_sample, fr_sample);
 }
 #endif
 
 #ifdef SAMPLE_SIZE_16BIT
-bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen, uint8_t stream_id)
+bool i2s_write_stereo_samples_i16(uint8_t stream_id, const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen)
 {
     size_t bytes_written = 0;
-
+    i2s_port_t target_port = i2s_port_number[stream_id];
     static union sampleTUNT sampleDataU[SAMPLE_BUFFER_SIZE];
 
 #ifdef OUTPUT_SAW_TEST
@@ -280,7 +283,7 @@ bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sa
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCountPre();
 #endif
-    i2s_write(i2s_port_number[stream_id], (const char *)&sampleDataU[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_written, portMAX_DELAY);
+    i2s_write(target_port, (const char *)&sampleDataU[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_written, portMAX_DELAY);
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCount();
 #endif
@@ -297,12 +300,12 @@ bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sa
 
 bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen)
 {
-    return i2s_write_stereo_samples_i16(fl_sample, fr_sample, buffLen, 0);
+    return i2s_write_stereo_samples_i16(0, fl_sample, fr_sample, buffLen);
 }
 #endif
 
 #ifdef SAMPLE_BUFFER_SIZE
-bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sample, const int buffLen, uint8_t stream_id)
+bool i2s_write_stereo_samples_buff(uint8_t stream_id, const float *fl_sample, const float *fr_sample, const int buffLen)
 {
     static union sampleTUNT sampleDataU[SAMPLE_BUFFER_SIZE];
 
@@ -353,8 +356,8 @@ bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sampl
 #ifdef OUTPUT_SAW_TEST
     for (int n = 0; n < buffLen; n++)
     {
-        sampleDataU[n].ch[1] = sampleDataI16SawTest[0 + stream_id * 2][n];
-        sampleDataU[n].ch[0] = sampleDataI16SawTest[1 + stream_id * 2][n];
+        sampleDataU[n].ch[1] = sampleDataI16SawTest[n];
+        sampleDataU[n].ch[0] = sampleDataI16SawTest[n];
     }
 #endif
 
@@ -380,11 +383,11 @@ bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sampl
 
 bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sample, const int buffLen)
 {
-    return i2s_write_stereo_samples_buff(fl_sample, fr_sample, buffLen, 0);
+    return i2s_write_stereo_samples_buff(0, fl_sample, fr_sample, buffLen);
 }
 #endif /* #ifdef SAMPLE_BUFFER_SIZE */
 
-void i2s_read_stereo_samples(float *fl_sample, float *fr_sample, uint8_t stream_id)
+void i2s_read_stereo_samples(uint8_t stream_id, float *fl_sample, float *fr_sample)
 {
     static size_t bytes_read = 0;
 
@@ -402,11 +405,11 @@ void i2s_read_stereo_samples(float *fl_sample, float *fr_sample, uint8_t stream_
 
 void i2s_read_stereo_samples(float *fl_sample, float *fr_sample)
 {
-    i2s_read_stereo_samples(fl_sample, fr_sample, 0);
+    i2s_read_stereo_samples(0, fl_sample, fr_sample);
 }
 
 #ifdef SAMPLE_BUFFER_SIZE
-void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const int buffLen, uint8_t stream_id)
+void i2s_read_stereo_samples_buff(uint8_t stream_id, int16_t *fl_sample, int16_t *fr_sample, const int buffLen)
 {
 #ifdef I2S_DIN_PIN
     static size_t bytes_read = 0;
@@ -429,10 +432,10 @@ void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const 
 
 void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const int buffLen)
 {
-    i2s_read_stereo_samples_buff(fl_sample, fr_sample, buffLen, 0);
+    i2s_read_stereo_samples_buff(0, fl_sample, fr_sample, buffLen);
 }
 
-void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int buffLen, uint8_t stream_id)
+void i2s_read_stereo_samples_buff(uint8_t stream_id, float *fl_sample, float *fr_sample, const int buffLen)
 {
 #ifdef I2S_DIN_PIN
     static size_t bytes_read = 0;
@@ -457,7 +460,7 @@ void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int 
 
 void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int buffLen)
 {
-    i2s_read_stereo_samples_buff(fl_sample, fr_sample, buffLen, 0);
+    i2s_read_stereo_samples_buff(0, fl_sample, fr_sample, buffLen);
 }
 
 #endif /* #ifdef SAMPLE_BUFFER_SIZE */
@@ -684,43 +687,8 @@ i2s_pin_config_t pins[] =
     },
 #endif /* (defined I2S_BCLK_PIN_SECONDARY) && (defined I2S_WCLK_PIN_SECONDARY) && (defined I2S_DOUT_PIN_SECONDARY) */
 #endif /* DUAL_CODEC_ENABLED */
-
-#endif /* (defined I2S_BCLK_PIN) && (defined I2S_WCLK_PIN) && (defined I2S_DOUT_PIN) */
-
-#ifdef DUAL_CODEC_ENABLED
-#if  (defined I2S_DOUT_PIN_SECONDARY) || (defined I2S_DIN_PIN_SECONDARY)
-    /* Secondary I2S pin configuration for dual codec setup */
-
-    {
-#ifdef I2S_MCLK_PIN_SECONDARY
-        .mck_io_num = I2S_MCLK_PIN_SECONDARY,
-#else
-        .mck_io_num = I2S_PIN_NO_CHANGE,
-#endif
-#ifdef I2S_BCLK_PIN_SECONDARY
-        .bck_io_num = I2S_BCLK_PIN_SECONDARY,
-#else
-        .bck_io_num = I2S_PIN_NO_CHANGE,
-#endif
-#ifdef I2S_WCLK_PIN_SECONDARY
-        .ws_io_num = I2S_WCLK_PIN_SECONDARY,
-#else
-        .ws_io_num = I2S_PIN_NO_CHANGE,
-#endif
-#ifdef I2S_DOUT_PIN_SECONDARY
-        .data_out_num = I2S_DOUT_PIN_SECONDARY,
-#else
-        .data_out_num = I2S_PIN_NO_CHANGE,
-#endif
-#ifdef I2S_DIN_PIN_SECONDARY
-        .data_in_num = I2S_DIN_PIN_SECONDARY,
-#else
-        .data_in_num = I2S_PIN_NO_CHANGE,
-#endif
-    },
-#endif /* (defined I2S_BCLK_PIN_SECONDARY) && (defined I2S_WCLK_PIN_SECONDARY) && (defined I2S_DOUT_PIN_SECONDARY) */
-#endif /* DUAL_CODEC_ENABLED */
 };
+#endif /* (defined I2S_BCLK_PIN) && (defined I2S_WCLK_PIN) && (defined I2S_DOUT_PIN) */
 
 #endif
 

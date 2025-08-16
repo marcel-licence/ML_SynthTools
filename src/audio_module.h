@@ -718,7 +718,7 @@ void Audio_Output(AudioPortId audio_port, const int16_t *left, const int16_t *ri
         }
     }
 #else
-    i2s_write_stereo_samples_i16(left, right, SAMPLE_BUFFER_SIZE, audio_port);
+    i2s_write_stereo_samples_i16((uint8_t)audio_port, left, right, SAMPLE_BUFFER_SIZE);
 #endif
 #endif /* ESP32 */
 
