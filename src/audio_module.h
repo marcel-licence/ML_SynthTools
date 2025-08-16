@@ -208,6 +208,12 @@ void Audio_Setup(void)
 #endif
 #endif
 
+#if defined(DUAL_CODEC_ENABLED) && defined(ES8388_ENABLED)
+    ES8388_SelectCodec(1);
+    ES8388_Setup();
+    ES8388_SetIn2OoutVOL(0, 0);
+    ES8388_SelectCodec(0);
+#endif
 
 #ifdef WM8978_ENABLED
     WM8978_Setup();
