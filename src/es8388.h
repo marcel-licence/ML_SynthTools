@@ -29,7 +29,7 @@
  */
 
 /**
- * @file es8388.ino
+ * @file es8388.h
  * @author Marcel Licence
  * @date 22.08.2021
  *
@@ -52,20 +52,27 @@
 #ifdef ES8388_ENABLED
 
 
-#define ES8388_ID0  (uint8_t)0
-#define ES8388_ID1  (uint8_t)1
+typedef enum
+{
+    ES8388_ID0 = 0,
+    ES8388_ID1 = 1,
+    // Add more outputs as needed
+} ES8388Id;
 
 bool ES8388_Setup(void);
-bool ES8388_Setup(int codec_id);
-void ES8388_SetIn2OoutVOL(uint8_t codec_id, float vol);
-void ES8388_SetDACVOL(float vol);
-void ES8388_SetDACVOL(uint8_t codec_id, float vol);
-void ES8388_SetOUT1VOL(float vol);
-void ES8388_SetOUT1VOL(uint8_t codec_id, float vol);
-void ES8388_SetOUT2VOL(float vol);
-void ES8388_SetOUT2VOL(uint8_t codec_id, float vol);
-void ES8388_MuteOutput(uint8_t codec_id, bool mute);
+bool ES8388_Setup(ES8388Id codec_id);
+
+void ES8388_MuteOutput(ES8388Id codec_id, bool mute);
 void ES8388_MuteOutput(bool mute);
+void ES8388_SetDACVOL(ES8388Id codec_id, float vol);
+void ES8388_SetDACVOL(float vol);
+void ES8388_SetIn2OoutVOL(ES8388Id codec_id, float vol);
+void ES8388_SetIn2OoutVOL(float vol);
+void ES8388_SetOUT1VOL(ES8388Id codec_id, float vol);
+void ES8388_SetOUT1VOL(float vol);
+void ES8388_SetOUT2VOL(ES8388Id codec_id, float vol);
+void ES8388_SetOUT2VOL(float vol);
+
 
 #endif // ES8388_ENABLED
 #endif // #ifdef ML_SYNTH_INLINE_DECLARATION
@@ -81,10 +88,8 @@ void ES8388_MuteOutput(bool mute);
 
 
 /* ES8388 address */
-//#define ES8388_ADDR 0x20  /*!< 0x22:CE=1;0x20:CE=0*/
-#define ES8388_ADDR 0x10  /*!< 0x22:CE=1;0x20:CE=0*/
-#define ES8388_ADDR_SECONDARY 0x11  /*!< 0x22:CE=1;0x20:CE=0*/
-
+#define ES8388_ADDR_0 0x10  /*!< I2C address with CE = low */
+#define ES8388_ADDR_1 0x11  /*!< I2C address with CE = high */
 
 /* ES8388 register */
 #define ES8388_CONTROL1         0x00
@@ -148,9 +153,11 @@ void ES8388_MuteOutput(bool mute);
 #define ES8388_DACCONTROL29     0x33
 #define ES8388_DACCONTROL30     0x34
 
-static const uint16_t es8388_addr[] = {ES8388_ADDR, ES8388_ADDR_SECONDARY};
 
-uint8_t ES8388_ReadReg(uint8_t codec_id, uint8_t reg)
+static const uint16_t es8388_addr[] = {ES8388_ADDR_0, ES8388_ADDR_1};
+
+
+uint8_t ES8388_ReadReg(ES8388Id codec_id, uint8_t reg)
 {
     Wire.beginTransmission(es8388_addr[codec_id]);
     Wire.write(reg);
@@ -170,7 +177,7 @@ uint8_t ES8388_ReadReg(uint8_t reg)
     return ES8388_ReadReg(ES8388_ID0, reg);
 }
 
-bool ES8388_WriteReg(uint8_t codec_id, uint8_t reg, uint8_t val)
+bool ES8388_WriteReg(ES8388Id codec_id, uint8_t reg, uint8_t val)
 {
     Wire.beginTransmission(es8388_addr[codec_id]);
     Wire.write(reg);
@@ -183,7 +190,7 @@ bool ES8388_WriteReg(uint8_t reg, uint8_t val)
     return ES8388_WriteReg(ES8388_ID0, reg, val);
 }
 
-bool ES8388_begin(uint8_t codec_id, int sda, int scl, uint32_t frequency)
+bool ES8388_begin(ES8388Id codec_id, int sda, int scl, uint32_t frequency)
 {
     static bool wireInitReq = true;
 
@@ -215,7 +222,7 @@ bool ES8388_begin(int sda, int scl, uint32_t frequency)
     return ES8388_begin(ES8388_ID0, sda, scl, frequency);
 }
 
-void es8388_read_all(uint8_t codec_id)
+void es8388_read_all(ES8388Id codec_id)
 {
     for (int i = 0; i < 53; i++)
     {
@@ -225,7 +232,7 @@ void es8388_read_all(uint8_t codec_id)
     }
 }
 
-void ES8388_SetADCVOL(uint8_t codec_id, float vol)
+void ES8388_SetADCVOL(ES8388Id codec_id, float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("ADC Volume /db", (vol - 1) * 97 + 0.5);
@@ -250,7 +257,7 @@ void ES8388_SetADCVOL(float vol)
     ES8388_SetADCVOL(ES8388_ID0, vol);
 }
 
-void ES8388_SetDACVOL(uint8_t codec_id, float vol)
+void ES8388_SetDACVOL(ES8388Id codec_id, float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("DAC Volume /db", (vol - 1) * 97 + 0.5);
@@ -275,7 +282,7 @@ void ES8388_SetDACVOL(float vol)
     ES8388_SetDACVOL(ES8388_ID0, vol);
 }
 
-void ES8388_SetPGAGain(uint8_t codec_id, float vol)
+void ES8388_SetPGAGain(ES8388Id codec_id, float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("PGA Gain /db", vol * 24 + 0.25);
@@ -298,7 +305,7 @@ void ES8388_SetPGAGain(float vol)
     ES8388_SetPGAGain(ES8388_ID0, vol);
 }
 
-void ES8388_SetInputCh(uint8_t codec_id, uint8_t ch, float var)
+void ES8388_SetInputCh(ES8388Id codec_id, uint8_t ch, float var)
 {
     if (var > 0)
     {
@@ -333,7 +340,7 @@ void ES8388_SetInputCh(uint8_t ch, float var)
     ES8388_SetInputCh(ES8388_ID0, ch, var);
 }
 
-void ES8388_SetMixInCh(uint8_t codec_id, uint8_t ch, float var)
+void ES8388_SetMixInCh(ES8388Id codec_id, uint8_t ch, float var)
 {
     if (var > 0)
     {
@@ -372,7 +379,7 @@ void ES8388_SetMixInCh(uint8_t ch, float var)
     ES8388_SetMixInCh(ES8388_ID0, ch, var);
 }
 
-void ES8388_SetIn2OoutVOL(uint8_t codec_id, float vol)
+void ES8388_SetIn2OoutVOL(ES8388Id codec_id, float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("In to out volume /db", (vol - 1) * 16 + 0.5);
@@ -418,7 +425,7 @@ void ES8388_SetIn2OoutVOL(float vol)
     ES8388_SetIn2OoutVOL(ES8388_ID0, vol);
 }
 
-void ES8388_SetOUT1VOL(uint8_t codec_id, float vol)
+void ES8388_SetOUT1VOL(ES8388Id codec_id, float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("OUT1VOL /db", (vol - 1) * 31 + 0.5);
@@ -442,7 +449,7 @@ void ES8388_SetOUT1VOL(float vol)
     ES8388_SetOUT1VOL(ES8388_ID0, vol);
 }
 
-void ES8388_MuteOutput(uint8_t codec_id, bool mute)
+void ES8388_MuteOutput(ES8388Id codec_id, bool mute)
 {
     if (mute)
     {
@@ -459,7 +466,7 @@ void ES8388_MuteOutput(bool mute)
     ES8388_MuteOutput(ES8388_ID0, mute);
 }
 
-void ES8388_SetOUT2VOL(uint8_t codec_id, float vol)
+void ES8388_SetOUT2VOL(ES8388Id codec_id, float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("OUT2VOL /db", (vol - 1) * 31 + 0.5);
@@ -483,7 +490,7 @@ void ES8388_SetOUT2VOL(float vol)
     ES8388_SetOUT2VOL(ES8388_ID0, vol);
 }
 
-bool ES8388_Setup(int codec_id)
+bool ES8388_Setup(ES8388Id codec_id)
 {
     const uint32_t i2c_freq = 400000;
 
