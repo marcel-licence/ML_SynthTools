@@ -1,6 +1,6 @@
 {
   "name": "ML_SynthTools",
-  "version": "2.0.12",
+  "version": "2.0.14",
   "keywords": "ML_SynthTools, Synthesizer, Filter, Audio, ESP32, ESP32S2, ESP32S3, STM32, RP2040",
   "description": "Synthesizer Tools; contains waveform generators etc.",
   "repository":
