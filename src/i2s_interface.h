@@ -41,6 +41,12 @@
 
 #ifdef __CDT_PARSER__
 #include <cdt.h>
+#define ML_SYNTH_INLINE_DECLARATION
+#define SAMPLE_BUFFER_SIZE 48
+#define SAMPLE_RATE 48000
+#define ML_SYNTH_INLINE_DEFINITION
+#define ESP32
+#define SAMPLE_SIZE_16BIT
 #endif
 
 
@@ -49,11 +55,15 @@
 
 #ifdef ML_SYNTH_INLINE_DECLARATION
 
-void setup_i2s();
-bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen);
+void setup_i2s(void);
 bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sample, const int buffLen);
+bool i2s_write_stereo_samples_buff(uint8_t stream_id, const float *fl_sample, const float *fr_sample, const int buffLen);
+bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen);
+bool i2s_write_stereo_samples_i16(uint8_t stream_id, const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen);
 void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int buffLen);
 void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const int buffLen);
+void i2s_read_stereo_samples_buff(uint8_t stream_id, float *fl_sample, float *fr_sample, const int buffLen);
+void i2s_read_stereo_samples_buff(uint8_t stream_id, int16_t *fl_sample, int16_t *fr_sample, const int buffLen);
 
 #endif /* ML_SYNTH_INLINE_DECLARATION */
 
@@ -75,8 +85,8 @@ void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const 
 
 
 #ifdef OUTPUT_SAW_TEST
-int16_t sampleDataI16SawTest[SAMPLE_BUFFER_SIZE];
-float sampleDataFSawTest[SAMPLE_BUFFER_SIZE];
+static int16_t sampleDataI16SawTest[4][SAMPLE_BUFFER_SIZE];
+static float sampleDataFSawTest[4][SAMPLE_BUFFER_SIZE];
 #endif
 
 
@@ -137,7 +147,13 @@ union sampleTUNT
 //#define I2S_NODAC
 
 
-const i2s_port_t i2s_port_number = I2S_NUM_0;
+i2s_port_t i2s_port_number[] =
+{
+    I2S_NUM_0,
+#ifdef DUAL_CODEC_ENABLED
+    I2S_NUM_1,
+#endif
+};
 
 /*
  * please refer to https://www.hackster.io/janost/audio-hacking-on-the-esp8266-fa9464#toc-a-simple-909-drum-synth-0
@@ -147,7 +163,7 @@ const i2s_port_t i2s_port_number = I2S_NUM_0;
 bool i2s_write_sample_32ch2(uint64_t sample)
 {
     static size_t bytes_written = 0;
-    i2s_write((i2s_port_t)i2s_port_number, (const char *)&sample, 8, &bytes_written, portMAX_DELAY);
+    i2s_write((i2s_port_t)i2s_port_number[0], (const char *)&sample, 8, &bytes_written, portMAX_DELAY);
 
     if (bytes_written > 0)
     {
@@ -167,8 +183,8 @@ bool i2s_write_sample_24ch2(uint8_t *sample)
 {
     static size_t bytes_written1 = 0;
     static size_t bytes_written2 = 0;
-    i2s_write(i2s_port_number, (const char *)&sample[1], 3, &bytes_written1, portMAX_DELAY);
-    i2s_write(i2s_port_number, (const char *)&sample[5], 3, &bytes_written2, portMAX_DELAY);
+    i2s_write(i2s_port_number[0], (const char *)&sample[1], 3, &bytes_written1, portMAX_DELAY);
+    i2s_write(i2s_port_number[0], (const char *)&sample[5], 3, &bytes_written2, portMAX_DELAY);
 
     if ((bytes_written1 + bytes_written2) > 0)
     {
@@ -182,7 +198,7 @@ bool i2s_write_sample_24ch2(uint8_t *sample)
 
 #endif
 
-bool i2s_write_stereo_samples(const float *fl_sample, const float *fr_sample)
+bool i2s_write_stereo_samples(uint8_t stream_id, const float *fl_sample, const float *fr_sample)
 {
     static union sampleTUNT sampleDataU;
 
@@ -194,7 +210,7 @@ bool i2s_write_stereo_samples(const float *fl_sample, const float *fr_sample)
 
     size_t bytes_written = 0;
 
-    i2s_write(i2s_port_number, (const char *)&sampleDataU.sample, 2 * BYTES_PER_SAMPLE, &bytes_written, portMAX_DELAY);
+    i2s_write(i2s_port_number[stream_id], (const char *)&sampleDataU.sample, 2 * BYTES_PER_SAMPLE, &bytes_written, portMAX_DELAY);
 
     if (bytes_written > 0)
     {
@@ -206,8 +222,13 @@ bool i2s_write_stereo_samples(const float *fl_sample, const float *fr_sample)
     }
 }
 
+bool i2s_write_stereo_samples(const float *fl_sample, const float *fr_sample)
+{
+    return i2s_write_stereo_samples(0, fl_sample, fr_sample);
+};
+
 #ifdef SAMPLE_SIZE_16BIT
-bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample)
+bool i2s_write_stereo_samples_i16(uint8_t stream_id, const int16_t *fl_sample, const int16_t *fr_sample)
 {
     size_t bytes_written = 0;
 
@@ -218,7 +239,7 @@ bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sa
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCountPre();
 #endif
-    i2s_write(i2s_port_number, (const char *)&sampleDataU.sample, 4, &bytes_written, portMAX_DELAY);
+    i2s_write(i2s_port_number[stream_id], (const char *)&sampleDataU.sample, 4, &bytes_written, portMAX_DELAY);
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCount();
 #endif
@@ -231,20 +252,24 @@ bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sa
         return false;
     }
 }
+
+bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample)
+{
+    return i2s_write_stereo_samples_i16(0, fl_sample, fr_sample);
+}
 #endif
 
 #ifdef SAMPLE_SIZE_16BIT
-bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen)
+bool i2s_write_stereo_samples_i16(uint8_t stream_id, const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen)
 {
     size_t bytes_written = 0;
-
     static union sampleTUNT sampleDataU[SAMPLE_BUFFER_SIZE];
 
 #ifdef OUTPUT_SAW_TEST
     for (int n = 0; n < buffLen; n++)
     {
-        sampleDataU[n].ch[1] = sampleDataI16SawTest[n];
-        sampleDataU[n].ch[0] = sampleDataI16SawTest[n];
+        sampleDataU[n].ch[1] = sampleDataI16SawTest[0 + stream_id * 2][n];
+        sampleDataU[n].ch[0] = sampleDataI16SawTest[1 + stream_id * 2][n];
     }
 #else
     for (int n = 0; n < buffLen; n++)
@@ -257,7 +282,7 @@ bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sa
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCountPre();
 #endif
-    i2s_write(i2s_port_number, (const char *)&sampleDataU[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_written, portMAX_DELAY);
+    i2s_write(i2s_port_number[stream_id], (const char *)&sampleDataU[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_written, portMAX_DELAY);
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCount();
 #endif
@@ -271,10 +296,15 @@ bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sa
         return false;
     }
 }
+
+bool i2s_write_stereo_samples_i16(const int16_t *fl_sample, const int16_t *fr_sample, const int buffLen)
+{
+    return i2s_write_stereo_samples_i16(0, fl_sample, fr_sample, buffLen);
+}
 #endif
 
 #ifdef SAMPLE_BUFFER_SIZE
-bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sample, const int buffLen)
+bool i2s_write_stereo_samples_buff(uint8_t stream_id, const float *fl_sample, const float *fr_sample, const int buffLen)
 {
     static union sampleTUNT sampleDataU[SAMPLE_BUFFER_SIZE];
 
@@ -335,7 +365,7 @@ bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sampl
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCountPre();
 #endif
-    i2s_write(i2s_port_number, (const char *)&sampleDataU[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_written, portMAX_DELAY);
+    i2s_write(i2s_port_number[stream_id], (const char *)&sampleDataU[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_written, portMAX_DELAY);
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCount();
 #endif
@@ -349,15 +379,20 @@ bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sampl
         return false;
     }
 }
+
+bool i2s_write_stereo_samples_buff(const float *fl_sample, const float *fr_sample, const int buffLen)
+{
+    return i2s_write_stereo_samples_buff(0, fl_sample, fr_sample, buffLen);
+}
 #endif /* #ifdef SAMPLE_BUFFER_SIZE */
 
-void i2s_read_stereo_samples(float *fl_sample, float *fr_sample)
+void i2s_read_stereo_samples(uint8_t stream_id, float *fl_sample, float *fr_sample)
 {
     static size_t bytes_read = 0;
 
     static union sampleTUNT sampleData;
 
-    i2s_read(i2s_port_number, (char *)&sampleData.sample, 4, &bytes_read, portMAX_DELAY);
+    i2s_read(i2s_port_number[stream_id], (char *)&sampleData.sample, 4, &bytes_read, portMAX_DELAY);
 
 
     /*
@@ -367,15 +402,20 @@ void i2s_read_stereo_samples(float *fl_sample, float *fr_sample)
     *fl_sample = ((float)sampleData.ch[1] * (5.5f / 65535.0f));
 }
 
+void i2s_read_stereo_samples(float *fl_sample, float *fr_sample)
+{
+    i2s_read_stereo_samples(0, fl_sample, fr_sample);
+}
+
 #ifdef SAMPLE_BUFFER_SIZE
-void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const int buffLen)
+void i2s_read_stereo_samples_buff(uint8_t stream_id, int16_t *fl_sample, int16_t *fr_sample, const int buffLen)
 {
 #ifdef I2S_DIN_PIN
     static size_t bytes_read = 0;
 
     static union sampleTUNT sampleData[SAMPLE_BUFFER_SIZE];
 
-    i2s_read(i2s_port_number, (char *)&sampleData[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_read, portMAX_DELAY);
+    i2s_read(i2s_port_number[stream_id], (char *)&sampleData[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_read, portMAX_DELAY);
 
 
     for (int n = 0; n < buffLen; n++)
@@ -389,7 +429,12 @@ void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const 
 #endif
 }
 
-void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int buffLen)
+void i2s_read_stereo_samples_buff(int16_t *fl_sample, int16_t *fr_sample, const int buffLen)
+{
+    i2s_read_stereo_samples_buff(0, fl_sample, fr_sample, buffLen);
+}
+
+void i2s_read_stereo_samples_buff(uint8_t stream_id, float *fl_sample, float *fr_sample, const int buffLen)
 {
 #ifdef I2S_DIN_PIN
     static size_t bytes_read = 0;
@@ -397,7 +442,7 @@ void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int 
     static union sampleTUNT sampleData[SAMPLE_BUFFER_SIZE];
 
 
-    i2s_read(i2s_port_number, (char *)&sampleData[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_read, 0);
+    i2s_read(i2s_port_number[stream_id], (char *)&sampleData[0].sample, 2 * BYTES_PER_SAMPLE * buffLen, &bytes_read, 0);
 
 
     for (int n = 0; n < buffLen; n++)
@@ -411,165 +456,316 @@ void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int 
     }
 #endif
 }
+
+void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int buffLen)
+{
+    i2s_read_stereo_samples_buff(0, fl_sample, fr_sample, buffLen);
+}
+
 #endif /* #ifdef SAMPLE_BUFFER_SIZE */
 
 /*
  * i2s configuration
  */
 #ifdef I2S_NODAC
-static const i2s_config_t i2s_configuration =
+static const i2s_config_t i2s_configuration[] =
 {
-    .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_DAC_BUILT_IN),
-    .sample_rate = SAMPLE_RATE * 1,
-    .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT, // only the top 8 bits will actually be used by the internal DAC, but using 8 bits straight away seems buggy
-    .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT, // always use stereo output. mono seems to be buggy, and the overhead is insignifcant on the ESP32
-    .communication_format = (i2s_comm_format_t)(I2S_COMM_FORMAT_STAND_I2S | I2S_COMM_FORMAT_STAND_MSB), // this appears to be the correct setting for internal DAC and PT8211, but not for other dacs
-    .intr_alloc_flags = 0, // default interrupt priority
-    .dma_buf_count = 8, // 8*128 bytes of buffer corresponds to 256 samples (2 channels, see above, 2 bytes per sample per channel)
-    .dma_buf_len = 64,
+    {
+        .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_DAC_BUILT_IN),
+        .sample_rate = SAMPLE_RATE * 1,
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT, // only the top 8 bits will actually be used by the internal DAC, but using 8 bits straight away seems buggy
+        .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT, // always use stereo output. mono seems to be buggy, and the overhead is insignifcant on the ESP32
+        .communication_format = (i2s_comm_format_t)(I2S_COMM_FORMAT_STAND_I2S | I2S_COMM_FORMAT_STAND_MSB), // this appears to be the correct setting for internal DAC and PT8211, but not for other dacs
+        .intr_alloc_flags = 0, // default interrupt priority
+        .dma_buf_count = 8, // 8*128 bytes of buffer corresponds to 256 samples (2 channels, see above, 2 bytes per sample per channel)
+        .dma_buf_len = 64,
 #ifdef I2S_USE_APLL
-    .use_apll = true,
+        .use_apll = true,
 #else
-    .use_apll = false,
+        .use_apll = false,
 #endif
+    }
 };
 #else
-i2s_config_t i2s_configuration =
+i2s_config_t i2s_configuration[] =
 {
+    {
 #ifdef I2S_DIN_PIN
-    .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_RX), // | I2S_MODE_DAC_BUILT_IN
+        .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_RX), // | I2S_MODE_DAC_BUILT_IN
 #else
-    .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX),
+        .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX),
 #endif
-    .sample_rate = SAMPLE_RATE * I2S_OVERSAMPLE,
+        .sample_rate = SAMPLE_RATE * I2S_OVERSAMPLE,
 #ifdef I2S_NODAC
-    .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT,
-    .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT,
+        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
 #ifdef ARDUINO_RUNNING_CORE /* tested with arduino esp32 core version 2.0.2 */
-    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
 #else
-    .communication_format = (i2s_comm_format_t)I2S_COMM_FORMAT_I2S_MSB,
+        .communication_format = (i2s_comm_format_t)I2S_COMM_FORMAT_I2S_MSB,
 #endif
 #else
 #ifdef SAMPLE_SIZE_32BIT
-    .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT, /* the DAC module will only take the 8bits from MSB */
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT, /* the DAC module will only take the 8bits from MSB */
 #endif
 #ifdef SAMPLE_SIZE_24BIT
-    .bits_per_sample = I2S_BITS_PER_SAMPLE_24BIT, /* the DAC module will only take the 8bits from MSB */
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_24BIT, /* the DAC module will only take the 8bits from MSB */
 #endif
 #ifdef SAMPLE_SIZE_16BIT
-    .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT, /* the DAC module will only take the 8bits from MSB */
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT, /* the DAC module will only take the 8bits from MSB */
 #endif
-    .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
+        .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
 #ifdef ARDUINO_RUNNING_CORE /* tested with arduino esp32 core version 2.0.2 */
 #ifdef MAX_98357A_ENABLED
-    .communication_format = I2S_COMM_FORMAT_STAND_PCM_LONG,
+        .communication_format = I2S_COMM_FORMAT_STAND_PCM_LONG,
 #else
-    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
 #endif
 #else
-    .communication_format = (i2s_comm_format_t)(I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB),
+        .communication_format = (i2s_comm_format_t)(I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB),
 #endif
 #endif
-    .intr_alloc_flags = 0, // default interrupt priority
-    .dma_buf_count = 2,
-    .dma_buf_len = SAMPLE_BUFFER_SIZE,
+        .intr_alloc_flags = 0, // default interrupt priority
+        .dma_buf_count = 2,
+        .dma_buf_len = SAMPLE_BUFFER_SIZE,
 #ifdef I2S_USE_APLL
-    .use_apll = true,
+        .use_apll = true,
 #else
-    .use_apll = false,
+        .use_apll = false,
 #endif
 
 #ifdef ARDUINO_RUNNING_CORE
-    .tx_desc_auto_clear = true,
-    .fixed_mclk = 0,
+        .tx_desc_auto_clear = true,
+        .fixed_mclk = 0,
 #ifdef I2S_MCLK_MULTIPLE_DEFAULT
-    .mclk_multiple = I2S_MCLK_MULTIPLE_DEFAULT,
+        .mclk_multiple = I2S_MCLK_MULTIPLE_DEFAULT,
 #else
-    .mclk_multiple = I2S_MCLK_MULTIPLE_256, /* is that the right default? */
+        .mclk_multiple = I2S_MCLK_MULTIPLE_256, /* is that the right default? */
 #endif
 #ifdef SAMPLE_SIZE_16BIT
-    .bits_per_chan = I2S_BITS_PER_CHAN_16BIT,
+        .bits_per_chan = I2S_BITS_PER_CHAN_16BIT,
 #endif
 #ifdef SAMPLE_SIZE_24BIT
-    .bits_per_chan = I2S_BITS_PER_CHAN_24BIT,
+        .bits_per_chan = I2S_BITS_PER_CHAN_24BIT,
 #endif
 #ifdef SAMPLE_SIZE_32BIT
-    .bits_per_chan = I2S_BITS_PER_CHAN_32BIT,
+        .bits_per_chan = I2S_BITS_PER_CHAN_32BIT,
 #endif
 #endif
 
 #if SOC_I2S_SUPPORTS_TDM
-    .chan_mask = I2S_CHANNEL_STEREO,
-    .total_chan = 0,
-    .left_align = 0,
-    .big_edin = 0,
-    .bit_order_msb = 0,
-    .skip_msk = 0,
+        .chan_mask = I2S_CHANNEL_STEREO,
+        .total_chan = 0,
+        .left_align = 0,
+        .big_edin = 0,
+        .bit_order_msb = 0,
+        .skip_msk = 0,
 #endif
+    },
+#ifdef DUAL_CODEC_ENABLED
+    /* Secondary I2S configuration for dual codec setup */
+    {
+        .mode = (i2s_mode_t)(I2S_MODE_SLAVE | I2S_MODE_TX | I2S_MODE_RX),
+        .sample_rate = SAMPLE_RATE * I2S_OVERSAMPLE,
+#ifdef SAMPLE_SIZE_32BIT
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT,
+#endif
+#ifdef SAMPLE_SIZE_24BIT
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_24BIT,
+#endif
+#ifdef SAMPLE_SIZE_16BIT
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+#endif
+        .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,
+#ifdef ARDUINO_RUNNING_CORE
+#ifdef MAX_98357A_ENABLED
+        .communication_format = I2S_COMM_FORMAT_STAND_PCM_LONG,
+#else
+        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+#endif
+#else
+        .communication_format = (i2s_comm_format_t)(I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB),
+#endif
+        .intr_alloc_flags = 0,
+        .dma_buf_count = 2,
+        .dma_buf_len = SAMPLE_BUFFER_SIZE,
+#ifdef I2S_USE_APLL
+        .use_apll = true,
+#else
+        .use_apll = false,
+#endif
+
+#ifdef ARDUINO_RUNNING_CORE
+        .tx_desc_auto_clear = true,
+        .fixed_mclk = 0,
+#ifdef I2S_MCLK_MULTIPLE_DEFAULT
+        .mclk_multiple = I2S_MCLK_MULTIPLE_DEFAULT,
+#else
+        .mclk_multiple = I2S_MCLK_MULTIPLE_256,
+#endif
+#ifdef SAMPLE_SIZE_16BIT
+        .bits_per_chan = I2S_BITS_PER_CHAN_16BIT,
+#endif
+#ifdef SAMPLE_SIZE_24BIT
+        .bits_per_chan = I2S_BITS_PER_CHAN_24BIT,
+#endif
+#ifdef SAMPLE_SIZE_32BIT
+        .bits_per_chan = I2S_BITS_PER_CHAN_32BIT,
+#endif
+#endif
+
+#if SOC_I2S_SUPPORTS_TDM
+        .chan_mask = I2S_CHANNEL_STEREO,
+        .total_chan = 0,
+        .left_align = 0,
+        .big_edin = 0,
+        .bit_order_msb = 0,
+        .skip_msk = 0,
+#endif
+    },
+#endif
+
 };
 #endif
 
 
 #ifdef I2S_NODAC
 #ifdef ESP8266
-i2s_pin_config_t pins =
+i2s_pin_config_t pins[] =
 {
-    .bck_io_num = I2S_PIN_NO_CHANGE,
-    .ws_io_num = I2S_PIN_NO_CHANGE,
-    .data_out_num = I2S_NODAC_OUT_PIN,
-    .data_in_num = I2S_PIN_NO_CHANGE
+    {
+        .bck_io_num = I2S_PIN_NO_CHANGE,
+        .ws_io_num = I2S_PIN_NO_CHANGE,
+        .data_out_num = I2S_NODAC_OUT_PIN,
+        .data_in_num = I2S_PIN_NO_CHANGE
+    },
 };
 #endif
 #else
 #if (defined I2S_BCLK_PIN) && (defined I2S_WCLK_PIN) && (defined I2S_DOUT_PIN)
-i2s_pin_config_t pins =
+i2s_pin_config_t pins[] =
 {
+    {
 #ifdef ARDUINO_RUNNING_CORE
-    .mck_io_num = I2S_MCLK_PIN,
+        .mck_io_num = I2S_MCLK_PIN,
 #endif
-    .bck_io_num = I2S_BCLK_PIN,
-    .ws_io_num = I2S_WCLK_PIN,
-    .data_out_num = I2S_DOUT_PIN,
-    .data_in_num = I2S_DIN_PIN,
+        .bck_io_num = I2S_BCLK_PIN,
+        .ws_io_num = I2S_WCLK_PIN,
+        .data_out_num = I2S_DOUT_PIN,
+        .data_in_num = I2S_DIN_PIN,
+    },
+#ifdef DUAL_CODEC_ENABLED
+#if  (defined I2S_DOUT_PIN_SECONDARY) || (defined I2S_DIN_PIN_SECONDARY)
+    /* Secondary I2S pin configuration for dual codec setup */
+    {
+#ifdef I2S_MCLK_PIN_SECONDARY
+        .mck_io_num = I2S_MCLK_PIN_SECONDARY,
+#else
+        .mck_io_num = I2S_PIN_NO_CHANGE,
+#endif
+#ifdef I2S_BCLK_PIN_SECONDARY
+        .bck_io_num = I2S_BCLK_PIN_SECONDARY,
+#else
+        .bck_io_num = I2S_PIN_NO_CHANGE,
+#endif
+#ifdef I2S_WCLK_PIN_SECONDARY
+        .ws_io_num = I2S_WCLK_PIN_SECONDARY,
+#else
+        .ws_io_num = I2S_PIN_NO_CHANGE,
+#endif
+#ifdef I2S_DOUT_PIN_SECONDARY
+        .data_out_num = I2S_DOUT_PIN_SECONDARY,
+#else
+        .data_out_num = I2S_PIN_NO_CHANGE,
+#endif
+#ifdef I2S_DIN_PIN_SECONDARY
+        .data_in_num = I2S_DIN_PIN_SECONDARY,
+#else
+        .data_in_num = I2S_PIN_NO_CHANGE,
+#endif
+    },
+#endif /* (defined I2S_BCLK_PIN_SECONDARY) && (defined I2S_WCLK_PIN_SECONDARY) && (defined I2S_DOUT_PIN_SECONDARY) */
+#endif /* DUAL_CODEC_ENABLED */
 };
 #endif /* (defined I2S_BCLK_PIN) && (defined I2S_WCLK_PIN) && (defined I2S_DOUT_PIN) */
 
 #endif
 
 #if (defined I2S_BCLK_PIN) && (defined I2S_WCLK_PIN) && (defined I2S_DOUT_PIN)
-void setup_i2s()
+void setup_i2s(void)
 {
-    i2s_driver_install(i2s_port_number, &i2s_configuration, 0, NULL);
+    i2s_driver_install(i2s_port_number[0], &i2s_configuration[0], 0, NULL);
     Serial.printf("i2s_configuration:\n");
-    Serial.printf("\ttx_desc_auto_clear: %d\n", i2s_configuration.tx_desc_auto_clear);
-    Serial.printf("\tfixed_mclk: %d\n", i2s_configuration.fixed_mclk);
-    Serial.printf("\tmclk_multiple: %d\n", i2s_configuration.mclk_multiple);
-    Serial.printf("\tbits_per_chan: %d\n", i2s_configuration.bits_per_chan);
+    Serial.printf("\ttx_desc_auto_clear: %d\n", i2s_configuration[0].tx_desc_auto_clear);
+    Serial.printf("\tfixed_mclk: %d\n", i2s_configuration[0].fixed_mclk);
+    Serial.printf("\tmclk_multiple: %d\n", i2s_configuration[0].mclk_multiple);
+    Serial.printf("\tbits_per_chan: %d\n", i2s_configuration[0].bits_per_chan);
 #if 0 /* for future use */
-    Serial.printf("\tchan_mask: %d\n", i2s_configuration.chan_mask);
-    Serial.printf("\ttotal_chan: %d\n", i2s_configuration.total_chan);
-    Serial.printf("\tleft_align: %d\n", i2s_configuration.left_align);
-    Serial.printf("\tbig_edin: %d\n", i2s_configuration.big_edin);
-    Serial.printf("\tbit_order_msb: %d\n", i2s_configuration.bit_order_msb);
-    Serial.printf("\tskip_msk: %d\n", i2s_configuration.skip_msk);
+    Serial.printf("\tchan_mask: %d\n", i2s_configuration[0].chan_mask);
+    Serial.printf("\ttotal_chan: %d\n", i2s_configuration[0].total_chan);
+    Serial.printf("\tleft_align: %d\n", i2s_configuration[0].left_align);
+    Serial.printf("\tbig_edin: %d\n", i2s_configuration[0].big_edin);
+    Serial.printf("\tbit_order_msb: %d\n", i2s_configuration[0].bit_order_msb);
+    Serial.printf("\tskip_msk: %d\n", i2s_configuration[0].skip_msk);
 #endif
 #ifdef I2S_NODAC
-    i2s_set_pin(i2s_port_number, NULL);
+    i2s_set_pin(i2s_port_number[0], NULL);
     i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
-    i2s_zero_dma_buffer(i2s_port_number);
+    i2s_zero_dma_buffer(i2s_port_number[0]);
 #else
-    i2s_set_pin(i2s_port_number, &pins);
+    i2s_set_pin(i2s_port_number[0], &pins[0]);
 
-    Serial.printf("I2S_NUM_%d configured using following pins:\n", i2s_port_number);
-    Serial.printf("    BCLK,BCK: %d\n", pins.bck_io_num);
-    Serial.printf("    WCLK,LCK: %d\n", pins.ws_io_num);
-    Serial.printf("    DOUT: %d\n", pins.data_out_num);
-    Serial.printf("    DIN: %d\n", pins.data_in_num);
-    Serial.printf("    MCLK: %d\n", pins.mck_io_num);
+    Serial.printf("I2S_NUM_%d configured using following pins:\n", i2s_port_number[0]);
+    Serial.printf("    BCLK,BCK: %d\n", pins[0].bck_io_num);
+    Serial.printf("    WCLK,LCK: %d\n", pins[0].ws_io_num);
+    Serial.printf("    DOUT: %d\n", pins[0].data_out_num);
+    Serial.printf("    DIN: %d\n", pins[0].data_in_num);
+    Serial.printf("    MCLK: %d\n", pins[0].mck_io_num);
 #endif
-    i2s_set_sample_rates(i2s_port_number, SAMPLE_RATE);
-    i2s_start(i2s_port_number);
+    i2s_set_sample_rates(i2s_port_number[0], SAMPLE_RATE);
+#ifdef DUAL_CODEC_ENABLED
+#if (defined I2S_BCLK_PIN_SECONDARY) || (defined I2S_WCLK_PIN_SECONDARY) || (defined I2S_DOUT_PIN_SECONDARY) || (defined I2S_DIN_PIN_SECONDARY)
+    /* Setup secondary codec */
+    i2s_driver_install(i2s_port_number[1], &i2s_configuration[1], 0, NULL);
+    Serial.printf("Secondary i2s_configuration:\n");
+    Serial.printf("\ttx_desc_auto_clear: %d\n", i2s_configuration[1].tx_desc_auto_clear);
+    Serial.printf("\tfixed_mclk: %d\n", i2s_configuration[1].fixed_mclk);
+    Serial.printf("\tmclk_multiple: %d\n", i2s_configuration[1].mclk_multiple);
+    Serial.printf("\tbits_per_chan: %d\n", i2s_configuration[1].bits_per_chan);
+
+    i2s_set_pin(i2s_port_number[1], &pins[1]);
+
+    Serial.printf("Secondary I2S_NUM_%d configured using following pins:\n", i2s_port_number[1]);
+    Serial.printf("    BCLK,BCK: %d\n", pins[1].bck_io_num);
+    Serial.printf("    WCLK,LCK: %d\n", pins[1].ws_io_num);
+    Serial.printf("    DOUT: %d\n", pins[1].data_out_num);
+    Serial.printf("    DIN: %d\n", pins[1].data_in_num);
+    Serial.printf("    MCLK: %d\n", pins[1].mck_io_num);
+
+    i2s_set_sample_rates(i2s_port_number[1], SAMPLE_RATE);
+
+    Serial.printf("Secondary I2S configured using following pins:\n");
+    Serial.printf("    BCLK,BCK: %d\n", pins[1].bck_io_num);
+    Serial.printf("    WCLK,LCK: %d\n", pins[1].ws_io_num);
+    Serial.printf("    DOUT: %d\n", pins[1].data_out_num);
+    Serial.printf("    DIN: %d\n", pins[1].data_in_num);
+    Serial.printf("    MCLK: %d\n", pins[1].mck_io_num);
+
+#endif /* (defined I2S_BCLK_PIN_SECONDARY) && (defined I2S_WCLK_PIN_SECONDARY) && (defined I2S_DOUT_PIN_SECONDARY) */
+#include "esp_rom_gpio.h"
+#include "soc/i2s_periph.h"
+    /* Connnect both BCLK signals */
+    esp_rom_gpio_connect_out_signal(I2S_BCLK_PIN_SECONDARY, i2s_periph_signal[0].m_tx_bck_sig, 0, 0);
+    esp_rom_gpio_connect_in_signal(I2S_BCLK_PIN_SECONDARY, i2s_periph_signal[1].s_rx_bck_sig, 0);
+    /* Connect both WS signals */
+    esp_rom_gpio_connect_out_signal(I2S_WCLK_PIN_SECONDARY, i2s_periph_signal[0].m_tx_ws_sig, 0, 0);
+    esp_rom_gpio_connect_in_signal(I2S_WCLK_PIN_SECONDARY, i2s_periph_signal[1].s_rx_ws_sig, 0);
+    i2s_start(i2s_port_number[0]);
+    i2s_start(i2s_port_number[1]);
+#else
+    i2s_start(i2s_port_number[0]);
+#endif /* DUAL_CODEC_ENABLED */
+
 #ifdef ES8388_ENABLED
 #ifdef PIN_CTRL
     REG_WRITE(PIN_CTRL, 0xFFFFFFF0);
@@ -580,11 +776,11 @@ void setup_i2s()
 #endif
 #ifndef I2S_NODAC
     Serial.printf("I2S configured using following pins:\n");
-    Serial.printf("    BCLK,BCK: %d\n", pins.bck_io_num);
-    Serial.printf("    WCLK,LCK: %d\n", pins.ws_io_num);
-    Serial.printf("    DOUT: %d\n", pins.data_out_num);
-    Serial.printf("    DIN: %d\n", pins.data_in_num);
-    Serial.printf("    MCLK: %d\n", pins.mck_io_num);
+    Serial.printf("    BCLK,BCK: %d\n", pins[0].bck_io_num);
+    Serial.printf("    WCLK,LCK: %d\n", pins[0].ws_io_num);
+    Serial.printf("    DOUT: %d\n", pins[0].data_out_num);
+    Serial.printf("    DIN: %d\n", pins[0].data_in_num);
+    Serial.printf("    MCLK: %d\n", pins[0].mck_io_num);
 #else
     Serial.printf("I2S configured using internal DAC (DAC_1, DAC_2 as output)\n");
 #endif
@@ -596,15 +792,19 @@ void setup_i2s()
        */
     for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
     {
-        float saw = ((float)i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
-        sampleDataFSawTest[i] = saw;
-        saw -= 1;
-        saw *= 0x7FFF;
-        sampleDataI16SawTest[i] = saw;
+        for (int n = 0; n < 4; n++)
+        {
+            float saw = ((float)n * i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
+            sampleDataFSawTest[n][i] = saw;
+            saw -= 1;
+            saw *= 0x7FFF;
+            sampleDataI16SawTest[n][i] = saw;
+        }
     }
 #endif
 }
 #endif /* (defined I2S_BCLK_PIN) && (defined I2S_WCLK_PIN) && (defined I2S_DOUT_PIN) */
+
 
 #endif /* ESP32 */
 

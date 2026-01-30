@@ -58,9 +58,15 @@ union wavHeader
         char riff[4]; /*!< 'RIFF' */
         uint32_t fileSize; /*!< bytes to write containing all data (header + data) */
         char waveType[4]; /*!< 'WAVE' */
-
-        char format[4]; /*!< 'fmt ' */
-        uint32_t lengthOfData; /*!< length of the fmt header (16 bytes) */
+        union
+        {
+            struct
+            {
+                char format[4]; /*!< 'fmt ' */
+                uint32_t lengthOfData; /*!< length of the fmt header (16 bytes) */
+            };
+            union wav_tag__header_u fmtTag;
+        };
         uint16_t format_tag; /*!< 0x0001: PCM */
         uint16_t numberOfChannels; /*!< 'WAVE' */
         uint32_t sampleRate;
