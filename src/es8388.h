@@ -73,6 +73,9 @@ void ES8388_SetOUT1VOL(float vol);
 void ES8388_SetOUT2VOL(ES8388Id codec_id, float vol);
 void ES8388_SetOUT2VOL(float vol);
 
+uint8_t ES8388_ReadReg(ES8388Id codec_id, uint8_t reg);
+bool ES8388_WriteReg(uint8_t reg, uint8_t val);
+bool ES8388_WriteReg(ES8388Id codec_id, uint8_t reg, uint8_t val);
 
 #endif // ES8388_ENABLED
 #endif // #ifdef ML_SYNTH_INLINE_DECLARATION

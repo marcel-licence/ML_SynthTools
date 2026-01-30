@@ -73,6 +73,7 @@ void Audio_Output(const Q1_14 *left, const Q1_14 *right);
 void Audio_Input(float *left, float *right);
 void Audio_Input(Q1_14 *left, Q1_14 *right);
 void Audio_Input(int16_t *left, int16_t *right);
+void Audio_Input(AudioPortId audio_port, int16_t *left, int16_t *right);
 void DaisySeed_Setup(void);
 void Teensy_Setup();
 void SAMD21_Synth_Init();
