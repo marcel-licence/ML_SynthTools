@@ -116,18 +116,22 @@ SoftwareSerial Serial2(RXD2, TXD2);
  * Configuration for
  * Board: "Seeeduino XIAO"
  */
-#ifdef ARDUINO_SEEED_XIAO_M0
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
 
-#define LED_PIN LED_BUILTIN
+#define BLINK_LED_PIN LED_BUILTIN
 #define MIDI_PORT1_ACTIVE
 
-#endif /* ARDUINO_SEEED_XIAO_M0 */
+#endif /* (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0) */
 
 
 #define ML_SYNTH_INLINE_DECLARATION
 #define ML_SYNTH_INLINE_DEFINITION
 #include <blink.h>
 #include <midi_interface.h>
+
+#ifdef USE_TINYUSB
+#include <Adafruit_TinyUSB.h>
+#endif
 
 struct midiMapping_s midiMapping =
 {
