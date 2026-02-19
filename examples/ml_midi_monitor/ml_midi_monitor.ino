@@ -171,7 +171,11 @@ void setup(void)
 void loop_1hz(void)
 {
     uint8_t msg[] = {0x90, 0x01, 0x02};
+#if (defined MIDI_TX1_PIN) || (defined MIDI_TX2_PIN)
     Midi_SendRaw(msg);
+#else
+    Serial1.write(msg, sizeof(msg));
+#endif
 #if 0 /* show sent data */
     Serial.printf("Tx: 90 01 02\n");
 #endif
