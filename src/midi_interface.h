@@ -58,6 +58,12 @@
 #define MIDI_BAUDRATE 31250
 #endif
 
+#define MIDI_NOTE_ON        0x90
+#define MIDI_NOTE_OFF       0x80
+#define MIDI_CONTROL_CHANGE 0xb0
+#define MIDI_PROGRAM_CHANGE 0xc0
+#define MIDI_CHANNEL_PRESSURE   0xd0
+#define MIDI_PITCH_BEND     0xe0
 
 /*
  * structure is used to build the mapping table
@@ -131,6 +137,7 @@ void Midi_HandleShortMsgEx(uint8_t *data, uint8_t cable __attribute__((unused)))
 
 #ifdef MIDI_TX2_PIN
 void Midi_SendShortMessage(uint8_t *msg);
+void Midi_SendMessage(uint8_t *msg, int len);
 #endif
 
 #ifndef ARDUINO_SEEED_XIAO_M0
@@ -397,7 +404,7 @@ inline void Midi_HandleShortMsg(uint8_t *data, uint8_t cable __attribute__((unus
     switch (data[0] & 0xF0)
     {
     /* note on */
-    case 0x90:
+    case MIDI_NOTE_ON:
         if (data[2] > 0)
         {
             Midi_NoteOn(ch, data[1], data[2]);
@@ -414,33 +421,33 @@ inline void Midi_HandleShortMsg(uint8_t *data, uint8_t cable __attribute__((unus
         }
         break;
     /* note off */
-    case 0x80:
+    case MIDI_NOTE_OFF:
         Midi_NoteOff(ch, data[1]);
 #ifdef MIDI_MONITOR_ENABLED
         Serial.printf(" %3d | %02x %02x %02x | Note Off         | Channel %2d | Pitch    %3d | Velocity %3d\n", cable, data[0], data[1], data[2], ch, data[1], data[2]);
 #endif
         break;
-    case 0xb0:
+    case MIDI_CONTROL_CHANGE:
         Midi_ControlChange(ch, data[1], data[2]);
 #ifdef MIDI_MONITOR_ENABLED
         Serial.printf(" %3d | %02x %02x %02x | Control Change   | Channel %2d | Number   %3d | Value    %3d\n", cable, data[0], data[1], data[2], ch, data[1], data[2]);
 #endif
         break;
-    case 0xc0:
+    case MIDI_PROGRAM_CHANGE:
         Midi_ProgramChange(ch, data[1]);
 #ifdef MIDI_MONITOR_ENABLED
         Serial.printf(" %3d | %02x %02x    | Program Change   | Channel %2d | Number   %3d |             \n", cable, data[0], data[1], ch, data[1]);
 #endif
         break;
     /* channel pressure */
-    case 0xD0:
+    case MIDI_CHANNEL_PRESSURE:
         Midi_ChannelPressure(ch, data[1]);
 #ifdef MIDI_MONITOR_ENABLED
         Serial.printf(" %3d | %02x %02x    | Channel Pressure | Channel %2d | Amount   %3d |             \n", cable, data[0], data[1], ch, data[1]);
 #endif
         break;
     /* pitchbend */
-    case 0xe0:
+    case MIDI_PITCH_BEND:
         {
             uint16_t amount = ((((uint16_t)data[1])) + ((uint16_t)data[2] << 7));
             Midi_PitchBend(ch, amount);
@@ -520,7 +527,11 @@ void Midi_Setup()
 #ifdef TEENSYDUINO
     Serial.printf("Setup Serial1 with %d baud with rx: RX1 pin (PIN 0)\n", MIDI_SERIAL1_BAUDRATE);
 #else
+#ifdef PIN_SERIAL1_RX
+    Serial.printf("Setup Serial1 with %d baud with rx: RX1 pin (%d)\n", MIDI_SERIAL1_BAUDRATE, PIN_SERIAL1_RX);
+#else
     Serial.printf("Setup Serial1 with %d baud with rx: RX1 pin\n", MIDI_SERIAL1_BAUDRATE);
+#endif
 #endif
     Serial1.begin(MIDI_SERIAL1_BAUDRATE);
 #endif
@@ -532,8 +543,10 @@ void Midi_Setup()
     Serial1.begin(MIDI_SERIAL1_BAUDRATE);
 #endif
 
-#ifdef ARDUINO_SEEED_XIAO_M0
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
     pinMode(PIN_SERIAL1_RX, INPUT_PULLUP);
+    /* this hack is required to reactivate the SERCOM functionality */
+    Serial1.begin(MIDI_SERIAL1_BAUDRATE);
 #endif
 
     MidiPort1.serial = &Serial1;
@@ -694,6 +707,11 @@ void Midi_Process()
 void Midi_SendShortMessage(uint8_t *msg)
 {
     MidiPort2.serial->write(msg, 3);
+}
+
+void Midi_SendMessage(uint8_t *msg, int len)
+{
+    MidiPort2.serial->write(msg, len);
 }
 
 void Midi_SendRaw(uint8_t *msg)
