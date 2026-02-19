@@ -40,19 +40,19 @@
 
 
 __attribute__((weak))
-void Status_ValueChangedFloatArr(const char *descr, float value, int index)
+void Status_ValueChangedFloatArr(const char *descr __attribute__((unused)), float value __attribute__((unused)), int index __attribute__((unused)))
 {
 
 }
 
 __attribute__((weak))
-void Status_ValueChangedFloat(const char *group, const char *descr, float value)
+void Status_ValueChangedFloat(const char *group __attribute__((unused)), const char *descr __attribute__((unused)), float value __attribute__((unused)))
 {
 
 }
 
 __attribute__((weak))
-void Status_LogMessage(const char *text)
+void Status_LogMessage(const char *text __attribute__((unused)))
 {
 
 }
