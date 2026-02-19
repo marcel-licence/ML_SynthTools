@@ -183,6 +183,10 @@ void Audio_Setup(void)
     }
 #endif
 #ifdef OUTPUT_SINE_TEST
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
+    /* it seems the device gets stuck and never boots */
+#error Audio output test waveform sine not supported!
+#endif
     /*
      * create sinewave with f and 2*f
      */
@@ -256,7 +260,7 @@ void Audio_Setup(void)
     AudioMemory(4);
 #endif
 
-#ifdef ARDUINO_SEEED_XIAO_M0
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
     SAMD21_Synth_Init();
     pinMode(DAC0, OUTPUT);
 #endif
@@ -354,7 +358,7 @@ void DaisySeed_Setup(void)
 }
 #endif /* ARDUINO_DAISY_SEED */
 
-#ifdef ARDUINO_SEEED_XIAO_M0
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
 
 static int32_t u32buf[SAMPLE_BUFFER_SIZE];
 
@@ -375,9 +379,9 @@ void ProcessAudio(uint16_t *buff, size_t len)
         var >>= 16;
         union ts varU;
         varU.i16 = var;
-        varU.u16 /= 64;
+        varU.u16 /= 32;
         varU.u16 += 512;
-        buff[i] = varU.u16;;
+        buff[i] = varU.u16;
     }
 }
 
@@ -523,7 +527,7 @@ void Audio_OutputMono(const int32_t *samples)
     dataReady = false;
 #endif /* ARDUINO_DAISY_SEED */
 
-#ifdef ARDUINO_SEEED_XIAO_M0
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCountPre();
 #endif
