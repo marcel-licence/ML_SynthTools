@@ -1,0 +1,245 @@
+name: Arduino CLI CI build
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Build ${{ matrix.board.name }} - ${{ matrix.sketch }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        sketch:
+          - ml_audio_test
+          - ml_midi_monitor
+
+        board:
+
+          # ESP32
+          - name: "ESP32 Dev Module"
+            fname: "esp32"
+            fqbn: "esp32:esp32:esp32"
+            core: "esp32:esp32@3.2.1"
+            urls: "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
+            family: "ESP32"
+            extra_libs: ""
+            options: ""
+        
+          - name: "ESP32S2 Dev Module"
+            fname: "esp32s2"
+            fqbn: "esp32:esp32:esp32s2"
+            core: "esp32:esp32@3.2.1"
+            urls: "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
+            family: "ESP32"
+            extra_libs: ""
+            options: ""
+
+          - name: "LOLIN S2 Mini"
+            fname: "lolin_s2_mini"
+            fqbn: "esp32:esp32:lolin_s2_mini"
+            core: "esp32:esp32@3.2.1"
+            urls: "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
+            family: "ESP32"
+            extra_libs: ""
+            options: ""
+
+          - name: "ESP32S3 Dev Module"
+            fname: "esp32s3"
+            fqbn: "esp32:esp32:esp32s3"
+            core: "esp32:esp32@3.2.1"
+            urls: "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
+            family: "ESP32"
+            extra_libs: ""
+            options: ""
+        
+          - name: "ESP32C3 Dev Module"
+            fname: "esp32c3"
+            fqbn: "esp32:esp32:esp32c3"
+            core: "esp32:esp32@3.2.1"
+            urls: "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
+            family: "ESP32"
+            extra_libs: ""
+            options: ""
+            
+          - name: "XIAO_ESP32C3"
+            fname: "xiao_esp32c3"
+            fqbn: "esp32:esp32:XIAO_ESP32C3"
+            core: "esp32:esp32@3.2.1"
+            urls: "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
+            extra_libs: ""
+            options: ""
+
+          # ESP8266
+          - name: "Generic ESP8266 Module"
+            fname: "esp8266"
+            fqbn: "esp8266:esp8266:generic"
+            core: "esp8266:esp8266@3.1.2"
+            urls: "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
+            family: "ESP8266"
+            extra_libs: ""
+            options: ""
+
+          # RP2040
+          - name: "Raspberry Pi Pico"
+            fname: "pico_rp2040"
+            fqbn: "rp2040:rp2040:rpipico"
+            family: "rp2040"
+            arduino_board: "Raspberry Pi Pico/RP2040/RP2350"
+            core: "rp2040:rp2040"
+            urls: "https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json"
+            extra_libs: "'MIDI Library@5.0.2'"
+            options: "usbstack=tinyusb"
+
+          - name: "Raspberry Pi Pico 2"
+            fname: "pico2_rp2350"
+            fqbn: "rp2040:rp2040:rpipico2"
+            family: "rp2350-arm-s --abs-block"
+            arduino_board: "Raspberry Pi Pico/RP2040/RP2350"
+            core: "rp2040:rp2040"
+            urls: "https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json"
+            extra_libs: "'MIDI Library@5.0.2'"
+            options: "usbstack=tinyusb"
+
+          - name: "Pimoroni PicoPlus2"
+            fname: "pimoroni_pico_plus2"
+            fqbn: "rp2040:rp2040:pimoroni_pico_plus_2"
+            family: "rp2350-arm-s --abs-block"
+            arduino_board: "Raspberry Pi Pico/RP2040/RP2350"
+            core: "rp2040:rp2040"
+            urls: "https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json"
+            extra_libs: "'MIDI Library@5.0.2'"
+            options: "usbstack=tinyusb"
+
+          # Seeeduino
+          - name: "Seeeduino XIAO (SAMD21)"
+            fname: "xiao_samd21"
+            fqbn: "Seeeduino:samd:seeed_XIAO_m0"
+            family: "SAMD21"
+            arduino_board: "Seeed SAMD Boards"
+            core: "Seeeduino:samd@1.8.5"
+            urls: "https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json"
+            extra_libs: ""
+            options: ""
+
+          # STM32
+          - name: "Generic STM32F4 Series - BlackPill F411CE"
+            fname: "genf4_blackpill_stm32f411ce"
+            fqbn: "STMicroelectronics:stm32:GenF4:pnum=BLACKPILL_F411CE"
+            core: "STMicroelectronics:stm32"
+            urls: "https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json"
+            family: "STM32"
+            extra_libs: ""
+            options: ""
+
+          - name: "Generic STM32H7 Series - Daisy Seed"
+            fname: "genh7_daisy_seed"
+            fqbn: "STMicroelectronics:stm32:GenH7:pnum=DAISY_SEED"
+            core: "STMicroelectronics:stm32"
+            urls: "https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json"
+            family: "STM32H7"
+            extra_libs: "DaisyDuino@1.7.0"
+            options: ""
+
+          # Teensy
+          - name: "Teensy 4.1"
+            fname: "teensy41"
+            fqbn: "teensy:avr:teensy41"
+            core: "teensy:avr"
+            urls: "https://www.pjrc.com/teensy/package_teensy_index.json"
+            family: "Teensy"
+            extra_libs: ""
+            options: ""
+
+        exclude:
+          - board:
+              name: "XIAO_ESP32C3"
+            sketch: ml_audio_test
+
+          - board:
+              name: "ESP32C3 Dev Module"
+            sketch: ml_audio_test
+
+          - board:
+              name: "Generic STM32F4 Series - BlackPill F411CE"
+            sketch: ml_audio_test
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Install Arduino CLI
+      uses: arduino/setup-arduino-cli@v1
+
+    - name: Install core
+      run: |
+        arduino-cli core update-index --additional-urls ${{ matrix.board.urls }}
+        arduino-cli core install ${{ matrix.board.core }} --additional-urls ${{ matrix.board.urls }}
+
+    - name: Install libraries
+      run: |
+        arduino-cli lib install \
+          "Adafruit GFX Library@1.10.10" \
+          "Adafruit SSD1306@2.4.5" \
+          "Adafruit BusIO@1.14.1"
+
+        if [ ! -z "${{ matrix.board.extra_libs }}" ]; then
+          arduino-cli lib install ${{ matrix.board.extra_libs }}
+        fi
+
+    - name: Install Custom Libraries
+      run: |
+        mkdir -p ~/Arduino/libraries
+
+        git clone --depth 1 https://github.com/marcel-licence/ML_SynthTools.git \
+          ~/Arduino/libraries/ML_SynthTools
+
+        git clone --depth 1 https://github.com/marcel-licence/ML_SynthTools_Lib.git \
+          ~/Arduino/libraries/ML_SynthTools_Lib
+
+    - name: Compile Sketch
+      run: |
+        FULL_FQBN="${{ matrix.board.fqbn }}"
+        if [ ! -z "${{ matrix.board.options }}" ]; then
+          FULL_FQBN="${FULL_FQBN}:${{ matrix.board.options }}"
+        fi
+
+        arduino-cli compile \
+          --fqbn "$FULL_FQBN" \
+          --output-dir build/${{ matrix.board.fname }}-${{ matrix.sketch }} \
+          examples/${{ matrix.sketch }}
+
+    - name: Generate UF2 (SAMD21)
+      if: matrix.board.family == 'SAMD21'
+      run: |
+        BIN_FILE=$(find build -name "*.bin" | head -n 1)
+        curl -L https://raw.githubusercontent.com/microsoft/uf2/master/utils/uf2conv.py -o uf2conv.py
+        curl -L https://raw.githubusercontent.com/microsoft/uf2/master/utils/uf2families.json -o uf2families.json
+        python3 uf2conv.py "$BIN_FILE" --family ${{ matrix.board.family }} --convert --output build/firmware.uf2
+
+    - name: Rename UF2 (RP2xxx)
+      if: contains(matrix.board.family, 'rp2')
+      run: mv build/*.uf2 build/firmware.uf2 || true
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware-${{ matrix.board.fname }}-${{ matrix.sketch }}
+        path: build/${{ matrix.board.fname }}-${{ matrix.sketch }}
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          build/**/*.bin
+          build/**/*.uf2
+          build/**/*.hex
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

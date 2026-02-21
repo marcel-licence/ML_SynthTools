@@ -56,6 +56,9 @@
 void Audio_Setup(void);
 void Audio_Output(const float *left, const float *right);
 void Audio_OutputMono(const int32_t *samples);
+void Audio_Output(const int32_t *samples);
+void Audio_Output(const int16_t *samples);
+void Audio_Output(const Q1_14 *samples);
 void Audio_Output(const int16_t *left, const int16_t *right);
 void Audio_Output(const Q1_14 *left, const Q1_14 *right);
 void Audio_Input(float *left, float *right);
@@ -135,6 +138,14 @@ I2S i2s(OUTPUT);
 #endif /* #endif RP2350_USE_I2S_ML_LIB */
 #endif
 
+#ifndef PICO_AUDIO_I2S_DATA_PIN
+#define PICO_AUDIO_I2S_DATA_PIN 26
+#endif
+
+#ifndef PICO_AUDIO_I2S_CLOCK_PIN_BASE
+#define PICO_AUDIO_I2S_CLOCK_PIN_BASE 27
+#endif
+
 #ifndef I2S_OVERSAMPLE
 #define I2S_OVERSAMPLE 1
 #endif
@@ -172,6 +183,10 @@ void Audio_Setup(void)
     }
 #endif
 #ifdef OUTPUT_SINE_TEST
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
+    /* it seems the device gets stuck and never boots */
+#error Audio output test waveform sine not supported!
+#endif
     /*
      * create sinewave with f and 2*f
      */
@@ -232,12 +247,11 @@ void Audio_Setup(void)
         while (1); // do nothing
     }
 #else /* #ifndef RP2350_USE_I2S_ML_LIB */
-    {
-        int data_pin = 26;
-        int clock_pin_base = 27;
-        rp2350_i2s_init(data_pin, clock_pin_base);
-        Serial.printf("rp2350_i2s_init\n\tdata_pin: %d\n\tclock_pin_base: %d\n\twclk_pin: %d\n", data_pin, clock_pin_base, clock_pin_base + 1);
-    }
+    rp2350_i2s_init(PICO_AUDIO_I2S_DATA_PIN, PICO_AUDIO_I2S_CLOCK_PIN_BASE);
+    Serial.printf("rp2350_i2s_init\n");
+    Serial.printf("\tclock_pin_base: %u (->BCK)\n", PICO_AUDIO_I2S_DATA_PIN);
+    Serial.printf("\tdata_pin: %u (-> DIN) \n", PICO_AUDIO_I2S_CLOCK_PIN_BASE);
+    Serial.printf("\tWCLK/LCK: %u\n", PICO_AUDIO_I2S_CLOCK_PIN_BASE + 1);
 #endif /* #endif RP2350_USE_I2S_ML_LIB */
 #endif
 
@@ -246,7 +260,7 @@ void Audio_Setup(void)
     AudioMemory(4);
 #endif
 
-#ifdef ARDUINO_SEEED_XIAO_M0
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
     SAMD21_Synth_Init();
     pinMode(DAC0, OUTPUT);
 #endif
@@ -344,7 +358,7 @@ void DaisySeed_Setup(void)
 }
 #endif /* ARDUINO_DAISY_SEED */
 
-#ifdef ARDUINO_SEEED_XIAO_M0
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
 
 static int32_t u32buf[SAMPLE_BUFFER_SIZE];
 
@@ -365,9 +379,9 @@ void ProcessAudio(uint16_t *buff, size_t len)
         var >>= 16;
         union ts varU;
         varU.i16 = var;
-        varU.u16 /= 64;
+        varU.u16 /= 32;
         varU.u16 += 512;
-        buff[i] = varU.u16;;
+        buff[i] = varU.u16;
     }
 }
 
@@ -396,6 +410,16 @@ void Audio_PrintStats()
 void Audio_Output(const Q1_14 *mono)
 {
     Audio_Output((const int16_t *)mono, (const int16_t *)mono);
+}
+
+void Audio_Output(const int32_t *samples)
+{
+    Audio_OutputMono(samples);
+}
+
+void Audio_Output(const int16_t *samples)
+{
+    Audio_Output((const int16_t *)samples, (const int16_t *)samples);
 }
 
 void Audio_OutputMono(const int32_t *samples)
@@ -503,7 +527,7 @@ void Audio_OutputMono(const int32_t *samples)
     dataReady = false;
 #endif /* ARDUINO_DAISY_SEED */
 
-#ifdef ARDUINO_SEEED_XIAO_M0
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCountPre();
 #endif

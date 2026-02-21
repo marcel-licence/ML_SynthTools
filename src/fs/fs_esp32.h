@@ -34,6 +34,8 @@
  * @data 27.06.2023
  *
  * @brief   This file contains ESP32 sepecific file system imeplementation
+ *
+ * use FS_PRINT_SD_FILES to print files in init function
  */
 
 
@@ -308,11 +310,13 @@ static bool FS_SdCardInit(void)
     delay(200);
 #endif
 
+#ifdef FS_PRINT_SD_FILES
     {
         File dir = SD_MMC.open("/");
         printDirectory(dir, 0);
         dir.close();
     }
+#endif
 
     return true;
 }

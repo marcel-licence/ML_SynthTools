@@ -36,6 +36,7 @@
  * @brief This file contains an implementation of a simple MIDI interpreter to parse incoming messages
  *
  * @see https://www.midi.org/specifications-old/item/table-1-summary-of-midi-message
+ * @see https://github.com/marcel-licence/ML_SynthTools/blob/add_documentation_for_midi_mapping/extras/midi_mapping.md
  */
 
 
@@ -44,8 +45,9 @@
 #endif
 
 
-#ifdef ML_SYNTH_INLINE_DECLARATION
-
+#if defined(ML_SYNTH_INLINE_DECLARATION) || defined(ML_SYNTH_INLINE_DEFINITION)
+#ifndef MIDI_INTERFACE_H
+#define MIDI_INTERFACE_H
 
 #define MIDI_CHANNEL_MASK   0x10
 #define MIDI_CHANNEL_0      0x01
@@ -56,6 +58,74 @@
 #ifndef MIDI_BAUDRATE
 #define MIDI_BAUDRATE 31250
 #endif
+
+#define MIDI_NOTE_ON        0x90
+#define MIDI_NOTE_OFF       0x80
+#define MIDI_CONTROL_CHANGE 0xb0
+#define MIDI_PROGRAM_CHANGE 0xc0
+#define MIDI_CHANNEL_PRESSURE   0xd0
+#define MIDI_PITCH_BEND     0xe0
+
+/*
+ * structure is used to build the mapping table
+ */
+struct midiControllerMapping
+{
+    uint8_t channel;
+    uint8_t data1;
+    const char *desc;
+    void(*callback_mid)(uint8_t ch, uint8_t data1, uint8_t data2);
+#ifdef MIDI_FMT_INT
+    void(*callback_val)(uint8_t userdata, uint8_t value);
+#else
+    void(*callback_val)(uint8_t userdata, float value);
+#endif
+    uint8_t user_data;
+};
+
+#ifdef MIDI_MAP_FLEX_ENABLED
+struct midiMapLookUpEntry
+{
+    const char *desc;
+    struct midiControllerMapping *controlMap;
+    int controlMapSize;
+};
+#endif
+
+struct midiMapping_s
+{
+    void (*rawMsg)(uint8_t *msg);
+#ifdef MIDI_FMT_INT
+    void (*noteOn)(uint8_t ch, uint8_t note, uint8_t vel);
+    void (*noteOff)(uint8_t ch, uint8_t note);
+    void (*pitchBend)(uint8_t ch, uint16_t bend);
+    void (*modWheel)(uint8_t ch, uint8_t value);
+#else
+    void (*noteOn)(uint8_t ch, uint8_t note, float vel);
+    void (*noteOff)(uint8_t ch, uint8_t note);
+    void (*pitchBend)(uint8_t ch, float bend);
+    void (*modWheel)(uint8_t ch, float value);
+#endif
+    void (*programChange)(uint8_t ch, uint8_t program_number);
+#ifdef MIDI_CHANNEL_PRESSURE_ENABLED
+#ifdef MIDI_FMT_INT
+    void (*channelPressure)(uint8_t ch, uint8_t pressure);
+#else
+    void (*channelPressure)(uint8_t ch, float pressure);
+#endif
+#endif
+    void (*rttMsg)(uint8_t msg);
+    void (*songPos)(uint16_t pos);
+
+    struct midiControllerMapping *controlMapping;
+    int mapSize;
+
+#ifdef MIDI_MAP_FLEX_ENABLED
+    /* the following map can be changed  during runtime */
+    struct midiControllerMapping *controlMapping_flex;
+    int mapSize_flex;
+#endif
+};
 
 
 void Midi_Setup(void);
@@ -68,6 +138,7 @@ void Midi_HandleShortMsgEx(uint8_t *data, uint8_t cable __attribute__((unused)))
 
 #ifdef MIDI_TX2_PIN
 void Midi_SendShortMessage(uint8_t *msg);
+void Midi_SendMessage(uint8_t *msg, int len);
 #endif
 
 #ifndef ARDUINO_SEEED_XIAO_M0
@@ -79,7 +150,7 @@ void Midi_SendRaw(uint8_t *msg);
 #endif
 #endif
 
-
+#endif /* #ifndef MIDI_INTERFACE_H */
 #endif /* ML_SYNTH_INLINE_DECLARATION */
 
 
@@ -157,66 +228,6 @@ struct midi_port_s MidiPort1;
 struct midi_port_s MidiPort2;
 #endif
 
-/*
- * structure is used to build the mapping table
- */
-struct midiControllerMapping
-{
-    uint8_t channel;
-    uint8_t data1;
-    const char *desc;
-    void(*callback_mid)(uint8_t ch, uint8_t data1, uint8_t data2);
-#ifdef MIDI_FMT_INT
-    void(*callback_val)(uint8_t userdata, uint8_t value);
-#else
-    void(*callback_val)(uint8_t userdata, float value);
-#endif
-    uint8_t user_data;
-};
-
-#ifdef MIDI_MAP_FLEX_ENABLED
-struct midiMapLookUpEntry
-{
-    const char *desc;
-    struct midiControllerMapping *controlMap;
-    int controlMapSize;
-};
-#endif
-
-struct midiMapping_s
-{
-    void (*rawMsg)(uint8_t *msg);
-#ifdef MIDI_FMT_INT
-    void (*noteOn)(uint8_t ch, uint8_t note, uint8_t vel);
-    void (*noteOff)(uint8_t ch, uint8_t note);
-    void (*pitchBend)(uint8_t ch, uint16_t bend);
-    void (*modWheel)(uint8_t ch, uint8_t value);
-#else
-    void (*noteOn)(uint8_t ch, uint8_t note, float vel);
-    void (*noteOff)(uint8_t ch, uint8_t note);
-    void (*pitchBend)(uint8_t ch, float bend);
-    void (*modWheel)(uint8_t ch, float value);
-#endif
-    void (*programChange)(uint8_t ch, uint8_t program_number);
-#ifdef MIDI_CHANNEL_PRESSURE_ENABLED
-#ifdef MIDI_FMT_INT
-    void (*channelPressure)(uint8_t ch, uint8_t pressure);
-#else
-    void (*channelPressure)(uint8_t ch, float pressure);
-#endif
-#endif
-    void (*rttMsg)(uint8_t msg);
-    void (*songPos)(uint16_t pos);
-
-    struct midiControllerMapping *controlMapping;
-    int mapSize;
-
-#ifdef MIDI_MAP_FLEX_ENABLED
-    /* the following map can be changed  during runtime */
-    struct midiControllerMapping *controlMapping_flex;
-    int mapSize_flex;
-#endif
-};
 
 /*
  * following variables shall be defined in z_config.ino
@@ -394,7 +405,7 @@ inline void Midi_HandleShortMsg(uint8_t *data, uint8_t cable __attribute__((unus
     switch (data[0] & 0xF0)
     {
     /* note on */
-    case 0x90:
+    case MIDI_NOTE_ON:
         if (data[2] > 0)
         {
             Midi_NoteOn(ch, data[1], data[2]);
@@ -411,33 +422,33 @@ inline void Midi_HandleShortMsg(uint8_t *data, uint8_t cable __attribute__((unus
         }
         break;
     /* note off */
-    case 0x80:
+    case MIDI_NOTE_OFF:
         Midi_NoteOff(ch, data[1]);
 #ifdef MIDI_MONITOR_ENABLED
         Serial.printf(" %3d | %02x %02x %02x | Note Off         | Channel %2d | Pitch    %3d | Velocity %3d\n", cable, data[0], data[1], data[2], ch, data[1], data[2]);
 #endif
         break;
-    case 0xb0:
+    case MIDI_CONTROL_CHANGE:
         Midi_ControlChange(ch, data[1], data[2]);
 #ifdef MIDI_MONITOR_ENABLED
         Serial.printf(" %3d | %02x %02x %02x | Control Change   | Channel %2d | Number   %3d | Value    %3d\n", cable, data[0], data[1], data[2], ch, data[1], data[2]);
 #endif
         break;
-    case 0xc0:
+    case MIDI_PROGRAM_CHANGE:
         Midi_ProgramChange(ch, data[1]);
 #ifdef MIDI_MONITOR_ENABLED
         Serial.printf(" %3d | %02x %02x    | Program Change   | Channel %2d | Number   %3d |             \n", cable, data[0], data[1], ch, data[1]);
 #endif
         break;
     /* channel pressure */
-    case 0xD0:
+    case MIDI_CHANNEL_PRESSURE:
         Midi_ChannelPressure(ch, data[1]);
 #ifdef MIDI_MONITOR_ENABLED
         Serial.printf(" %3d | %02x %02x    | Channel Pressure | Channel %2d | Amount   %3d |             \n", cable, data[0], data[1], ch, data[1]);
 #endif
         break;
     /* pitchbend */
-    case 0xe0:
+    case MIDI_PITCH_BEND:
         {
             uint16_t amount = ((((uint16_t)data[1])) + ((uint16_t)data[2] << 7));
             Midi_PitchBend(ch, amount);
@@ -517,7 +528,11 @@ void Midi_Setup()
 #ifdef TEENSYDUINO
     Serial.printf("Setup Serial1 with %d baud with rx: RX1 pin (PIN 0)\n", MIDI_SERIAL1_BAUDRATE);
 #else
+#ifdef PIN_SERIAL1_RX
+    Serial.printf("Setup Serial1 with %d baud with rx: RX1 pin (%d)\n", MIDI_SERIAL1_BAUDRATE, PIN_SERIAL1_RX);
+#else
     Serial.printf("Setup Serial1 with %d baud with rx: RX1 pin\n", MIDI_SERIAL1_BAUDRATE);
+#endif
 #endif
     Serial1.begin(MIDI_SERIAL1_BAUDRATE);
 #endif
@@ -529,8 +544,10 @@ void Midi_Setup()
     Serial1.begin(MIDI_SERIAL1_BAUDRATE);
 #endif
 
-#ifdef ARDUINO_SEEED_XIAO_M0
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
     pinMode(PIN_SERIAL1_RX, INPUT_PULLUP);
+    /* this hack is required to reactivate the SERCOM functionality */
+    Serial1.begin(MIDI_SERIAL1_BAUDRATE);
 #endif
 
     MidiPort1.serial = &Serial1;
@@ -693,6 +710,11 @@ void Midi_SendShortMessage(uint8_t *msg)
     MidiPort2.serial->write(msg, 3);
 }
 
+void Midi_SendMessage(uint8_t *msg, int len)
+{
+    MidiPort2.serial->write(msg, len);
+}
+
 void Midi_SendRaw(uint8_t *msg)
 {
     /* sysex */
@@ -722,6 +744,44 @@ void Midi_SendRaw(uint8_t *msg)
         MidiPort2.serial->write(msg, 3);
     }
 }
+#else /* MIDI_TX2_PIN */
+
+#ifdef MIDI_TX1_PIN
+void Midi_SendShortMessage(uint8_t *msg)
+{
+    MidiPort1.serial->write(msg, 3);
+}
+
+void Midi_SendRaw(uint8_t *msg)
+{
+    /* sysex */
+    if (msg[0] == 0xF0)
+    {
+        int i = 2;
+        while (msg[i] != 0xF7)
+        {
+            i++;
+        }
+        MidiPort1.serial->write(msg, i + 1);
+    }
+    else if ((msg[0] & 0xF0) == 0xC0)
+    {
+        MidiPort1.serial->write(msg, 2);
+    }
+    else if ((msg[0] & 0xF0) == 0xD0)
+    {
+        MidiPort1.serial->write(msg, 2);
+    }
+    else if ((msg[0] & 0xF0) == 0xF0)
+    {
+        MidiPort1.serial->write(msg, 1);
+    }
+    else
+    {
+        MidiPort1.serial->write(msg, 3);
+    }
+}
+#endif /* MIDI_TX1_PIN */
 #endif /* MIDI_TX2_PIN */
 #endif
 #endif

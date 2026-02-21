@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Marcel Licence
+ * Copyright (c) 2026 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,12 +88,12 @@ struct scratch_s
 static struct scratch_s scratch;
 
 
-void Scratch_Init(float sample_rate)
+void Scratch_Init(float sample_rate __attribute__((unused)))
 {
     scratch.sample_count = 0;
 }
 
-bool Scratch_AddSampleStatic(const uint8_t *data, uint32_t size, uint8_t idx)
+bool Scratch_AddSampleStatic(const uint8_t *data, uint32_t size, uint8_t idx __attribute__((unused)))
 {
     if (scratch.sample_count >= SCRATCH_SAMPLE_COUNT)
     {

@@ -288,3 +288,10 @@ uint32_t Arp_GetPos(void)
     return arp_pos;
 }
 
+/* please implement the following functions in your application */
+__attribute__((weak)) void Arp_Cb_NoteOn(uint8_t ch __attribute__((unused)), uint8_t note __attribute__((unused)), float vel __attribute__((unused))) {};
+__attribute__((weak)) void Arp_Cb_NoteOff(uint8_t ch __attribute__((unused)), uint8_t note __attribute__((unused))) {};
+__attribute__((weak)) void Arp_Status_ValueChangedInt(const char *msg __attribute__((unused)), int value __attribute__((unused))) {};
+__attribute__((weak)) void Arp_Status_LogMessage(const char *msg __attribute__((unused))) {};
+__attribute__((weak)) void Arp_Status_ValueChangedFloat(const char *msg __attribute__((unused)), float value __attribute__((unused))) {};
+__attribute__((weak)) void Arp_Cb_Step(uint8_t step __attribute__((unused))) {};
