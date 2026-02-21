@@ -37,6 +37,13 @@
  *          connected via I2S
  */
 #define OUTPUT_SAW_TEST
+//#define OUTPUT_SINE_TEST
+
+
+#ifdef LED_BUILTIN
+#define BLINK_LED_PIN LED_BUILTIN
+#endif
+
 
 /*
  * The following configuration is for the RP2040, RP2350
@@ -47,13 +54,12 @@
 #define SAMPLE_SIZE_16BIT
 #define SAMPLE_BUFFER_SIZE  48
 
-
 #endif
 
 /*
  * the following configuration is for ESP32, ESP32S2, ..
  */
-#ifdef ESP32
+#if (defined ESP32) && (!defined ARDUINO_LOLIN_S2_MINI)
 
 //#define BOARD_ML_V1 /* activate this when using the ML PCB V1 */
 //#define BOARD_ML_SYNTH_V2 /* activate this when using the ML PCB V1 */
@@ -72,7 +78,23 @@
 #define SAMPLE_SIZE_16BIT
 #define SAMPLE_BUFFER_SIZE  48
 
-#endif /* ESP32 */
+#endif /* (defined ESP32) && (!defined ARDUINO_LOLIN_S2_MINI) */
+
+
+#ifdef ARDUINO_LOLIN_S2_MINI
+
+#define SAMPLE_RATE 44100
+#define SAMPLE_SIZE_16BIT
+#define SAMPLE_BUFFER_SIZE  48
+
+#define I2S_BCLK_PIN -1
+#define I2S_WCLK_PIN -1
+#define I2S_DOUT_PIN 17
+#define I2S_DIRECT_OUT
+#define AUDIO_MONO_DOWNMIX
+#define AUDIO_OUT_MONO
+
+#endif
 
 
 /*
@@ -141,6 +163,11 @@ void setup()
     /*
      * this code runs once
      */
+#ifdef BLINK_LED_PIN
+    Blink_Setup();
+    Blink_Fast(1);
+#endif
+
     Serial.begin(115200);
 
     Serial.printf("Initialize Audio Interface\n");
@@ -149,6 +176,21 @@ void setup()
 
 void loop()
 {
+    static int loop_cnt_1hz = 0; /*!< counter to allow 1Hz loop cycle */
+
+#ifdef SAMPLE_BUFFER_SIZE
+    loop_cnt_1hz += SAMPLE_BUFFER_SIZE;
+#else
+    loop_cnt_1hz += 1; /* in case only one sample will be processed per loop cycle */
+#endif
+    if (loop_cnt_1hz >= SAMPLE_RATE)
+    {
+        loop_cnt_1hz -= SAMPLE_RATE;
+#ifdef BLINK_LED_PIN
+        Blink_Process();
+#endif
+    }
+
 #ifndef AUDIO_OUT_MONO
     float left[SAMPLE_BUFFER_SIZE], right[SAMPLE_BUFFER_SIZE];
     /*
