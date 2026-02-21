@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Marcel Licence
+ * Copyright (c) 2026 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,8 +62,10 @@
  * the following configuration is for ESP32, ESP32S2, ...
  */
 #ifdef ESP32
+#if (!defined CONFIG_IDF_TARGET_ESP32S2) && (!defined CONFIG_IDF_TARGET_ESP32C3)
 #define MIDI_TX2_PIN  17
 #define MIDI_RX2_PIN  16
+#endif
 #endif
 
 /*
@@ -73,8 +75,8 @@
 
 #define BLINK_LED_PIN 13 /* led pin on teensy 4.1 */
 
-#define MIDI_TX1_PIN  1
-#define MIDI_RX1_PIN  0
+#define MIDI_PORT_ACTIVE
+
 #endif
 
 /*
