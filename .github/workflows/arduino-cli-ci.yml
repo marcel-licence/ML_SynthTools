@@ -31,7 +31,7 @@ jobs:
             extra_libs: ""
             options: ""
         
-          - name: "ESP32-S2 Dev Module"
+          - name: "ESP32S2 Dev Module"
             fname: "esp32s2"
             fqbn: "esp32:esp32:esp32s2"
             core: "esp32:esp32@3.2.1"
@@ -49,7 +49,7 @@ jobs:
             extra_libs: ""
             options: ""
 
-          - name: "ESP32-S3 Dev Module"
+          - name: "ESP32S3 Dev Module"
             fname: "esp32s3"
             fqbn: "esp32:esp32:esp32s3"
             core: "esp32:esp32@3.2.1"
@@ -58,7 +58,7 @@ jobs:
             extra_libs: ""
             options: ""
         
-          - name: "ESP32-C3 Dev Module"
+          - name: "ESP32C3 Dev Module"
             fname: "esp32c3"
             fqbn: "esp32:esp32:esp32c3"
             core: "esp32:esp32@3.2.1"
@@ -143,7 +143,7 @@ jobs:
             core: "STMicroelectronics:stm32"
             urls: "https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json"
             family: "STM32H7"
-            extra_libs: ""
+            extra_libs: "DaisyDuino@1.7.0"
             options: ""
 
           # Teensy
@@ -159,6 +159,10 @@ jobs:
         exclude:
           - board:
               name: "XIAO_ESP32C3"
+            sketch: ml_audio_test
+
+          - board:
+              name: "ESP32C3 Dev Module"
             sketch: ml_audio_test
 
           - board:

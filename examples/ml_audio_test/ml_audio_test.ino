@@ -59,10 +59,10 @@
 /*
  * the following configuration is for ESP32, ESP32S2, ..
  */
-#if (defined ESP32) && (!defined ARDUINO_LOLIN_S2_MINI)
+#if (defined ESP32) && (!defined ARDUINO_LOLIN_S2_MINI) && (!defined ARDUINO_ESP32S2_DEV)
 
 //#define BOARD_ML_V1 /* activate this when using the ML PCB V1 */
-//#define BOARD_ML_SYNTH_V2 /* activate this when using the ML PCB V1 */
+#define BOARD_ML_SYNTH_V2 /* activate this when using the ML PCB V1 */
 //#define BOARD_ESP32_AUDIO_KIT_AC101 /* activate this when using the ESP32 Audio Kit v2.2 with the AC101 codec */
 //#define BOARD_ESP32_AUDIO_KIT_ES8388 /* activate this when using the ESP32 Audio Kit v2.2 with the ES8388 codec */
 //#define BOARD_ESP32_DOIT /* activate this when using the DOIT ESP32 DEVKIT V1 board */
@@ -72,7 +72,7 @@
  * include the board configuration
  * there you will find the most hardware depending pin settings
  */
-//#include <ml_boards.h> /* requires the ML_Synth library:  https://github.com/marcel-licence/ML_SynthTools */
+#include <ml_boards.h> /* requires the ML_Synth library:  https://github.com/marcel-licence/ML_SynthTools */
 
 #define SAMPLE_RATE 44100
 #define SAMPLE_SIZE_16BIT
@@ -81,7 +81,7 @@
 #endif /* (defined ESP32) && (!defined ARDUINO_LOLIN_S2_MINI) */
 
 
-#ifdef ARDUINO_LOLIN_S2_MINI
+#if (defined ARDUINO_LOLIN_S2_MINI) || (defined ARDUINO_ESP32S2_DEV)
 
 #define SAMPLE_RATE 44100
 #define SAMPLE_SIZE_16BIT
