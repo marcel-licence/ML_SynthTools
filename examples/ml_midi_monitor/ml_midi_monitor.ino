@@ -62,8 +62,10 @@
  * the following configuration is for ESP32, ESP32S2, ...
  */
 #ifdef ESP32
+#if (!defined CONFIG_IDF_TARGET_ESP32S2) && (!defined CONFIG_IDF_TARGET_ESP32C3)
 #define MIDI_TX2_PIN  17
 #define MIDI_RX2_PIN  16
+#endif
 #endif
 
 /*
