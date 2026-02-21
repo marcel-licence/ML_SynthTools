@@ -67,9 +67,9 @@ jobs:
             options: ""
 
           # ESP8266
-          - name: "ESP8266 NodeMCU"
+          - name: "Generic ESP8266 Module"
             fname: "esp8266"
-            fqbn: "esp8266:esp8266:nodemcuv2"
+            fqbn: "esp8266:esp8266:generic"
             core: "esp8266:esp8266@3.1.2"
             urls: "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
             family: "ESP8266"
@@ -187,7 +187,7 @@ jobs:
         arduino-cli compile \
           --fqbn "$FULL_FQBN" \
           --output-dir build/${{ matrix.board.fname }}-${{ matrix.sketch }} \
-          ${{ matrix.sketch }}
+          examples/${{ matrix.sketch }}
 
     - name: Generate UF2 (SAMD21)
       if: matrix.board.family == 'SAMD21'
