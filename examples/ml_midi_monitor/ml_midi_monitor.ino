@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Marcel Licence
+ * Copyright (c) 2026 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,8 +62,10 @@
  * the following configuration is for ESP32, ESP32S2, ...
  */
 #ifdef ESP32
+#if (!defined CONFIG_IDF_TARGET_ESP32S2) && (!defined CONFIG_IDF_TARGET_ESP32C3)
 #define MIDI_TX2_PIN  17
 #define MIDI_RX2_PIN  16
+#endif
 #endif
 
 /*
@@ -73,8 +75,8 @@
 
 #define BLINK_LED_PIN 13 /* led pin on teensy 4.1 */
 
-#define MIDI_TX1_PIN  1
-#define MIDI_RX1_PIN  0
+#define MIDI_PORT_ACTIVE
+
 #endif
 
 /*
@@ -116,18 +118,22 @@ SoftwareSerial Serial2(RXD2, TXD2);
  * Configuration for
  * Board: "Seeeduino XIAO"
  */
-#ifdef ARDUINO_SEEED_XIAO_M0
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
 
-#define LED_PIN LED_BUILTIN
+#define BLINK_LED_PIN LED_BUILTIN
 #define MIDI_PORT1_ACTIVE
 
-#endif /* ARDUINO_SEEED_XIAO_M0 */
+#endif /* (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0) */
 
 
 #define ML_SYNTH_INLINE_DECLARATION
 #define ML_SYNTH_INLINE_DEFINITION
 #include <blink.h>
 #include <midi_interface.h>
+
+#ifdef USE_TINYUSB
+#include <Adafruit_TinyUSB.h>
+#endif
 
 struct midiMapping_s midiMapping =
 {
@@ -167,7 +173,11 @@ void setup(void)
 void loop_1hz(void)
 {
     uint8_t msg[] = {0x90, 0x01, 0x02};
+#if (defined MIDI_TX1_PIN) || (defined MIDI_TX2_PIN)
     Midi_SendRaw(msg);
+#else
+    Serial1.write(msg, sizeof(msg));
+#endif
 #if 0 /* show sent data */
     Serial.printf("Tx: 90 01 02\n");
 #endif

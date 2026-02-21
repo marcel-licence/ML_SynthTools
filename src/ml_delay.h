@@ -61,6 +61,7 @@ void Delay_SetOutputLevel(uint8_t unused __attribute__((unused)), float value);
 void Delay_SetOutputLevel(uint8_t unused __attribute__((unused)), uint8_t value);
 void Delay_SetLength(uint8_t unused __attribute__((unused)), float value);
 void Delay_SetLength(uint8_t unused __attribute__((unused)), uint32_t value);
+void Delay_SetLength(uint8_t unused __attribute__((unused)), uint8_t value);
 void Delay_SetShift(uint8_t unused __attribute__((unused)), float value);
 
 
