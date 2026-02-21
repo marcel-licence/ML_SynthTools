@@ -18,7 +18,7 @@ jobs:
       - name: Run astyle check
         run: |
           # Run astyle but don't overwrite
-          astyle --style=allman \
+          if astyle --style=allman \
                  --indent=spaces=4 \
                  --indent-col1-comments \
                  --pad-oper \
@@ -37,11 +37,9 @@ jobs:
                  --indent-preproc-define \
                  --recursive \
                  --dry-run \
-                 "*.cpp" "*.h" "*.ino"
-
-          # Check if formatting would change anything
-          if ! git diff --quiet; then
-            echo "Code formatting issues detected!"
-            git diff
+                 "*.cpp" "*.h" "*.ino" | grep -q "Formatted"; then
+            echo "::error::Indentation check failed"
             exit 1
+          else
+            echo "Indentation check passed"
           fi
