@@ -1,7 +1,11 @@
 name: Verify code formatting
+
 on:
   push:
+    branches: [ "main" ]
   pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   verify-formatting:
