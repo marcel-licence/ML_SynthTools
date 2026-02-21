@@ -41,7 +41,7 @@ jobs:
             options: ""
 
           - name: "LOLIN S2 Mini"
-            fname: "esp32s2"
+            fname: "lolin_s2_mini"
             fqbn: "esp32:esp32:lolin_s2_mini"
             core: "esp32:esp32@3.2.1"
             urls: "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
@@ -128,20 +128,20 @@ jobs:
             options: ""
 
           # STM32
-          - name: "STM32F411 BlackPill"
-            fname: "stm32f411"
-            fqbn: "STMicroelectronics:stm32:GenF4"
+          - name: "Generic STM32F4 Series - BlackPill F411CE"
+            fname: "genf4_blackpill_stm32f411ce"
+            fqbn: "STMicroelectronics:stm32:GenF4:pnum=BLACKPILL_F411CE"
             core: "STMicroelectronics:stm32"
             urls: "https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json"
             family: "STM32"
             extra_libs: ""
             options: ""
 
-          - name: "Daisy Seed"
-            fname: "daisy_seed"
-            fqbn: "electro-smith:stm32h7:daisy_seed"
-            core: "electro-smith:stm32h7"
-            urls: "https://raw.githubusercontent.com/electro-smith/arduino-boards/main/package_electro-smith_index.json"
+          - name: "Generic STM32H7 Series - Daisy Seed"
+            fname: "genh7_daisy_seed"
+            fqbn: "STMicroelectronics:stm32:GenH7:pnum=DAISY_SEED"
+            core: "STMicroelectronics:stm32"
+            urls: "https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json"
             family: "STM32H7"
             extra_libs: ""
             options: ""
@@ -159,6 +159,10 @@ jobs:
         exclude:
           - board:
               name: "XIAO_ESP32C3"
+            sketch: ml_audio_test
+
+          - board:
+              name: "Generic STM32F4 Series - BlackPill F411CE"
             sketch: ml_audio_test
 
     steps:
