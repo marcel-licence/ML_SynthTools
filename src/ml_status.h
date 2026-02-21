@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Marcel Licence
+ * Copyright (c) 2025 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@ void Status_ValueChangedFloat(const char *group, const char *descr, float value)
 void Status_ValueChangedFloat(const char *descr, float value);
 void Status_ValueChangedFloatArr(const char *descr, float value, int index);
 void Status_ValueChangedIntArr(const char *descr, int value, int index);
+void Status_ValueChangedIntArr(const char *group, const char *descr, int value, int index);
 void Status_ValueChangedInt(const char *group, const char *descr, int value);
 void Status_ValueChangedInt(const char *descr, int value);
 void Status_ValueChangedStr(const char *descr, const char *value);

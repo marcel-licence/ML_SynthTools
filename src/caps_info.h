@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Marcel Licence
+ * Copyright (c) 2025 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -97,17 +97,21 @@ void CapsPrintInfo(void)
 #ifdef SOC_CPU_HAS_FPU
     Serial.printf("Cpu has FPU\n");
 #endif
+#if defined(RP2350_PSRAM_CS)
+    Serial.printf("PSRAM Size: %d\n", rp2040.getPSRAMSize());
+    Serial.printf(" total PSRAM heap: %d\navailable PSRAM heap: %d\n", rp2040.getTotalPSRAMHeap(), rp2040.getFreePSRAMHeap());
+#endif
 }
 
 void PrintMemoryInfo(void)
 {
 #ifdef ESP32
-    Serial.printf("ESP.getFreeHeap() %d\n", ESP.getFreeHeap());
-    Serial.printf("ESP.getMinFreeHeap() %d\n", ESP.getMinFreeHeap());
-    Serial.printf("ESP.getHeapSize() %d\n", ESP.getHeapSize());
-    Serial.printf("ESP.getMaxAllocHeap() %d\n", ESP.getMaxAllocHeap());
+    Serial.printf("ESP.getFreeHeap() %" PRIu32 "\n", ESP.getFreeHeap());
+    Serial.printf("ESP.getMinFreeHeap() %" PRIu32 "\n", ESP.getMinFreeHeap());
+    Serial.printf("ESP.getHeapSize() %" PRIu32 "\n", ESP.getHeapSize());
+    Serial.printf("ESP.getMaxAllocHeap() %" PRIu32 "\n", ESP.getMaxAllocHeap());
 
-    Serial.printf("Total PSRAM: %d\n", ESP.getPsramSize());
-    Serial.printf("Free PSRAM: %d\n", ESP.getFreePsram());
+    Serial.printf("Total PSRAM: %" PRIu32 "\n", ESP.getPsramSize());
+    Serial.printf("Free PSRAM: %" PRIu32 "\n", ESP.getFreePsram());
 #endif
 }

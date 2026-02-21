@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Marcel Licence
+ * Copyright (c) 2026 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,12 +88,12 @@ struct scratch_s
 static struct scratch_s scratch;
 
 
-void Scratch_Init(float sample_rate)
+void Scratch_Init(float sample_rate __attribute__((unused)))
 {
     scratch.sample_count = 0;
 }
 
-bool Scratch_AddSampleStatic(const uint8_t *data, uint32_t size, uint8_t idx)
+bool Scratch_AddSampleStatic(const uint8_t *data, uint32_t size, uint8_t idx __attribute__((unused)))
 {
     if (scratch.sample_count >= SCRATCH_SAMPLE_COUNT)
     {
@@ -153,6 +153,7 @@ bool Scratch_AddSampleStatic(const uint8_t *data, uint32_t size, uint8_t idx)
     newSample->sample_count = (wavHdr->nextTag.tag_data_size / wavHdr->bytesPerSample);
     newSample->loop = true;
     newSample->volume = 1 << 15;
+
     if (wavHdr->numberOfChannels == 2)
     {
         newSample->stereo = true;
@@ -181,8 +182,8 @@ void Scratch_ProcessSample(Q1_14 *samples_l, Q1_14 *samples_r, uint32_t len, str
 {
     for (uint32_t n = 0 ; n < len; n++)
     {
-
         sample->pos = sample->pos_f;
+
         if (sample->stereo)
         {
             sample->pos -= sample->pos % 2;

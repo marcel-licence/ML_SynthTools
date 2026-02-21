@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Marcel Licence
+ * Copyright (c) 2025 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -403,7 +403,18 @@ void Delay_SetOutputLevel(uint8_t unused __attribute__((unused)), uint8_t value)
 void Delay_SetLength(uint8_t unused __attribute__((unused)), float value)
 {
     delayLen = (uint32_t)(((float)delayLenMax - 1.0f) * value);
+    if (delayLen < 1)
+    {
+        delayLen = 1;
+    }
     Status_ValueChangedFloat("Delay_SetLength", value);
+}
+
+void Delay_SetLength(uint8_t unused __attribute__((unused)), uint8_t value)
+{
+    float value_f = value;
+    value_f *= 1.0f / 127.0f;
+    Delay_SetLength(unused, value_f);
 }
 
 void Delay_SetLength(uint8_t unused __attribute__((unused)), uint32_t value)
