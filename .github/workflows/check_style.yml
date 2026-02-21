@@ -6,22 +6,45 @@ on:
 jobs:
   verify-formatting:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Checkout astyle
-        uses: actions/checkout@v4
-        with:
-          repository: szepeviktor/astyle
-          path: astyle
-          ref: v3.4.12
       - name: Install astyle
+        run: sudo apt-get update && sudo apt-get install -y astyle
+      - name: Run astyle check
         run: |
-          cd astyle/build/gcc/
-          make
-          sudo make install
-          astyle --version
+          # Run astyle but don't overwrite
+          astyle --style=allman \
+                 --indent=spaces=4 \
+                 --indent-col1-comments \
+                 --pad-oper \
+                 --pad-comma \
+                 --pad-header \
+                 --unpad-paren \
+                 --unpad-brackets \
+                 --align-pointer=name \
+                 --align-reference=name \
+                 --break-closing-braces \
+                 --add-braces \
+                 --attach-return-type \
+                 --attach-return-type-decl \
+                 --convert-tabs \
+                 --indent-cases \
+                 --indent-namespaces \
+                 --squeeze-ws \
+                 --squeeze-lines=2 \
+                 --indent-preproc-define \
+                 --recursive \
+                 --dry-run \
+                 "*.cpp" "*.h" "*.ino"
+
+          # Check if formatting would change anything
+          if ! git diff --quiet; then
+            echo "Code formatting issues detected!"
+            git diff
+            exit 1
+          fi
