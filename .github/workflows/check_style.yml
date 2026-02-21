@@ -18,6 +18,7 @@ jobs:
       - name: Run astyle check
         run: |
           # Run astyle but don't overwrite
+          astyle --version
           if astyle --style=allman \
                  --indent=spaces=4 \
                  --indent-col1-comments \
@@ -39,6 +40,27 @@ jobs:
                  --dry-run \
                  "*.cpp" "*.h" "*.ino" | grep -q "Formatted"; then
             echo "::error::Indentation check failed"
+            astyle --style=allman \
+                 --indent=spaces=4 \
+                 --indent-col1-comments \
+                 --pad-oper \
+                 --pad-comma \
+                 --pad-header \
+                 --unpad-paren \
+                 --align-pointer=name \
+                 --align-reference=name \
+                 --break-closing-braces \
+                 --add-braces \
+                 --attach-return-type \
+                 --attach-return-type-decl \
+                 --convert-tabs \
+                 --indent-cases \
+                 --indent-namespaces \
+                 --indent-preproc-define \
+                 --recursive \
+                 --dry-run \
+                 --formatted \
+                 "*.cpp" "*.h" "*.ino"
             exit 1
           else
             echo "Indentation check passed"
