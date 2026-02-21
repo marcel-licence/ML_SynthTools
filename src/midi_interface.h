@@ -36,6 +36,7 @@
  * @brief This file contains an implementation of a simple MIDI interpreter to parse incoming messages
  *
  * @see https://www.midi.org/specifications-old/item/table-1-summary-of-midi-message
+ * @see https://github.com/marcel-licence/ML_SynthTools/blob/add_documentation_for_midi_mapping/extras/midi_mapping.md
  */
 
 
