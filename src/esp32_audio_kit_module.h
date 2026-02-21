@@ -53,7 +53,7 @@ typedef void(*audioKitButtonCb)(uint8_t, uint8_t);
 extern audioKitButtonCb audioKitButtonCallback;
 void button_setup();
 void button_loop();
-void ac101_setSourceMic(  void);
+void ac101_setSourceMic(void);
 void ac101_setSourceLine(void);
 
 #ifdef AC101_ENABLED
@@ -138,8 +138,9 @@ static AC101 ac;
  * this function could be used to set up the masterclock
  * it is not necessary to use the ac101
  */
-void ac101_mclk_setup() {
-    uint32_t freq = SAMPLE_RATE* 512; /* The maximal frequency is 80000000 / 2^bit_num */
+void ac101_mclk_setup()
+{
+    uint32_t freq = SAMPLE_RATE * 512; /* The maximal frequency is 80000000 / 2^bit_num */
     Serial.printf("Output frequency: %d\n", freq);
     ledcSetup(MCLK_CH, freq, PWM_BIT);
     ledcAttachPin(OUTPUT_PIN, MCLK_CH);
