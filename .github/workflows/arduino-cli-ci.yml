@@ -180,7 +180,10 @@ jobs:
     - name: Install core
       run: |
         arduino-cli core update-index --additional-urls ${{ matrix.board.urls }}
-        arduino-cli core install ${{ matrix.board.core }} --additional-urls ${{ matrix.board.urls }}
+        for i in 1 2 3; do
+          arduino-cli core install ${{ matrix.board.core }} --additional-urls ${{ matrix.board.urls }} \
+            && break || sleep 20
+        done
 
     - name: Install libraries
       run: |
