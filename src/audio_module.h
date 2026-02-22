@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Marcel Licence
+ * Copyright (c) 2025 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,6 +56,9 @@
 void Audio_Setup(void);
 void Audio_Output(const float *left, const float *right);
 void Audio_OutputMono(const int32_t *samples);
+void Audio_Output(const int32_t *samples);
+void Audio_Output(const int16_t *samples);
+void Audio_Output(const Q1_14 *samples);
 void Audio_Output(const int16_t *left, const int16_t *right);
 void Audio_Output(const Q1_14 *left, const Q1_14 *right);
 void Audio_Input(float *left, float *right);
@@ -110,12 +113,8 @@ extern "C" {
 #include "DaisyDuino.h" /* requires the DaisyDuino library: https://github.com/electro-smith/DaisyDuino */
 #endif
 
-#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
-#include <I2S.h>
-
 #ifdef RP2040_AUDIO_PWM
 #include "RP2040_AudioPwm.h"
-
 #ifndef RP2040_AUDIO_PWM_PIN
 #define RP2040_AUDIO_PWM_PIN 0
 #endif
@@ -124,6 +123,8 @@ uint32_t WavPwmDataBuff[SAMPLE_BUFFER_SIZE];
 uint32_t WavPwmDataBuff2[SAMPLE_BUFFER_SIZE];
 #endif
 
+#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
+#include <I2S.h>
 #endif
 
 
@@ -137,6 +138,14 @@ I2S i2s(OUTPUT);
 #endif /* #endif RP2350_USE_I2S_ML_LIB */
 #endif
 
+#ifndef PICO_AUDIO_I2S_DATA_PIN
+#define PICO_AUDIO_I2S_DATA_PIN 26
+#endif
+
+#ifndef PICO_AUDIO_I2S_CLOCK_PIN_BASE
+#define PICO_AUDIO_I2S_CLOCK_PIN_BASE 27
+#endif
+
 #ifndef I2S_OVERSAMPLE
 #define I2S_OVERSAMPLE 1
 #endif
@@ -144,10 +153,12 @@ I2S i2s(OUTPUT);
 #ifdef OUTPUT_SAW_TEST
 static float saw_left[SAMPLE_BUFFER_SIZE];
 static float saw_right[SAMPLE_BUFFER_SIZE];
+static int32_t saw_i32[SAMPLE_BUFFER_SIZE];
 #endif
 #ifdef OUTPUT_SINE_TEST
 static float sin_left[SAMPLE_BUFFER_SIZE];
 static float sin_right[SAMPLE_BUFFER_SIZE];
+static int32_t sine_i32[SAMPLE_BUFFER_SIZE];
 #endif
 
 void Audio_Setup(void)
@@ -163,13 +174,19 @@ void Audio_Setup(void)
      */
     for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
     {
-        saw_left[i] = ((float)i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
-        saw_right[i] = ((float)i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
-        saw_left[i] -= 1.0f;
-        saw_right[i] -= 1.0f;
+        float saw = ((float)i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
+        saw -= 1.0f;
+        saw_left[i] = saw;
+        saw_right[i] = saw;
+        saw *= 1073741824;
+        saw_i32[i] = saw;
     }
 #endif
 #ifdef OUTPUT_SINE_TEST
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
+    /* it seems the device gets stuck and never boots */
+#error Audio output test waveform sine not supported!
+#endif
     /*
      * create sinewave with f and 2*f
      */
@@ -178,11 +195,13 @@ void Audio_Setup(void)
         float w = i;
         w *= 1.0f / ((float)SAMPLE_BUFFER_SIZE);
         w *= 2.0f * M_PI;
-        sin_left[i] = sin(w);
+        float sine = sin(w);
+        sin_left[i] = sine;
         sin_right[i] = sin(w * 2.0f);
+        sine *= 1073741824;
+        sine_i32[i] = sine;
     }
 #endif
-
 
 #ifdef ESP32_AUDIO_KIT
 #ifdef ES8388_ENABLED
@@ -228,7 +247,11 @@ void Audio_Setup(void)
         while (1); // do nothing
     }
 #else /* #ifndef RP2350_USE_I2S_ML_LIB */
-    rp2350_i2s_init(26, 27);
+    rp2350_i2s_init(PICO_AUDIO_I2S_DATA_PIN, PICO_AUDIO_I2S_CLOCK_PIN_BASE);
+    Serial.printf("rp2350_i2s_init\n");
+    Serial.printf("\tclock_pin_base: %u (->BCK)\n", PICO_AUDIO_I2S_DATA_PIN);
+    Serial.printf("\tdata_pin: %u (-> DIN) \n", PICO_AUDIO_I2S_CLOCK_PIN_BASE);
+    Serial.printf("\tWCLK/LCK: %u\n", PICO_AUDIO_I2S_CLOCK_PIN_BASE + 1);
 #endif /* #endif RP2350_USE_I2S_ML_LIB */
 #endif
 
@@ -237,24 +260,29 @@ void Audio_Setup(void)
     AudioMemory(4);
 #endif
 
-#ifdef ARDUINO_SEEED_XIAO_M0
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
     SAMD21_Synth_Init();
     pinMode(DAC0, OUTPUT);
 #endif
 
-#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
 #ifdef RP2040_AUDIO_PWM
     uint8_t pwmPinNumber = RP2040_AUDIO_PWM_PIN;
     Serial.printf("Initialize pwm audio used without DAC pin %d + pin %d:\n", pwmPinNumber, pwmPinNumber + 1);
     Serial.printf("    sample rate: %d\n", SAMPLE_RATE);
     Serial.printf("    buffer size: %d\n", SAMPLE_BUFFER_SIZE);
     RP2040_Audio_Pwm_Init(pwmPinNumber, SAMPLE_RATE, WavPwmDataBuff, WavPwmDataBuff2, SAMPLE_BUFFER_SIZE);
+#endif
+
+#if 0
+#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
+#ifdef RP2040_AUDIO_PWM
 #else
     if (!I2S.begin(SAMPLE_RATE))
     {
         Serial.println("Failed to initialize I2S!");
         while (1); // do nothing
     }
+#endif
 #endif
 #endif
 
@@ -286,9 +314,12 @@ static int16_t *queueTransmitBuffer2;
 
 void Teensy_Setup()
 {
-#ifdef LED_PIN
-    pinMode(ledPin, OUTPUT);
-#endif
+    Serial.printf("Teensy Setup\n");
+    Serial.printf("BCLK1: 21 -> connect to BCLK\n");
+    Serial.printf("LRCLK1: 20 -> connect to WCLK/LRCLK\n");
+    Serial.printf("OUT1A: 7 -> connect to DIN\n");
+    Serial.printf("IN1: 8 (optional connect to DOUT)\n");
+
     Midi_Setup();
 }
 
@@ -327,7 +358,7 @@ void DaisySeed_Setup(void)
 }
 #endif /* ARDUINO_DAISY_SEED */
 
-#ifdef ARDUINO_SEEED_XIAO_M0
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
 
 static int32_t u32buf[SAMPLE_BUFFER_SIZE];
 
@@ -348,9 +379,9 @@ void ProcessAudio(uint16_t *buff, size_t len)
         var >>= 16;
         union ts varU;
         varU.i16 = var;
-        varU.u16 /= 64;
+        varU.u16 /= 32;
         varU.u16 += 512;
-        buff[i] = varU.u16;;
+        buff[i] = varU.u16;
     }
 }
 
@@ -376,8 +407,30 @@ void Audio_PrintStats()
 #endif
 #endif
 
+void Audio_Output(const Q1_14 *mono)
+{
+    Audio_Output((const int16_t *)mono, (const int16_t *)mono);
+}
+
+void Audio_Output(const int32_t *samples)
+{
+    Audio_OutputMono(samples);
+}
+
+void Audio_Output(const int16_t *samples)
+{
+    Audio_Output((const int16_t *)samples, (const int16_t *)samples);
+}
+
 void Audio_OutputMono(const int32_t *samples)
 {
+#ifdef OUTPUT_SAW_TEST
+    samples = saw_i32;
+#endif
+#ifdef OUTPUT_SINE_TEST
+    samples = sine_i32;
+#endif
+
 #ifdef ESP8266
     for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
     {
@@ -403,7 +456,7 @@ void Audio_OutputMono(const int32_t *samples)
     int16_t mono_u16[SAMPLE_BUFFER_SIZE];
     for (int n = 0; n < SAMPLE_BUFFER_SIZE; n++)
     {
-        mono_u16[n] = samples[n] >> 8;
+        mono_u16[n] = samples[n] >> 16;
     }
     rp2350_i2s_write_stereo_samples_buff(mono_u16, mono_u16, SAMPLE_BUFFER_SIZE);
 #endif /* #endif RP2350_USE_I2S_ML_LIB */
@@ -474,7 +527,7 @@ void Audio_OutputMono(const int32_t *samples)
     dataReady = false;
 #endif /* ARDUINO_DAISY_SEED */
 
-#ifdef ARDUINO_SEEED_XIAO_M0
+#if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCountPre();
 #endif
@@ -500,7 +553,6 @@ void Audio_OutputMono(const int32_t *samples)
     STM32F407G_AudioWriteS16(mono_s16, mono_s16);
 #endif /* ARDUINO_DISCO_F407VGxx */
 
-#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
 #ifdef RP2040_AUDIO_PWM
     union sample
     {
@@ -531,12 +583,19 @@ void Audio_OutputMono(const int32_t *samples)
 
     for (int i = 0; i < SAMPLE_BUFFER_SIZE; i++)
     {
-        uint16_t val = (samples[i] + 0x8000) >> 5; /* 21 with 32 bit input */
+        int32_t val32 = samples[i];
+        val32 >>= 16;
+        uint16_t val = (val32 + 0x8000) >> 5; /* 21 with 32 bit input */
         val += 361;
 
         audioBuff[i].left = val;
         audioBuff[i].right = val;
     }
+#endif
+
+#if 0
+#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
+#ifdef RP2040_AUDIO_PWM
 #else /* RP2040_AUDIO_PWM */
     /*
      * @see https://arduino-pico.readthedocs.io/en/latest/i2s.html
@@ -555,6 +614,7 @@ void Audio_OutputMono(const int32_t *samples)
     }
 #endif /* RP2040_AUDIO_PWM */
 #endif /* ARDUINO_RASPBERRY_PI_PICO, ARDUINO_GENERIC_RP2040 */
+#endif
 
 #ifdef ARDUINO_GENERIC_F407VGTX
     /*
@@ -683,7 +743,6 @@ void Audio_Output(const int16_t *left, const int16_t *right)
     dataReady = false;
 #endif /* ARDUINO_DAISY_SEED */
 
-#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
 #ifdef RP2040_AUDIO_PWM
     union sample
     {
@@ -724,6 +783,11 @@ void Audio_Output(const int16_t *left, const int16_t *right)
         val += 361;
         audioBuff[i].right = val;
     }
+#endif
+
+#if 0
+#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
+#ifdef RP2040_AUDIO_PWM
 #else /* RP2040_AUDIO_PWM */
     /*
      * @see https://arduino-pico.readthedocs.io/en/latest/i2s.html
@@ -742,9 +806,32 @@ void Audio_Output(const int16_t *left, const int16_t *right)
     }
 #endif /* RP2040_AUDIO_PWM */
 #endif /* ARDUINO_RASPBERRY_PI_PICO, ARDUINO_GENERIC_RP2040 */
+#endif
 
 #ifdef PICO_AUDIO_I2S
+#ifndef RP2350_USE_I2S_ML_LIB
+    while (i2s.availableForWrite() == false)
+    {
+
+    }
+    union
+    {
+        uint32_t u32;
+        struct
+        {
+            int16_t l;
+            int16_t r;
+        };
+    } bf[SAMPLE_BUFFER_SIZE];
+    for (int n = 0; n < SAMPLE_BUFFER_SIZE; n++)
+    {
+        bf[n].l = left[n];
+        bf[n].r = right[n];
+    }
+    i2s.write((const uint8_t *)bf, SAMPLE_BUFFER_SIZE * 4);
+#else
     rp2350_i2s_write_stereo_samples_buff(left, right, SAMPLE_BUFFER_SIZE);
+#endif
 #endif /* PICO_AUDIO_I2S */
 }
 #endif

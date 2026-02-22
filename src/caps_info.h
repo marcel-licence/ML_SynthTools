@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Marcel Licence
+ * Copyright (c) 2025 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,6 +96,10 @@ void CapsPrintInfo(void)
 #endif
 #ifdef SOC_CPU_HAS_FPU
     Serial.printf("Cpu has FPU\n");
+#endif
+#if defined(RP2350_PSRAM_CS)
+    Serial.printf("PSRAM Size: %d\n", rp2040.getPSRAMSize());
+    Serial.printf(" total PSRAM heap: %d\navailable PSRAM heap: %d\n", rp2040.getTotalPSRAMHeap(), rp2040.getFreePSRAMHeap());
 #endif
 }
 

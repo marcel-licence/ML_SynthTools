@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Marcel Licence
+ * Copyright (c) 2025 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@
 #define __WAV_PWM_AUDIO_H
 
 
-#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
+#if defined(ARDUINO_ARCH_RP2040)
 /* ignore */
 #else
 #error not supported by this platform!

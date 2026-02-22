@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Marcel Licence
+ * Copyright (c) 2025 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@
  */
 
 
-#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
+#if (defined ARDUINO_ARCH_RP2040)
 
 
 #include "RP2040_AudioPwm.h"
@@ -193,4 +193,4 @@ static void RP2040_Audio_Pwm_Start_Audio(uint32_t *audio_buffer_a, uint32_t *aud
     }
 }
 
-#endif /* #if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040) */
+#endif /* #if (defined ARDUINO_ARCH_RP2040) */

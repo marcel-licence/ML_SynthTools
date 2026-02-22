@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Marcel Licence
+ * Copyright (c) 2025 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,8 +49,14 @@
 #ifdef ES8388_ENABLED
 
 
-void ES8388_Setup();
+void ES8388_Setup(void);
 void ES8388_SetIn2OoutVOL(uint8_t unused, float vol);
+void ES8388_SetDACVOL(float vol);
+void ES8388_SetDACVOL(uint8_t unused, float vol);
+void ES8388_SetOUT1VOL(float vol);
+void ES8388_SetOUT1VOL(uint8_t unused, float vol);
+void ES8388_SetOUT2VOL(float vol);
+void ES8388_SetOUT2VOL(uint8_t unused, float vol);
 
 
 #endif // ES8388_ENABLED
@@ -206,7 +212,7 @@ void ES8388_SetADCVOL(uint8_t unused, float vol)
     ES8388_WriteReg(0x11, volu8); // RADCVOL
 }
 
-void ES8388_SetDACVOL(uint8_t unused, float vol)
+void ES8388_SetDACVOL(float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("DAC Volume /db", (vol - 1) * 97 + 0.5);
@@ -224,6 +230,11 @@ void ES8388_SetDACVOL(uint8_t unused, float vol)
 
     ES8388_WriteReg(0x1A, volu8); // LDACVOL
     ES8388_WriteReg(0x1B, volu8); // RDACVOL
+}
+
+void ES8388_SetDACVOL(uint8_t unused, float vol)
+{
+    ES8388_SetDACVOL(vol);
 }
 
 void ES8388_SetPGAGain(uint8_t unused, float vol)
@@ -349,7 +360,7 @@ void ES8388_SetIn2OoutVOL(uint8_t unused, float vol)
     ES8388_WriteReg(0x2A, (volu8 << 3) + var); // RD2RO, RI2RO, RI2ROVOL
 }
 
-void ES8388_SetOUT1VOL(uint8_t unused, float vol)
+void ES8388_SetOUT1VOL(float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("OUT1VOL /db", (vol - 1) * 31 + 0.5);
@@ -368,7 +379,12 @@ void ES8388_SetOUT1VOL(uint8_t unused, float vol)
     ES8388_WriteReg(0x2F, volu8); // ROUT1VOL
 }
 
-void ES8388_SetOUT2VOL(uint8_t unused, float vol)
+void ES8388_SetOUT1VOL(uint8_t unused, float vol)
+{
+    ES8388_SetOUT1VOL(vol);
+}
+
+void ES8388_SetOUT2VOL(float vol)
 {
 #ifdef STATUS_ENABLED
     Status_ValueChangedInt("OUT2VOL /db", (vol - 1) * 31 + 0.5);
@@ -385,6 +401,11 @@ void ES8388_SetOUT2VOL(uint8_t unused, float vol)
 
     ES8388_WriteReg(0x30, volu8); // LOUT2VOL
     ES8388_WriteReg(0x31, volu8); // ROUT2VOL
+}
+
+void ES8388_SetOUT2VOL(uint8_t unused, float vol)
+{
+    ES8388_SetOUT2VOL(vol);
 }
 
 void ES8388_Setup()
@@ -478,7 +499,9 @@ void ES8388_Setup()
     ES8388_WriteReg(0x1A, 0x00);
     ES8388_WriteReg(0x1B, 0x02);
     /* UnMute DAC */
+#ifdef KEEP_CODEC_MUTED_IN_SETUP
     ES8388_WriteReg(0x19, 0x32);
+#endif
     /*
      * Setup Mixer
      */
@@ -489,8 +512,8 @@ void ES8388_Setup()
     ES8388_WriteReg(0x2A, 0xD0);
 
     /* Set Lout/Rout Volume */
-    ES8388_SetOUT1VOL(0, 1);
-    ES8388_SetOUT2VOL(0, 1);
+    ES8388_SetOUT1VOL(1);
+    ES8388_SetOUT2VOL(1);
 
     /* Power up DEM and STM */
     ES8388_WriteReg(0x02, 0x00);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Marcel Licence
+ * Copyright (c) 2025 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,16 +36,24 @@
  * @brief   This file includes all required header for inline build
  */
 
+#if !defined(ML_SYNTH_INLINE_DECLARATION) && !defined(ML_SYNTH_INLINE_DEFINITION)
+#define ML_SYNTH_INLINE_DECLARATION
+#define ML_SYNTH_INLINE_DEFINITION
+#endif
+
 #include <audio_module.h>
 #include <blink.h>
 #include <es8388.h>
 #include <esp32_audio_kit_module.h>
-#if (defined ESP32) || (defined ESP8266) || (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_ARCH_RP2040)
+#if defined (ESP32) || defined (ESP8266) || defined (ARDUINO_RASPBERRY_PI_PICO) || defined (ARDUINO_ARCH_RP2040)
 #include <fs/fs_access.h>
 #include <fs/fs_common.h>
 #include <fs/fs_esp32.h>
 #include <fs/fs_esp8266.h>
 #include <fs/fs_rp2040.h>
+#endif
+#if defined(TEENSYDUINO)
+#include <fs/fs_teensy.h>
 #endif
 #include <i2s_interface.h>
 #include <i2s_module.h>
