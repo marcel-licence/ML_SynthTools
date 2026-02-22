@@ -94,7 +94,15 @@ jobs:
             - name: esp32:esp32
               source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
               version: 3.0.5
-          sketch-paths: ${{ matrix.sketch-paths }}
+          sketch-paths: |
+            - examples/ml_epiano_example
+            - examples/ml_mod_tracker
+            - examples/ml_synth_basic_example
+            - examples/ml_synth_fm_example
+            - examples/ml_synth_multi_saw_example
+            - examples/ml_synth_organ_example
+            - examples/ml_synth_pwm_osc_example
+            - examples/ml_synth_sampler_example
           libraries: |
               - source-url: https://github.com/marcel-licence/ML_SynthTools.git
                 name: ML_SynthTools
