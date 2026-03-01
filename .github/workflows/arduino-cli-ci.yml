@@ -183,6 +183,73 @@ jobs:
               name: "Generic STM32F4 Series - BlackPill F411CE"
             sketch: 
               name: ml_audio_test
+              
+              
+          - board:
+              name: "Teensy 4.1"
+            sketch: 
+              name: ml_epiano_example
+              
+          - board:
+              name: "Generic STM32H7 Series - Daisy Seed"
+            sketch: 
+              name: ml_epiano_example
+              
+          - board:
+              name: "ESP8266 Dev Module"
+            sketch: 
+              name: ml_epiano_example
+
+          - board:
+              name: "ESP32C3 Dev Module"
+            sketch: 
+              name: ml_epiano_example
+              
+          - board:
+              name: "XIAO_ESP32C3"
+            sketch: 
+              name: ml_epiano_example
+              
+          - board:
+              name: "Seeeduino XIAO (SAMD21)"
+            sketch: 
+              name: ml_epiano_example
+
+          - board:
+              name: "Generic STM32F4 Series - BlackPill F411CE"
+            sketch: 
+              name: ml_epiano_example
+
+              
+          - board:
+              name: "XIAO_ESP32C3"
+            sketch: 
+              name: ml_mod_tracker
+              
+          - board:
+              name: "ESP32C3 Dev Module"
+            sketch: 
+              name: ml_mod_tracker
+              
+          - board:
+              name: "ESP8266 Dev Module"
+            sketch: 
+              name: ml_mod_tracker
+              
+          - board:
+              name: "Seeeduino XIAO (SAMD21)"
+            sketch: 
+              name: ml_mod_tracker
+              
+          - board:
+              name: "Generic STM32H7 Series - Daisy Seed"
+            sketch: 
+              name: ml_mod_tracker
+              
+          - board:
+              name: "Generic STM32F4 Series - BlackPill F411CE"
+            sketch: 
+              name: ml_mod_tracker
 
     steps:
     - uses: actions/checkout@v4
