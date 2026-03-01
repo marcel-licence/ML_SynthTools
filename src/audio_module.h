@@ -249,10 +249,10 @@ void Audio_Setup(void)
 #else /* #ifndef RP2350_USE_I2S_ML_LIB */
     rp2350_i2s_init(PICO_AUDIO_I2S_DATA_PIN, PICO_AUDIO_I2S_CLOCK_PIN_BASE);
     Serial.printf("rp2350_i2s_init\n");
-    Serial.printf("\tclock_pin_base: %u (->BCK)\n", PICO_AUDIO_I2S_DATA_PIN);
-    Serial.printf("\tdata_pin: %u (-> DIN) \n", PICO_AUDIO_I2S_CLOCK_PIN_BASE);
-    Serial.printf("\tWCLK/LCK: %u\n", PICO_AUDIO_I2S_CLOCK_PIN_BASE + 1);
 #endif /* #endif RP2350_USE_I2S_ML_LIB */
+    Serial.printf("\tclock_pin_base: %u (->BCK)\n", PICO_AUDIO_I2S_CLOCK_PIN_BASE);
+    Serial.printf("\tdata_pin: %u (-> DIN) \n", PICO_AUDIO_I2S_DATA_PIN);
+    Serial.printf("\tWCLK/LCK: %u\n", PICO_AUDIO_I2S_CLOCK_PIN_BASE + 1);
 #endif
 
 
@@ -268,9 +268,13 @@ void Audio_Setup(void)
 #ifdef RP2040_AUDIO_PWM
     uint8_t pwmPinNumber = RP2040_AUDIO_PWM_PIN;
     Serial.printf("Initialize pwm audio used without DAC pin %d + pin %d:\n", pwmPinNumber, pwmPinNumber + 1);
+    Serial.printf("    F_CPU: %d\n", F_CPU);
     Serial.printf("    sample rate: %d\n", SAMPLE_RATE);
     Serial.printf("    buffer size: %d\n", SAMPLE_BUFFER_SIZE);
-    RP2040_Audio_Pwm_Init(pwmPinNumber, SAMPLE_RATE, WavPwmDataBuff, WavPwmDataBuff2, SAMPLE_BUFFER_SIZE);
+    uint64_t sampleRate_at_125MHz = SAMPLE_RATE;
+    sampleRate_at_125MHz *= 125000000ULL;
+    sampleRate_at_125MHz /= ((uint64_t)F_CPU);
+    RP2040_Audio_Pwm_Init(pwmPinNumber, sampleRate_at_125MHz, WavPwmDataBuff, WavPwmDataBuff2, SAMPLE_BUFFER_SIZE);
 #endif
 
 #if 0
