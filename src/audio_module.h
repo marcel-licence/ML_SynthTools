@@ -151,14 +151,13 @@ I2S i2s(OUTPUT);
 #endif
 
 #ifdef OUTPUT_SAW_TEST
-static float saw_left[SAMPLE_BUFFER_SIZE];
-static float saw_right[SAMPLE_BUFFER_SIZE];
-static int32_t saw_i32[SAMPLE_BUFFER_SIZE];
+static float test_signal_saw_left[SAMPLE_BUFFER_SIZE];
+static float test_signal_saw_right[SAMPLE_BUFFER_SIZE];
+static int32_t test_signal_saw_i32[SAMPLE_BUFFER_SIZE];
 #endif
 #ifdef OUTPUT_SINE_TEST
-static float sin_left[SAMPLE_BUFFER_SIZE];
-static float sin_right[SAMPLE_BUFFER_SIZE];
-static int32_t sine_i32[SAMPLE_BUFFER_SIZE];
+static float test_signal_sin[4][SAMPLE_BUFFER_SIZE];
+static int32_t test_signal_sine_i32[4][SAMPLE_BUFFER_SIZE];
 #endif
 
 void Audio_Setup(void)
@@ -176,10 +175,10 @@ void Audio_Setup(void)
     {
         float saw = ((float)i * 2.0f) / ((float)SAMPLE_BUFFER_SIZE);
         saw -= 1.0f;
-        saw_left[i] = saw;
-        saw_right[i] = saw;
+        test_signal_saw_left[i] = saw;
+        test_signal_saw_right[i] = saw;
         saw *= 1073741824;
-        saw_i32[i] = saw;
+        test_signal_saw_i32[i] = saw;
     }
 #endif
 #ifdef OUTPUT_SINE_TEST
@@ -196,10 +195,13 @@ void Audio_Setup(void)
         w *= 1.0f / ((float)SAMPLE_BUFFER_SIZE);
         w *= 2.0f * M_PI;
         float sine = sin(w);
-        sin_left[i] = sine;
-        sin_right[i] = sin(w * 2.0f);
-        sine *= 1073741824;
-        sine_i32[i] = sine;
+        for (int n = 0; n < 4; n++)
+        {
+            sine = sin(n * w * 2.0f);
+            test_signal_sin[n][i] = sine;
+            sine *= 1073741824;
+            test_signal_sine_i32[n][i] = sine;
+        }
     }
 #endif
 
@@ -389,7 +391,7 @@ void ProcessAudio(uint16_t *buff, size_t len)
     }
 }
 
-#endif
+#endif /* (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0) */
 
 #ifdef AUDIO_PRINT_STATS
 #if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
@@ -429,10 +431,10 @@ void Audio_Output(const int16_t *samples)
 void Audio_OutputMono(const int32_t *samples)
 {
 #ifdef OUTPUT_SAW_TEST
-    samples = saw_i32;
+    samples = (const int32_t *)test_signal_saw_i32;
 #endif
 #ifdef OUTPUT_SINE_TEST
-    samples = sine_i32;
+    samples = (const int32_t *)test_signal_sine_i32;
 #endif
 
 #ifdef ESP8266
@@ -529,7 +531,7 @@ void Audio_OutputMono(const int32_t *samples)
     memcpy(out_temp[1], sig_f, sizeof(out_temp[1]));
 
     dataReady = false;
-#endif /* ARDUINO_DAISY_SEED */
+#endif /* (defined ARDUINO_DAISY_SEED) || (defined STM32H7xx) */
 
 #if (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0)
 #ifdef CYCLE_MODULE_ENABLED
@@ -543,7 +545,7 @@ void Audio_OutputMono(const int32_t *samples)
 #ifdef CYCLE_MODULE_ENABLED
     calcCycleCount();
 #endif
-#endif /* ARDUINO_SEEED_XIAO_M0 */
+#endif /* (defined ARDUINO_SEEED_XIAO_M0) || (defined SEEED_XIAO_M0) */
 
 #ifdef ARDUINO_DISCO_F407VGxx
     int16_t mono_s16[SAMPLE_BUFFER_SIZE];
@@ -866,12 +868,12 @@ void Audio_Input(float *left __attribute__((__unused__)), float *right __attribu
 void Audio_Output(const float *left, const float *right)
 {
 #ifdef OUTPUT_SAW_TEST
-    left = saw_left;
-    right = saw_right;
+    left = (const float *)test_signal_saw_left;
+    right = (const float *)test_signal_saw_right;
 #endif
 #ifdef OUTPUT_SINE_TEST
-    left = sin_left;
-    right = sin_right;
+    left = (const float *)test_signal_sin[0];
+    right = (const float *)test_signal_sin[1];
 #endif
 
 #ifdef ESP32
