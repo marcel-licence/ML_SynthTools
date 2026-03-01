@@ -15,9 +15,6 @@ on:
 
 jobs:
   build:
-    if: github.event_name != 'workflow_dispatch' ||
-        github.event.inputs.build_all == 'true' ||
-        matrix.sketch.manual_only == false
     name: Build ${{ matrix.board.name }} - ${{ matrix.sketch.name }}
     runs-on: ubuntu-latest
 
