@@ -26,10 +26,10 @@ jobs:
             manual_only: false
           - name: ml_midi_monitor
             manual_only: false
-          - name: ml_epiano_example
-            manual_only: true
-          - name: ml_mod_tracker
-            manual_only: true
+          # - name: ml_epiano_example
+          #   manual_only: true
+          # - name: ml_mod_tracker
+          #   manual_only: true
 
         board:
 
