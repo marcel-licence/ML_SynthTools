@@ -1,0 +1,50 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # ----------------------------
+    # Cppcheck
+    # ----------------------------
+    - name: Install cppcheck
+      run: sudo apt-get install -y cppcheck
+
+    - name: Run cppcheck
+      run: |
+        cppcheck \
+          --enable=all \
+          --inconclusive \
+          --error-exitcode=1 \
+          --suppress=missingIncludeSystem \
+          src
+
+    # ----------------------------
+    # Clang Format Check
+    # ----------------------------
+    - name: Install clang-format
+      run: sudo apt-get install -y clang-format
+
+    - name: Check formatting
+      run: |
+        find . -name "*.cpp" -o -name "*.h" | \
+        xargs clang-format -n --Werror
+
+    # ----------------------------
+    # Basic Clang Static Analyzer
+    # ----------------------------
+    - name: Install clang
+      run: sudo apt-get install -y clang
+
+    - name: Run clang analyzer
+      run: |
+        find src -name "*.cpp" | \
+        xargs -I{} clang++ -std=c++17 -fsyntax-only {}
