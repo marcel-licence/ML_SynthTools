@@ -249,8 +249,13 @@ void Audio_Setup(void)
         while (1); // do nothing
     }
 #else /* #ifndef RP2350_USE_I2S_ML_LIB */
-    rp2350_i2s_init(PICO_AUDIO_I2S_DATA_PIN, PICO_AUDIO_I2S_CLOCK_PIN_BASE);
-    Serial.printf("rp2350_i2s_init\n");
+    {
+        int data_pin = PICO_AUDIO_I2S_DATA_PIN;
+        int clock_pin_base = PICO_AUDIO_I2S_CLOCK_PIN_BASE;
+        rp2350_i2s_init(data_pin, clock_pin_base);
+        Serial.printf("rp2350_i2s_init\n\tdata_pin: %d\n\tclock_pin_base: %d\n\twclk_pin: %d\n", data_pin, clock_pin_base, clock_pin_base + 1);
+        /* for some strange reason the rp2350 audio does not work when removing the printf statement */
+    }
 #endif /* #endif RP2350_USE_I2S_ML_LIB */
     Serial.printf("\tclock_pin_base: %u (->BCK)\n", PICO_AUDIO_I2S_CLOCK_PIN_BASE);
     Serial.printf("\tdata_pin: %u (-> DIN) \n", PICO_AUDIO_I2S_DATA_PIN);
