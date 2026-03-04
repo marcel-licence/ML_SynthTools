@@ -179,9 +179,36 @@ void FS_Setup(void)
     }
 }
 
-bool FS_OpenFile(int fs, const char *filename, const char *mode)
+bool FS_OpenFile(fs_id_t id, const char *filename, const char *mode)
 {
-    f = SD.open(filename, mode);
+    uint8_t fs_mode = FILE_READ;
+
+    if (strcmp(mode, "rw") == 0)
+    {
+        fs_mode = FILE_WRITE;
+    }
+
+    if (strcmp(mode, "w") == 0)
+    {
+        fs_mode = FILE_WRITE;
+    }
+
+    f = SD.open(filename, fs_mode);
+    if (f)
+    {
+        g_file = &f;
+        return true;
+    }
+    else
+    {
+        Serial.printf("Error opening file: %s\n", filename);
+        return false;
+    }
+}
+
+bool FS_OpenFile(fs_id_t id, const char *filename)
+{
+    f = SD.open(filename);
     if (f)
     {
         g_file = &f;
