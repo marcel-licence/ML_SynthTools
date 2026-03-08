@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Marcel Licence
+ * Copyright (c) 2026 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,13 +60,11 @@ void Blink_Process(void);
 #ifdef BLINK_LED_PIN
 
 
-inline
 void Blink_Setup(void)
 {
     pinMode(BLINK_LED_PIN, OUTPUT);
 }
 
-inline
 void Blink_Process(void)
 {
     static bool ledOn = true;
