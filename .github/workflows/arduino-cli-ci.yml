@@ -282,10 +282,14 @@ jobs:
       run: |
         mkdir -p ~/Arduino/libraries
 
-        git clone --depth 1 https://github.com/marcel-licence/ML_SynthTools.git \
+        git clone --depth 1 --branch "$REF" https://github.com/marcel-licence/ML_SynthTools.git \
+          ~/Arduino/libraries/ML_SynthTools \
+          || git clone --depth 1 https://github.com/marcel-licence/ML_SynthTools.git \
           ~/Arduino/libraries/ML_SynthTools
 
-        git clone --depth 1 https://github.com/marcel-licence/ML_SynthTools_Lib.git \
+        git clone --depth 1 --branch "$REF" https://github.com/marcel-licence/ML_SynthTools_Lib.git \
+          ~/Arduino/libraries/ML_SynthTools_Lib \
+          || git clone --depth 1 https://github.com/marcel-licence/ML_SynthTools_Lib.git \
           ~/Arduino/libraries/ML_SynthTools_Lib
 
     - name: Compile Sketch
