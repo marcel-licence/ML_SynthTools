@@ -523,7 +523,7 @@ void Midi_Setup()
     Serial.printf("Setup Serial1 with %d baud with rx: %s%d only\n", MIDI_SERIAL1_BAUDRATE, PIN_CAPTION, MIDI_RX1_PIN);
     Serial1.begin(MIDI_SERIAL1_BAUDRATE, SERIAL_8N1, MIDI_RX1_PIN);
 #endif
-    pinMode(MIDI_RX1_PIN, INPUT_PULLUP); /* can be connected to open collector output */
+    // pinMode(MIDI_RX1_PIN, INPUT_PULLUP); /* can be connected to open collector output */
 #else
 #ifdef TEENSYDUINO
     Serial.printf("Setup Serial1 with %d baud with rx: RX1 pin (PIN 0)\n", MIDI_SERIAL1_BAUDRATE);
@@ -573,7 +573,7 @@ void Midi_Setup()
 #endif
 #endif  /* MIDI_TX2_PIN */
 #if (!defined ARDUINO_RASPBERRY_PI_PICO) && (!defined ARDUINO_GENERIC_RP2040)
-    pinMode(MIDI_RX2_PIN, INPUT_PULLUP); /* can be connected to open collector output */
+    // pinMode(MIDI_RX2_PIN, INPUT_PULLUP); /* can be connected to open collector output */
 #endif
 #else /* MIDI_TX2_PIN */
     Serial.printf("Setup Serial2 with %d baud with rx: RX2 pin\n", MIDI_SERIAL2_BAUDRATE);
