@@ -61,12 +61,13 @@ enum fileLoadStatus
 };
 
 
-enum fileLoadStatus LoadFileFromIdx(int fileIdx);
+static enum fileLoadStatus LoadFileFromIdx(int fileIdx);
 
 
 static uint8_t g_fileIdx = 0;
 static uint8_t g_totalFilesFound = 0;
-static bool auto_reload = true;
+static bool g_auto_reload = true;
+static bool g_is_first_loaded_file = true;
 
 
 void TrackSelector_Setup(const char *filter)
@@ -76,6 +77,8 @@ void TrackSelector_Setup(const char *filter)
     FS_Setup();
 
     g_totalFilesFound = getFileCount(s_filter);
+    g_is_first_loaded_file = true;
+
     TrackSelector_DebugPrintf("Found %u %s files\n", g_totalFilesFound, s_filter);
 }
 
@@ -92,13 +95,13 @@ void TrackSelector_Autostart(void)
 
 void TrackSelector_Process(void)
 {
-    if (auto_reload == true)
+    if (g_auto_reload)
     {
         TrackSelector_Autostart();
     }
 }
 
-enum fileLoadStatus LoadFileFromIdx(int fileIdx)
+static enum fileLoadStatus LoadFileFromIdx(int fileIdx)
 {
     TrackSelector_DebugPrintf("LoadFileFromIdx(%d)\n", fileIdx);
 
@@ -170,7 +173,14 @@ void TrackSelector_LoadFileNext(void)
 
         do
         {
-            g_fileIdx = (g_fileIdx + 1) % g_totalFilesFound;
+            if (!g_is_first_loaded_file)
+            {
+                g_fileIdx = (g_fileIdx + 1) % g_totalFilesFound;
+            }
+            else
+            {
+                g_is_first_loaded_file = false;
+            }
         }
         while (LoadFileFromIdx(g_fileIdx) != fls_ok && g_fileIdx != startIdx);
     }
@@ -184,7 +194,14 @@ void TrackSelector_LoadFilePrev(void)
 
         do
         {
-            g_fileIdx = (g_fileIdx == 0) ? (g_totalFilesFound - 1) : (g_fileIdx - 1);
+            if (!g_is_first_loaded_file)
+            {
+                g_fileIdx = (g_fileIdx == 0) ? (g_totalFilesFound - 1) : (g_fileIdx - 1);
+            }
+            else
+            {
+                g_is_first_loaded_file = false;
+            }
         }
         while (LoadFileFromIdx(g_fileIdx) != fls_ok && g_fileIdx != startIdx);
     }
