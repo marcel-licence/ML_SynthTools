@@ -82,10 +82,10 @@ void TrackSelector_Setup(const char *filter)
     TrackSelector_DebugPrintf("Found %u %s files\n", g_totalFilesFound, s_filter);
 }
 
-void TrackSelector_LoadFirst(void)
+bool TrackSelector_LoadFirst(void)
 {
     g_fileIdx = 0;
-    LoadFileFromIdx(g_fileIdx);
+    return LoadFileFromIdx(g_fileIdx);
 }
 
 void TrackSelector_Autostart(void)
@@ -151,21 +151,27 @@ static enum fileLoadStatus LoadFileFromIdx(int fileIdx)
     return fls_open_error;
 }
 
-void TrackSelector_LoadFirstFile(void)
+bool TrackSelector_LoadFirstFile(void)
 {
     if (g_totalFilesFound > 0)
     {
         g_fileIdx = 0;
         uint8_t startIdx = g_fileIdx;
 
-        while (LoadFileFromIdx((g_fileIdx) != fls_ok) && (g_fileIdx != startIdx))
+        while (LoadFileFromIdx(g_fileIdx) != fls_ok)
         {
             g_fileIdx = (g_fileIdx + 1) % g_totalFilesFound;
+            if (g_fileIdx == startIdx)
+            {
+                return false;
+            }
         }
+        return true;
     }
+    return false;
 }
 
-void TrackSelector_LoadFileNext(void)
+bool TrackSelector_LoadFileNext(void)
 {
     if (g_totalFilesFound > 0)
     {
@@ -182,11 +188,21 @@ void TrackSelector_LoadFileNext(void)
                 g_is_first_loaded_file = false;
             }
         }
-        while (LoadFileFromIdx(g_fileIdx) != fls_ok && g_fileIdx != startIdx);
+        while ((LoadFileFromIdx(g_fileIdx) != fls_ok) && (g_fileIdx != startIdx));
+
+        if (g_fileIdx == startIdx)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
+    return false;
 }
 
-void TrackSelector_LoadFilePrev(void)
+bool TrackSelector_LoadFilePrev(void)
 {
     if (g_totalFilesFound > 0)
     {
@@ -203,8 +219,18 @@ void TrackSelector_LoadFilePrev(void)
                 g_is_first_loaded_file = false;
             }
         }
-        while (LoadFileFromIdx(g_fileIdx) != fls_ok && g_fileIdx != startIdx);
+        while ((LoadFileFromIdx(g_fileIdx) != fls_ok) && (g_fileIdx != startIdx));
+
+        if (g_fileIdx == startIdx)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
+    return false;
 }
 
 __attribute__((weak))
