@@ -42,12 +42,12 @@
 
 
 void TrackSelector_Setup(const char *filter);
-void TrackSelector_LoadFirst(void);
+bool TrackSelector_LoadFirst(void);
 void TrackSelector_Autostart(void);
 void TrackSelector_Process(void);
-void TrackSelector_LoadFirstFile(void);
-void TrackSelector_LoadFileNext(void);
-void TrackSelector_LoadFilePrev(void);
+bool TrackSelector_LoadFirstFile(void);
+bool TrackSelector_LoadFileNext(void);
+bool TrackSelector_LoadFilePrev(void);
 
 bool TrackSelector_LoadTrack(const char *filename);
 void TrackSelector_DebugPrintf(const char *fmt, ...); /* implement this function to get debug output */
