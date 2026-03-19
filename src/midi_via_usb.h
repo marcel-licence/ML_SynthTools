@@ -63,7 +63,7 @@ void UsbMidiLoop();
 #endif
 
 
-extern char shortName[]; /*!< used as MIDI device name */
+extern const char shortName[]; /*!< used as MIDI device name */
 
 
 #endif /* ML_SYNTH_INLINE_DECLARATION */
