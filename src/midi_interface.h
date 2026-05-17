@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Marcel Licence
+ * Copyright (c) 2026 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ struct midiMapLookUpEntry
 
 struct midiMapping_s
 {
-    void (*rawMsg)(uint8_t *msg);
+    void (*rawMsg)(const uint8_t *msg, uint8_t len);
 #ifdef MIDI_FMT_INT
     void (*noteOn)(uint8_t ch, uint8_t note, uint8_t vel);
     void (*noteOff)(uint8_t ch, uint8_t note);
@@ -146,6 +146,7 @@ void Midi_SendMessage(uint8_t *msg, int len);
 #ifdef MIDI_TX2_PIN
 void Midi_SendShortMessage(uint8_t *msg);
 void Midi_SendRaw(uint8_t *msg);
+void Midi_SendRaw(const uint8_t *msg, uint8_t len);
 #endif /* MIDI_TX2_PIN */
 #endif
 #endif
@@ -191,7 +192,7 @@ void Midi_SendRaw(uint8_t *msg);
 #define MIDI_PORT2_ACTIVE
 #endif
 
-#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040)
+#if (defined ARDUINO_RASPBERRY_PI_PICO) || (defined ARDUINO_GENERIC_RP2040) || (defined ARDUINO_ARCH_RP2040)
 #define PIN_CAPTION "GP"
 #elif (defined ESP32)
 #define PIN_CAPTION "IO"
@@ -660,7 +661,7 @@ void Midi_CheckMidiPort(struct midi_port_s *port, uint8_t cable)
             Midi_HandleShortMsg(port->inMsg, cable);
             if (midiMapping.rawMsg != NULL)
             {
-                midiMapping.rawMsg(port->inMsg);
+                midiMapping.rawMsg(port->inMsg, port->inMsgIndex);
             }
             port->inMsgIndex = 0;
         }
@@ -715,6 +716,14 @@ void Midi_SendMessage(uint8_t *msg, int len)
     MidiPort2.serial->write(msg, len);
 }
 
+void Midi_SendRaw(const uint8_t *msg, uint8_t len)
+{
+    MidiPort2.serial->write(msg, len);
+#ifdef MIDI_TX1_PIN
+    MidiPort1.serial->write(msg, len);
+#endif
+}
+
 void Midi_SendRaw(uint8_t *msg)
 {
     /* sysex */
@@ -726,22 +735,37 @@ void Midi_SendRaw(uint8_t *msg)
             i++;
         }
         MidiPort2.serial->write(msg, i + 1);
+#ifdef MIDI_TX1_PIN
+        MidiPort1.serial->write(msg, i + 1);
+#endif
     }
     else if ((msg[0] & 0xF0) == 0xC0)
     {
         MidiPort2.serial->write(msg, 2);
+#ifdef MIDI_TX1_PIN
+        MidiPort1.serial->write(msg, 2);
+#endif
     }
     else if ((msg[0] & 0xF0) == 0xD0)
     {
         MidiPort2.serial->write(msg, 2);
+#ifdef MIDI_TX1_PIN
+        MidiPort1.serial->write(msg, 2);
+#endif
     }
     else if ((msg[0] & 0xF0) == 0xF0)
     {
         MidiPort2.serial->write(msg, 1);
+#ifdef MIDI_TX1_PIN
+        MidiPort1.serial->write(msg, 1);
+#endif
     }
     else
     {
         MidiPort2.serial->write(msg, 3);
+#ifdef MIDI_TX1_PIN
+        MidiPort1.serial->write(msg, 3);
+#endif
     }
 }
 #else /* MIDI_TX2_PIN */
@@ -763,22 +787,37 @@ void Midi_SendRaw(uint8_t *msg)
             i++;
         }
         MidiPort1.serial->write(msg, i + 1);
+#ifdef MIDI_TX2_PIN
+        MidiPort2.serial->write(msg, i + 1);
+#endif
     }
     else if ((msg[0] & 0xF0) == 0xC0)
     {
         MidiPort1.serial->write(msg, 2);
+#ifdef MIDI_TX2_PIN
+        MidiPort2.serial->write(msg, 2);
+#endif
     }
     else if ((msg[0] & 0xF0) == 0xD0)
     {
         MidiPort1.serial->write(msg, 2);
+#ifdef MIDI_TX2_PIN
+        MidiPort2.serial->write(msg, 2);
+#endif
     }
     else if ((msg[0] & 0xF0) == 0xF0)
     {
         MidiPort1.serial->write(msg, 1);
+#ifdef MIDI_TX2_PIN
+        MidiPort2.serial->write(msg, 1);
+#endif
     }
     else
     {
         MidiPort1.serial->write(msg, 3);
+#ifdef MIDI_TX2_PIN
+        MidiPort2.serial->write(msg, 3);
+#endif
     }
 }
 #endif /* MIDI_TX1_PIN */
