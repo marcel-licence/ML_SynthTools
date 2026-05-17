@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Marcel Licence
+ * Copyright (c) 2026 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@
 #ifdef MIDI_USB_ENABLED
 void Midi_Usb_Setup();
 void Midi_Usb_Loop();
+void Midi_Usb_SetMidiMap(struct midiMapping_s *map);
 
 
 #ifdef TEENSYDUINO // CORE_TEENSY
@@ -86,34 +87,103 @@ Adafruit_USBD_MIDI usb_midi; /* create instance */
 MIDI_CREATE_INSTANCE(Adafruit_USBD_MIDI, usb_midi, MIDI);
 
 
+struct midiMapping_s *midi_map = &midiMapping;
+
+void Midi_Usb_SetMidiMap(struct midiMapping_s *map)
+{
+    midi_map = map;
+}
+
 void Midi_Usb_Setup()
 {
 #if defined(ARDUINO_ARCH_MBED) && defined(ARDUINO_ARCH_RP2040)
     /* Manual begin() is required on core without built-in support for TinyUSB such as mbed rp2040 */
-    TinyUSB_Device_Init(0);
+    if (!TinyUSBDevice.isInitialized())
+    {
+        TinyUSBDevice.begin(0);
+    }
 #endif
 
     usb_midi.setStringDescriptor(shortName);
 
     MIDI.begin(MIDI_CHANNEL_OMNI);
 
+    if (TinyUSBDevice.mounted())
+    {
+        TinyUSBDevice.detach();
+        delay(10);
+        TinyUSBDevice.attach();
+    }
+
+    MIDI.setHandleMessage([](const midi::Message<128> &msg)
+    {
+        if (!midi_map || !midi_map->rawMsg)
+        {
+            return;
+        }
+
+        if (msg.type == midi::SystemExclusive)
+        {
+            const uint16_t size = msg.getSysExSize();
+            midi_map->rawMsg(msg.sysexArray, size);
+            return;
+        }
+
+        uint8_t bytes[3];
+        uint8_t len = 0;
+
+        bytes[0] = (uint8_t)msg.type | ((msg.channel - 1) & 0x0F);
+
+        switch (msg.type)
+        {
+        case midi::NoteOff:
+        case midi::NoteOn:
+        case midi::ControlChange:
+        case midi::PitchBend:
+        case midi::AfterTouchPoly:
+            {
+                bytes[1] = msg.data1;
+                bytes[2] = msg.data2;
+                len = 3;
+                break;
+            }
+
+        case midi::ProgramChange:
+        case midi::AfterTouchChannel:
+            {
+                bytes[1] = msg.data1;
+                len = 2;
+                break;
+            }
+
+        default:
+            {
+                bytes[0] = (uint8_t)msg.type;
+                len = 1;
+                break;
+            }
+        }
+
+        midi_map->rawMsg(bytes, len);
+    });
+
     MIDI.setHandleNoteOn([](byte channel, byte note, byte velocity)
     {
         channel -= 1;
 
-        if (midiMapping.noteOn != NULL)
+        if (midi_map->noteOn != NULL)
         {
 #ifdef MIDI_FMT_INT
-            midiMapping.noteOn(channel, note, velocity);
+            midi_map->noteOn(channel, note, velocity);
 #else
-            midiMapping.noteOn(channel, note, pow(2, ((velocity * NORM127MUL) - 1.0f) * 6));
+            midi_map->noteOn(channel, note, pow(2, ((velocity * NORM127MUL) - 1.0f) * 6));
 #endif
         }
 
 #ifdef LED_BLE_STATUS_PIN
         digitalWrite(LED_BLE_STATUS_PIN, LOW);
 #endif
-#ifdef MIDI_BLE_DEBUG_ENABLED
+#ifdef MIDI_USB_DEBUG_ENABLED
         Serial.print("NoteOn(rx): CH: ");
         Serial.print(channel);
         Serial.print(" | ");
@@ -126,15 +196,15 @@ void Midi_Usb_Setup()
     {
         channel -= 1;
 
-        if (midiMapping.noteOff != NULL)
+        if (midi_map->noteOff != NULL)
         {
-            midiMapping.noteOff(channel, note);
+            midi_map->noteOff(channel, note);
         }
 
 #ifdef LED_BLE_STATUS_PIN
         digitalWrite(LED_BLE_STATUS_PIN, HIGH);
 #endif
-#ifdef MIDI_BLE_DEBUG_ENABLED
+#ifdef MIDI_USB_DEBUG_ENABLED
         Serial.print("NoteOff(rx): CH: ");
         Serial.print(channel);
         Serial.print(" | ");
@@ -152,17 +222,17 @@ void Midi_Usb_Setup()
 
         if (number == 1)
         {
-            if (midiMapping.modWheel != NULL)
+            if (midi_map->modWheel != NULL)
             {
 #ifdef MIDI_FMT_INT
-                midiMapping.modWheel(channel, value);
+                midi_map->modWheel(channel, value);
 #else
-                midiMapping.modWheel(channel, (float)value * NORM127MUL);
+                midi_map->modWheel(channel, (float)value * NORM127MUL);
 #endif
             }
         }
 
-#ifdef MIDI_BLE_DEBUG_ENABLED
+#ifdef MIDI_USB_DEBUG_ENABLED
         Serial.print("ControlChange(rx): CH: ");
         Serial.print(channel);
         Serial.print(" | number: ");
@@ -184,9 +254,9 @@ void Midi_Usb_Setup()
         bender.bendI += 8192;
 
         float value = ((float)bender.bendU - 8192.0f) * (1.0f / 8192.0f);
-        if (midiMapping.pitchBend != NULL)
+        if (midi_map->pitchBend != NULL)
         {
-            midiMapping.pitchBend(channel, value);
+            midi_map->pitchBend(channel, value);
         }
         Serial.print("PitchBend(rx): CH: ");
         Serial.print(channel);
@@ -200,8 +270,11 @@ void Midi_Usb_Setup()
         delay(1);
     }
     Serial.printf("mounted!\n");
-}
 
+    Serial.printf("USB VID:PID active\n");
+    Serial.printf("TinyUSB mounted\n");
+}
+// #define MIDI_USB_SEND_TEST_ENABLED
 void Midi_Usb_Loop()
 {
     MIDI.read();
@@ -210,6 +283,7 @@ void Midi_Usb_Loop()
     static unsigned long t0 = millis();
     static uint8_t i = 36; /* low c on 64 key keyboard */
     static bool noteOn = false;
+    static bool isConnected = true;
 
     if (isConnected && (millis() - t0) > 250) /* next step after 250 ms */
     {
