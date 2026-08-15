@@ -50,6 +50,13 @@
 
 #ifdef ML_SYNTH_INLINE_DECLARATION
 
+#define MIDI_STREAM_PLAYER_CTRL_PAUSE 0
+#define MIDI_STREAM_PLAYER_CTRL_STOP    1
+#define MIDI_STREAM_PLAYER_CTRL_PLAY 2
+#define MIDI_STREAM_PLAYER_CTRL_SKIP 3
+#define MIDI_STREAM_PLAYER_CTRL_START 4
+
+
 void MidiStreamPlayer_Init(void);
 void MidiStreamPlayer_PlayFile(char *midi_filename);
 void MidiStreamPlayer_Tick(uint32_t ticks);
@@ -59,6 +66,14 @@ void MidiStreamPlayer_StopPlayback(void);
 void MidiStreamPlayer_StartPlayback(void);
 bool MidiStreamPlayer_IsPlaying(void);
 void MidiStreamPlayer_PlayMidiFile_fromLittleFS(char *filename, uint8_t trackToPlay);
+
+#ifdef MIDI_FMT_INT
+void MidiStreamPlayerCtrl(uint8_t setting, uint8_t value);
+void MidiStreamPlayerTempo(uint8_t unused __attribute__((unused)), uint8_t value);
+#else
+void MidiStreamPlayerCtrl(uint8_t setting, float value);
+void MidiStreamPlayerTempo(uint8_t unused __attribute__((unused)), float value);
+#endif
 
 #endif /* ML_SYNTH_INLINE_DECLARATION */
 
@@ -72,13 +87,6 @@ void MidiStreamPlayer_PlayMidiFile_fromLittleFS(char *filename, uint8_t trackToP
 
 
 #include <ml_midi_file_stream.h>
-
-
-#define MIDI_STREAM_PLAYER_CTRL_PAUSE 0
-#define MIDI_STREAM_PLAYER_CTRL_STOP    1
-#define MIDI_STREAM_PLAYER_CTRL_PLAY 2
-#define MIDI_STREAM_PLAYER_CTRL_SKIP 3
-#define MIDI_STREAM_PLAYER_CTRL_START 4
 
 
 static uint64_t tickCnt = 0;
