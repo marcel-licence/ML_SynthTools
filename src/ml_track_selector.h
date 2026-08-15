@@ -41,7 +41,32 @@
 #define SRC_ML_TRACK_SELECTOR_H_
 
 
+#include <stdint.h>
+#include <stdbool.h>
+
+
+struct trackselector_io
+{
+    uint32_t (*getFileCount)(const char *filter);
+    bool (*getFileNameFromIndex)(uint32_t index, char *filename_buffer, uint32_t buffer_size, const char *filter);
+    bool (*fileExists)(const char *filename);
+    bool (*openFile)(const char *filename);
+    void (*closeFile)(void);
+    int32_t (*readFile)(uint8_t *buffer, uint32_t buffer_size);
+    void (*rewindFile)(void);
+};
+
+struct trackselector_cfg
+{
+    const char *filter;
+    trackselector_io io;
+};
+
+
+[[deprecated("Use TrackSelector_Setup(const struct trackselector_cfg *cfg) instead.")]]
 void TrackSelector_Setup(const char *filter);
+
+void TrackSelector_Setup(const struct trackselector_cfg *cfg);
 bool TrackSelector_LoadFirst(void);
 void TrackSelector_Autostart(void);
 void TrackSelector_Process(void);
