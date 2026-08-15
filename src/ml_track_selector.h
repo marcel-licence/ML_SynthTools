@@ -29,80 +29,28 @@
  */
 
 /**
- * @file blink.ino
+ * @file ml_track_selector.h
  * @author Marcel Licence
- * @date 12.05.2021
+ * @data 08.03.2026
  *
- * @brief this file includes a simple blink task implementation
+ * @brief   Declarations of the track selector module which allows continouus track playback
  */
 
 
-#ifdef __CDT_PARSER__
-#include <cdt.h>
-#endif
+#ifndef SRC_ML_TRACK_SELECTOR_H_
+#define SRC_ML_TRACK_SELECTOR_H_
 
 
-#ifdef ML_SYNTH_INLINE_DECLARATION
-#ifdef BLINK_LED_PIN
+void TrackSelector_Setup(const char *filter);
+bool TrackSelector_LoadFirst(void);
+void TrackSelector_Autostart(void);
+void TrackSelector_Process(void);
+bool TrackSelector_LoadFirstFile(void);
+bool TrackSelector_LoadFileNext(void);
+bool TrackSelector_LoadFilePrev(void);
+
+bool TrackSelector_LoadTrack(const char *filename);
+void TrackSelector_DebugPrintf(const char *fmt, ...); /* implement this function to get debug output */
 
 
-void Blink_Setup(void);
-void Blink_Fast(uint8_t cnt);
-void Blink_Slow(uint8_t cnt);
-void Blink_Process(void);
-
-
-#endif // BLINK_LED_PIN
-#endif // #ifdef ML_SYNTH_INLINE_DECLARATION
-
-
-#ifdef ML_SYNTH_INLINE_DEFINITION
-#ifdef BLINK_LED_PIN
-
-
-void Blink_Setup(void)
-{
-    pinMode(BLINK_LED_PIN, OUTPUT);
-}
-
-void Blink_Process(void)
-{
-    static bool ledOn = true;
-    if (ledOn)
-    {
-        digitalWrite(BLINK_LED_PIN, HIGH); // turn the LED on (HIGH is the voltage level)
-    }
-    else
-    {
-        digitalWrite(BLINK_LED_PIN, LOW); // turn the LED off
-    }
-    ledOn = !ledOn;
-}
-
-void Blink_Fast(uint8_t cnt)
-{
-    delay(500);
-    for (int i = 0; i < cnt; i++)
-    {
-        digitalWrite(BLINK_LED_PIN, HIGH);
-        delay(50);
-        digitalWrite(BLINK_LED_PIN, LOW);
-        delay(200);
-    }
-}
-
-void Blink_Slow(uint8_t cnt)
-{
-    delay(500);
-    for (int i = 0; i < cnt; i++)
-    {
-        digitalWrite(BLINK_LED_PIN, HIGH);
-        delay(200);
-        digitalWrite(BLINK_LED_PIN, LOW);
-        delay(100);
-    }
-}
-
-
-#endif
-#endif // ML_SYNTH_INLINE_DEFINITION
+#endif /* SRC_ML_TRACK_SELECTOR_H_ */
