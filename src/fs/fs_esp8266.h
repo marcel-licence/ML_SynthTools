@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Marcel Licence
+ * Copyright (c) 2026 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,8 +55,45 @@
 
 
 #include <FS.h>
-
 #include <LittleFS.h>
+
+
+/*
+ * definitions
+ */
+#define FILENAME_MAX_LEN    64
+
+/*
+ * static function definitions
+ */
+static void printDirectory(File dir, int numTabs)
+{
+    while (true)
+    {
+
+        File entry = dir.openNextFile();
+        if (! entry)
+        {
+            break;
+        }
+        for (uint8_t i = 0; i < numTabs; i++)
+        {
+            Serial.print('\t');
+        }
+        Serial.print(entry.name());
+        if (entry.isDirectory())
+        {
+            Serial.println("/");
+            printDirectory(entry, numTabs + 1);
+        }
+        else
+        {
+            Serial.print("\t\t");
+            Serial.println(entry.size(), DEC);
+        }
+        entry.close();
+    }
+}
 
 /*
  * extern function definitions
@@ -82,7 +119,8 @@ uint32_t getFileFromIdx(File dir, int numTabs, uint32_t idx, char *filename, cha
             {
                 if (idx == 0)
                 {
-                    strcpy(filename, entry.name());
+                    strncpy(filename, entry.name(), FILENAME_MAX_LEN - 1);
+                    filename[FILENAME_MAX_LEN - 1] = '\0';
                     return idx;
                 }
                 idx -= 1;
@@ -105,18 +143,74 @@ bool getFileFromIdx(uint32_t idx, char *filename, char *filter)
     return result;
 }
 
-void FS_Setup()
+static uint32_t getFileCountRecursive(File dir, char *filter)
 {
+    uint32_t count = 0;
 
+    while (true)
+    {
+        File entry = dir.openNextFile();
+        if (!entry)
+        {
+            break;
+        }
+
+        if (entry.isDirectory())
+        {
+            count += getFileCountRecursive(entry, filter);
+        }
+        else
+        {
+            if (str_ends_with_ul(entry.name(), filter))
+            {
+                count++;
+            }
+        }
+
+        entry.close();
+    }
+
+    return count;
+}
+
+uint32_t getFileCount(char *filter)
+{
+    File dir = LittleFS.open("/", "r");
+    if (!dir)
+    {
+        return 0;
+    }
+
+    uint32_t count = getFileCountRecursive(dir, filter);
+    dir.close();
+    return count;
+}
+
+/*
+ * function definitions
+ */
+void FS_Setup(bool listFiles)
+{
     if (!LittleFS.begin())
     {
         Serial.printf("LittleFS Mount Failed");
         return ;
     }
 
-
     Serial.printf("LittleFS Mount Successful!\n");
 
+    if (listFiles)
+    {
+        Serial.printf("List files ...\n\n");
+        File dir = LittleFS.open("/", "r");
+        printDirectory(dir, 0);
+        dir.close();
+    }
+}
+
+void FS_Setup(void)
+{
+    FS_Setup(true);
 }
 
 

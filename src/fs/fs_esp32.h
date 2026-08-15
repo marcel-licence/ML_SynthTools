@@ -322,6 +322,49 @@ static bool FS_SdCardInit(void)
 }
 #endif
 
+static uint32_t getFileCountRecursive(File dir, char *filter)
+{
+    uint32_t count = 0;
+
+    while (true)
+    {
+        File entry = dir.openNextFile();
+        if (!entry)
+        {
+            break;
+        }
+
+        if (entry.isDirectory())
+        {
+            count += getFileCountRecursive(entry, filter);
+        }
+        else
+        {
+            if (str_ends_with_ul(entry.name(), filter))
+            {
+                count++;
+            }
+        }
+
+        entry.close();
+    }
+
+    return count;
+}
+
+uint32_t getFileCount(char *filter)
+{
+    File dir = LittleFS.open("/", "r");
+    if (!dir)
+    {
+        return 0;
+    }
+
+    uint32_t count = getFileCountRecursive(dir, filter);
+    dir.close();
+    return count;
+}
+
 void FS_Setup(void)
 {
 #ifdef SD_MMC_ENABLED
