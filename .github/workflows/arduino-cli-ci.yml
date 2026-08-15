@@ -152,7 +152,7 @@ jobs:
           - name: "Generic STM32H7 Series - Daisy Seed"
             fname: "genh7_daisy_seed"
             fqbn: "STMicroelectronics:stm32:GenH7:pnum=DAISY_SEED"
-            core: "STMicroelectronics:stm32"
+            core: "STMicroelectronics:stm32@2.12.0"
             urls: "https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json"
             family: "STM32H7"
             extra_libs: "DaisyDuino@1.7.0"
