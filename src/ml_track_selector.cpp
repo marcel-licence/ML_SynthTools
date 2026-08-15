@@ -48,9 +48,6 @@
 #include <fs/fs_access.h>
 
 
-static char s_filter[8] = "";
-
-
 enum fileLoadStatus
 {
     fls_ok,
@@ -69,17 +66,38 @@ static uint8_t g_totalFilesFound = 0;
 static bool g_auto_reload = true;
 static bool g_is_first_loaded_file = true;
 
+static const struct trackselector_cfg *s_cfg = NULL;
 
+
+/* to be removed in future */
+extern uint32_t getFileCount(const char *filter);
+extern bool getFileFromIdx(uint32_t index, char *filename_buffer, uint32_t buffer_size, const char *filter);
+
+
+/* to be removed in future */
 void TrackSelector_Setup(const char *filter)
 {
+    static struct trackselector_cfg local_cfg;
+    static char s_filter[8] = "";
+
     strncpy(s_filter, filter, sizeof(s_filter));
+    local_cfg.filter = s_filter;
+    local_cfg.io.getFileCount = getFileCount;
+    local_cfg.io.getFileNameFromIndex = getFileFromIdx;
+
+    TrackSelector_Setup(&local_cfg);
+}
+
+void TrackSelector_Setup(const struct trackselector_cfg *cfg)
+{
+    s_cfg = cfg;
 
     FS_Setup();
 
-    g_totalFilesFound = getFileCount(s_filter);
+    g_totalFilesFound = s_cfg->io.getFileCount(s_cfg->filter);
     g_is_first_loaded_file = true;
 
-    TrackSelector_DebugPrintf("Found %u %s files\n", g_totalFilesFound, s_filter);
+    TrackSelector_DebugPrintf("Found %u %s files\n", g_totalFilesFound, s_cfg->filter);
 }
 
 bool TrackSelector_LoadFirst(void)
@@ -107,12 +125,12 @@ static enum fileLoadStatus LoadFileFromIdx(int fileIdx)
 
     char filename[64];
 
-    if (!getFileFromIdx(fileIdx, filename, s_filter))
+    if (!s_cfg->io.getFileNameFromIndex(fileIdx, filename, sizeof(filename), s_cfg->filter))
     {
         if (fileIdx > 0)
         {
             fileIdx = 0;
-            if (!getFileFromIdx(fileIdx, filename, s_filter))
+            if (!s_cfg->io.getFileNameFromIndex(fileIdx, filename, sizeof(filename), s_cfg->filter))
             {
                 return fls_file_not_found;
             }
