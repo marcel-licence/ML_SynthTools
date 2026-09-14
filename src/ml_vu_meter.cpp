@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Marcel Licence
+ * Copyright (c) 2026 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -103,6 +103,27 @@ void VuMeter_PutSamples(float *left, float *right, uint32_t len)
         if (ABS_F(right[i]) > _vuMeterValueInBf[1])
         {
             _vuMeterValueInBf[1] = ABS_F(right[i]);
+        }
+    }
+}
+
+void VuMeter_PutSamples(Q1_14 *left, Q1_14 *right, uint32_t len)
+{
+    for (uint32_t i = 0; i < len; i++)
+    {
+        float sample_l = left[i].s16;
+        sample_l /= 32768.0f; /* convert to float */
+
+        float sample_r = right[i].s16;
+        sample_r /= 32768.0f; /* convert to float */
+
+        if (ABS_F(sample_l) > _vuMeterValueInBf[0])
+        {
+            _vuMeterValueInBf[0] = ABS_F(sample_l);
+        }
+        if (ABS_F(sample_r) > _vuMeterValueInBf[1])
+        {
+            _vuMeterValueInBf[1] = ABS_F(sample_r);
         }
     }
 }
