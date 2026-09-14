@@ -58,7 +58,7 @@ jobs:
         xargs -0 -I{} clang++ \
           -std=c++17 \
           -DARDUINO=1 \
-          -D__CDT_PARSER__=0 \
+          -Isrc \
           -fsyntax-only {}
 
     # ----------------------------
