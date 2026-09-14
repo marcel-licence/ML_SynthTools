@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Marcel Licence
+ * Copyright (c) 2026 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,11 +42,13 @@
 
 
 #include <stdint.h>
+#include <ml_types.h>
 
 
 void VuMeter_Init(void);
 void VuMeter_Process(void);
 void VuMeter_PutSamples(float *left, float *right, uint32_t len);
+void VuMeter_PutSamples(Q1_14 *left, Q1_14 *right, uint32_t len);
 float getVuMeterVal(uint8_t idx);
 
 
