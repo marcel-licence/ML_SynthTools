@@ -210,7 +210,8 @@ struct midi_port_s
 };
 
 #if (defined ARDUINO_DAISY_SEED) || (defined STM32H7xx)
-HardwareSerial Serial2(USART1);
+//HardwareSerial Serial2(USART1);
+extern Uart Serial2;
 #endif
 
 #if (defined ARDUINO_GENERIC_F407VGTX) // || (defined ARDUINO_DISCO_F407VG)
