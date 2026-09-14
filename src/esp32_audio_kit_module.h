@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Marcel Licence
+ * Copyright (c) 2026 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -142,9 +142,14 @@ void ac101_mclk_setup()
 {
     uint32_t freq = SAMPLE_RATE * 512; /* The maximal frequency is 80000000 / 2^bit_num */
     Serial.printf("Output frequency: %d\n", freq);
+#if 0 /* not supported by new ESP32 library */
     ledcSetup(MCLK_CH, freq, PWM_BIT);
     ledcAttachPin(OUTPUT_PIN, MCLK_CH);
     ledcWrite(MCLK_CH, 1 << (PWM_BIT - 1)); /* 50% duty -> The available duty levels are (2^bit_num)-1, where bit_num can be 1-15. */
+#else
+    ledcAttach(OUTPUT_PIN, freq, PWM_BIT);
+    ledcWrite(OUTPUT_PIN, 1 << (PWM_BIT - 1)); /* 50% duty */
+#endif
 }
 
 /*

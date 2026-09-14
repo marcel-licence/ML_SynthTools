@@ -64,6 +64,8 @@
  */
 #define FST fs::FS
 
+#define FILENAME_MAX_LEN    64
+
 /*
  * static function declarations
  */
@@ -169,7 +171,8 @@ uint32_t getFileFromIdx(File dir, int numTabs, uint32_t idx, char *filename, cha
             {
                 if (idx == 0)
                 {
-                    strcpy(filename, entry.name());
+                    strncpy(filename, entry.name(), FILENAME_MAX_LEN - 1);
+                    filename[FILENAME_MAX_LEN - 1] = '\0';
                     return idx;
                 }
                 idx -= 1;
@@ -184,18 +187,66 @@ uint32_t getFileFromIdx(File dir, int numTabs, uint32_t idx, char *filename, cha
 bool getFileFromIdx(uint32_t idx, char *filename, char *filter)
 {
     File dir = LittleFS.open("/", "r");
-    char filename_clean[64];
+    char filename_clean[FILENAME_MAX_LEN - 1];
 
-    bool result = getFileFromIdx(dir, 0, idx, filename_clean, filter) == 0 ? true : false;
-    sprintf(filename, "/%s", filename_clean);
+    bool found = (getFileFromIdx(dir, 0, idx, filename_clean, filter) == 0);
+
+    if (found)
+    {
+        snprintf(filename, FILENAME_MAX_LEN, "/%s", filename_clean);
+    }
+
     dir.close();
-    return result;
+    return found;
+}
+
+static uint32_t getFileCountRecursive(File dir, char *filter)
+{
+    uint32_t count = 0;
+
+    while (true)
+    {
+        File entry = dir.openNextFile();
+        if (!entry)
+        {
+            break;
+        }
+
+        if (entry.isDirectory())
+        {
+            count += getFileCountRecursive(entry, filter);
+        }
+        else
+        {
+            if (str_ends_with_ul(entry.name(), filter))
+            {
+                count++;
+            }
+        }
+
+        entry.close();
+    }
+
+    return count;
+}
+
+uint32_t getFileCount(char *filter)
+{
+    File dir = LittleFS.open("/", "r");
+    if (!dir)
+    {
+        return 0;
+    }
+
+    uint32_t count = getFileCountRecursive(dir, filter);
+    dir.close();
+    return count;
 }
 
 /*
  * function definitions
  */
-void FS_Setup(void)
+void FS_Setup(bool listFiles)
 {
     if (!LittleFS.begin())
     {
@@ -205,12 +256,18 @@ void FS_Setup(void)
 
     Serial.printf("LittleFS Mount Successful!\n");
 
+    if (listFiles)
     {
         Serial.printf("List files ...\n\n");
         File dir = LittleFS.open("/", "r");
         printDirectory(dir, 0);
         dir.close();
     }
+}
+
+void FS_Setup(void)
+{
+    FS_Setup(true);
 }
 
 

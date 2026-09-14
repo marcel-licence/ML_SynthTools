@@ -78,6 +78,7 @@ uint32_t getStaticPos(void);
 uint32_t getCurrentOffset(void);
 uint32_t readBytesFromAddr(uint8_t *buffer, uint32_t addr, uint32_t len);
 bool getFileFromIdx(uint32_t idx, char *filename, char *filter);
+uint32_t getFileCount(char *filter);
 
 void WavToKeyboard(fs_id_t id, const char *dirname, void(*fileInd)(const char *filename, int offset, uint8_t note), int depth, int max_depth, uint8_t note);
 

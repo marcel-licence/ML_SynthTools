@@ -45,8 +45,10 @@
 #include <blink.h>
 #include <es8388.h>
 #include <esp32_audio_kit_module.h>
-#if defined (ESP32) || defined (ESP8266) || defined (ARDUINO_RASPBERRY_PI_PICO) || defined (ARDUINO_ARCH_RP2040)
+#if defined (ESP32) || defined (ESP8266) || defined (ARDUINO_RASPBERRY_PI_PICO) || defined (ARDUINO_ARCH_RP2040) || (defined TEENSYDUINO)
 #include <fs/fs_access.h>
+#endif
+#if defined (ESP32) || defined (ESP8266) || defined (ARDUINO_RASPBERRY_PI_PICO) || defined (ARDUINO_ARCH_RP2040)
 #include <fs/fs_common.h>
 #include <fs/fs_esp32.h>
 #include <fs/fs_esp8266.h>
