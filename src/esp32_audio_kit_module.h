@@ -97,8 +97,6 @@ void ac101_setup();
 
 #define KEY_SETTLE_VAL  9 /* use higher value if anaog buton detection is unstable */
 
-uint32_t keyMin[7] = {4095 - 32, 0, 462 - 32, 925 - 32, 1283 - 32, 1570 - 32, 1800 - 32};
-uint32_t keyMax[7] = {4095 + 32, 0 + 32, 525 + 32, 1006 + 32, 1374 + 32, 1570 + 32, 1800 + 32 };
 #endif
 
 #define OUTPUT_PIN 0
@@ -128,8 +126,26 @@ uint32_t keyMax[7] = {4095 + 32, 0 + 32, 525 + 32, 1006 + 32, 1374 + 32, 1570 + 
 #ifdef ML_SYNTH_INLINE_DEFINITION
 #ifdef ESP32_AUDIO_KIT
 
+
+#include <driver/adc.h> /* for old framework */
+
+
+#define ADC_VAL_KEY6 448
+#define ADC_VAL_KEY5 392
+#define ADC_VAL_KEY4 320
+#define ADC_VAL_KEY3 230
+#define ADC_VAL_KEY2 115
+#define ADC_VAL_KEY1 0
+
+#define ADC_VAL_KEY_NONE    1023
+
+
+static uint32_t keyMin[7] = {ADC_VAL_KEY_NONE - 32, ADC_VAL_KEY1, ADC_VAL_KEY2 - 32, ADC_VAL_KEY3 - 32, ADC_VAL_KEY4 - 32, ADC_VAL_KEY5 - 32, ADC_VAL_KEY6 - 32};
+static uint32_t keyMax[7] = {ADC_VAL_KEY_NONE + 32, ADC_VAL_KEY1 + 32, ADC_VAL_KEY2 + 32, ADC_VAL_KEY3 + 32, ADC_VAL_KEY4 + 32, ADC_VAL_KEY5 + 32, ADC_VAL_KEY6 + 32 };
+
+
 #ifdef AC101_ENABLED
-#include "AC101.h" /* only compatible with forked repo: https://github.com/marcel-licence/AC101 */
+#include <AC101.h> /* only compatible with forked repo: https://github.com/marcel-licence/AC101 */
 
 
 static AC101 ac;
@@ -138,19 +154,24 @@ static AC101 ac;
  * this function could be used to set up the masterclock
  * it is not necessary to use the ac101
  */
-void ac101_mclk_setup()
+#if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+void ac101_mclk_setup(void)
 {
-    uint32_t freq = SAMPLE_RATE * 512; /* The maximal frequency is 80000000 / 2^bit_num */
+    uint32_t freq = SAMPLE_RATE * 512;
+    Serial.printf("Output frequency: %" PRIu32 "\n", freq);
+    ledcAttach(OUTPUT_PIN, freq, PWM_BIT);
+    ledcWrite(OUTPUT_PIN, 1 << (PWM_BIT - 1)); /* 50% duty-cycle */
+}
+#else
+void ac101_mclk_setup(void)
+{
+    uint32_t freq = SAMPLE_RATE * 512;
     Serial.printf("Output frequency: %d\n", freq);
-#if 0 /* not supported by new ESP32 library */
     ledcSetup(MCLK_CH, freq, PWM_BIT);
     ledcAttachPin(OUTPUT_PIN, MCLK_CH);
     ledcWrite(MCLK_CH, 1 << (PWM_BIT - 1)); /* 50% duty -> The available duty levels are (2^bit_num)-1, where bit_num can be 1-15. */
-#else
-    ledcAttach(OUTPUT_PIN, freq, PWM_BIT);
-    ledcWrite(OUTPUT_PIN, 1 << (PWM_BIT - 1)); /* 50% duty */
-#endif
 }
+#endif
 
 /*
  * complete setup of the ac101 to enable in/output
@@ -198,7 +219,7 @@ void ac101_setup()
 /*
  * pullup required to enable reading the buttons (buttons will connect them to ground if pressed)
  */
-void button_setup()
+void button_setup(void)
 {
 #ifdef AUDIO_KIT_BUTTON_DIGITAL
     pinMode(PIN_PLAY, INPUT_PULLUP);
@@ -235,7 +256,7 @@ void ac101_setSourceLine(void)
  * very bad implementation checking the button state
  * there is some work required for a better functionality
  */
-void button_loop()
+void button_loop(void)
 {
 #ifdef AUDIO_KIT_BUTTON_DIGITAL
     if (digitalRead(PIN_PLAY) == LOW)
