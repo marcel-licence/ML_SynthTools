@@ -1,0 +1,81 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Custom Libraries
+      run: |
+        mkdir -p ~/Arduino/libraries
+
+        git clone --depth 1 --branch "$REF" https://github.com/marcel-licence/ML_SynthTools_Lib.git \
+          ~/Arduino/libraries/ML_SynthTools_Lib \
+          || git clone --depth 1 https://github.com/marcel-licence/ML_SynthTools_Lib.git \
+          ~/Arduino/libraries/ML_SynthTools_Lib
+
+    # ----------------------------
+    # cppcheck
+    # ----------------------------
+    - name: Install cppcheck
+      run: sudo apt-get install -y cppcheck
+
+    - name: Run cppcheck
+      id: cppcheck
+      continue-on-error: true
+      run: |
+        cppcheck \
+          --enable=all \
+          --inconclusive \
+          --suppress=missingIncludeSystem \
+          --suppress=unusedFunction \
+          -I"$HOME/Arduino/libraries/ML_SynthTools_Lib/src" \
+          src
+
+    # ----------------------------
+    # clang-format
+    # ----------------------------
+    - name: Install clang-format
+      run: sudo apt-get install -y clang-format
+
+    - name: Check formatting
+      id: format
+      continue-on-error: true
+      run: |
+        find src -name "*.cpp" -o -name "*.h" | \
+        xargs clang-format -n --Werror
+
+    # ----------------------------
+    # clang syntax check
+    # ----------------------------
+    - name: Install clang
+      run: sudo apt-get install -y clang
+
+    - name: Run clang syntax check
+      id: clang
+      continue-on-error: true
+      run: |
+        find src -name "*.cpp" \
+          ! -path "*generated*" \
+          -print0 | \
+        xargs -0 -I{} clang++ \
+          -std=c++17 \
+          -DARDUINO=1 \
+          -Isrc \
+          -fsyntax-only {}
+
+    # ----------------------------
+    # Final decision
+    # ----------------------------
+    - name: Fail if something failed
+      if: |
+        steps.cppcheck.outcome == 'failure' ||
+        steps.format.outcome == 'failure'
+      run: exit 1
