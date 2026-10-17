@@ -210,7 +210,8 @@ struct midi_port_s
 };
 
 #if (defined ARDUINO_DAISY_SEED) || (defined STM32H7xx)
-#if 0 /* Serial2 is defined in new STM32 board library, wasn't defined in the old one */
+/* Serial2 is defined in new STM32 board library, wasn't defined in the old one */
+#if STM32_CORE_VERSION_MAJOR<3
 HardwareSerial Serial2(USART1);
 #else
 extern Uart Serial2;
