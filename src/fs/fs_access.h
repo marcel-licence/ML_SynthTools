@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Marcel Licence
+ * Copyright (c) 2026 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,6 +69,7 @@ bool FS_OpenFile(fs_id_t id, const char *filename, const char *mode);
 bool FS_OpenFile(fs_id_t id, const char *filename);
 void FS_CloseFile(void);
 void FS_UseTempFile(void);
+bool FS_FileExists(fs_id_t id, const char *path);
 
 uint32_t readBytes(uint8_t *buffer, uint32_t len);
 uint32_t writeBytes(uint8_t *buffer, uint32_t len);

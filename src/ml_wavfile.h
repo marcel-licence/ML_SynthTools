@@ -41,6 +41,10 @@
 #define ML_WAVFILE_H_
 
 
+#define WAVE_FILE_FORMAT_HEADER_SIZE  16
+#define WAV_FILE_FORMAT_TAG_PCM 0x0001
+
+
 union wav_tag__header_u
 {
     struct
