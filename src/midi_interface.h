@@ -217,7 +217,7 @@ HardwareSerial Serial2(USART1);
 #if defined(ENABLE_HWSERIAL2)
 extern Uart Serial2;
 #else
-Uart Serial2(USART1); 
+Uart Serial2(USART1);
 #endif
 #endif
 #endif
