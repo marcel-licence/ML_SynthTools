@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Marcel Licence
+ * Copyright (c) 2026 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -170,6 +170,16 @@ void FS_CloseFile(void)
 void FS_UseTempFile(void)
 {
     g_file = t_file;
+}
+
+bool FS_FileExists(FST &fs, const char *path)
+{
+    return fs.exists(path);
+}
+
+bool FS_FileExists(fs_id_t id, const char *path)
+{
+    return FS_FileExists(FsFromId(id), path);
 }
 
 uint32_t readBytes(uint8_t *buffer, uint32_t len)
