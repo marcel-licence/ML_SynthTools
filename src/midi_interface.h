@@ -214,7 +214,7 @@ struct midi_port_s
 #if STM32_CORE_VERSION<0x03000000
 HardwareSerial Serial2(USART1);
 #else
-extern Uart Serial2;
+Uart Serial2;
 #endif
 #endif
 
