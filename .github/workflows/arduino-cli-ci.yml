@@ -279,18 +279,27 @@ jobs:
         fi
 
     - name: Install Custom Libraries
+      env:
+        # PR: source branch name, push/tag: branch or tag name
+        REF: ${{ github.head_ref || github.ref_name }}
       run: |
         mkdir -p ~/Arduino/libraries
 
-        git clone --depth 1 --branch "$REF" https://github.com/marcel-licence/ML_SynthTools.git \
-          ~/Arduino/libraries/ML_SynthTools \
-          || git clone --depth 1 https://github.com/marcel-licence/ML_SynthTools.git \
-          ~/Arduino/libraries/ML_SynthTools
+        # ML_SynthTools: use the code that was just checked out (same branch/commit)
+        ln -s "$GITHUB_WORKSPACE" ~/Arduino/libraries/ML_SynthTools
 
-        git clone --depth 1 --branch "$REF" https://github.com/marcel-licence/ML_SynthTools_Lib.git \
-          ~/Arduino/libraries/ML_SynthTools_Lib \
-          || git clone --depth 1 https://github.com/marcel-licence/ML_SynthTools_Lib.git \
-          ~/Arduino/libraries/ML_SynthTools_Lib
+        # ML_SynthTools_Lib: same branch/tag name if it exists, otherwise default branch
+        if git ls-remote --exit-code --heads --tags \
+             https://github.com/marcel-licence/ML_SynthTools_Lib.git "$REF" > /dev/null; then
+          git clone --depth 1 --branch "$REF" \
+            https://github.com/marcel-licence/ML_SynthTools_Lib.git \
+            ~/Arduino/libraries/ML_SynthTools_Lib
+        else
+          echo "No '$REF' in ML_SynthTools_Lib, using default branch"
+          git clone --depth 1 \
+            https://github.com/marcel-licence/ML_SynthTools_Lib.git \
+            ~/Arduino/libraries/ML_SynthTools_Lib
+        fi
 
     - name: Compile Sketch
       run: |
