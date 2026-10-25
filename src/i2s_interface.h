@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Marcel Licence
+ * Copyright (c) 2026 Marcel Licence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -420,7 +420,7 @@ void i2s_read_stereo_samples_buff(float *fl_sample, float *fr_sample, const int 
 static const i2s_config_t i2s_configuration =
 {
     .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_DAC_BUILT_IN),
-    .sample_rate = SAMPLE_RATE * 1,
+    .sample_rate = SAMPLE_RATE * I2S_OVERSAMPLE,
     .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT, // only the top 8 bits will actually be used by the internal DAC, but using 8 bits straight away seems buggy
     .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT, // always use stereo output. mono seems to be buggy, and the overhead is insignifcant on the ESP32
     .communication_format = (i2s_comm_format_t)(I2S_COMM_FORMAT_STAND_I2S | I2S_COMM_FORMAT_STAND_MSB), // this appears to be the correct setting for internal DAC and PT8211, but not for other dacs
@@ -546,6 +546,11 @@ void setup_i2s()
     Serial.printf("\tfixed_mclk: %d\n", i2s_configuration.fixed_mclk);
     Serial.printf("\tmclk_multiple: %d\n", i2s_configuration.mclk_multiple);
     Serial.printf("\tbits_per_chan: %d\n", i2s_configuration.bits_per_chan);
+    Serial.printf("\tcommunication_format: %d\n", i2s_configuration.communication_format);
+    if (i2s_configuration.communication_format == I2S_COMM_FORMAT_STAND_I2S)
+    {
+        Serial.printf("\t\t format: I2S_COMM_FORMAT_STAND_I2S\n");
+    }
 #if 0 /* for future use */
     Serial.printf("\tchan_mask: %d\n", i2s_configuration.chan_mask);
     Serial.printf("\ttotal_chan: %d\n", i2s_configuration.total_chan);
@@ -568,7 +573,7 @@ void setup_i2s()
     Serial.printf("    DIN: %d\n", pins.data_in_num);
     Serial.printf("    MCLK: %d\n", pins.mck_io_num);
 #endif
-    i2s_set_sample_rates(i2s_port_number, SAMPLE_RATE);
+    i2s_set_sample_rates(i2s_port_number, SAMPLE_RATE * I2S_OVERSAMPLE);
     i2s_start(i2s_port_number);
 #ifdef ES8388_ENABLED
 #ifdef PIN_CTRL
