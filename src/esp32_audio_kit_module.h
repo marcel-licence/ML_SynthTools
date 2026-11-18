@@ -167,9 +167,13 @@ void ac101_mclk_setup(void)
 {
     uint32_t freq = SAMPLE_RATE * 512;
     Serial.printf("Output frequency: %d\n", freq);
+#if ESP_ARDUINO_VERSION_MAJOR < 3
     ledcSetup(MCLK_CH, freq, PWM_BIT);
     ledcAttachPin(OUTPUT_PIN, MCLK_CH);
     ledcWrite(MCLK_CH, 1 << (PWM_BIT - 1)); /* 50% duty -> The available duty levels are (2^bit_num)-1, where bit_num can be 1-15. */
+#else
+#warning MCLK not supported yet
+#endif
 }
 #endif
 
